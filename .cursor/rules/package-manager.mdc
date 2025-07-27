@@ -1,0 +1,23 @@
+---
+description: Always use Yarn (v1 or Berry) for dependency management & scripts
+globs: ["**/*"]
+alwaysApply: true
+---
+
+- Detect Yarn by checking for **`yarn.lock`** or **`.yarnrc.yml`** at the repo root.  
+- Use Yarn commands, never `npm` or `pnpm`:
+  • Install: `yarn add` / `yarn add -D`  
+  • Remove: `yarn remove`  
+  • Upgrade: `yarn up <pkg>@latest`  
+  • Run scripts: `yarn test`, `yarn dev`, `yarn build`, etc.
+- If the repo is using Yarn Berry (presence of `.yarnrc.yml` with `packageExtensions` or `plugins`):
+  • Use `yarn dlx` for one-off CLIs.  
+  • Prefer **`npm:` protocol** for package aliases when needed (e.g., `yarn add eslint-config-airbnb@npm:eslint-config-airbnb@latest`).
+- When generating `package.json` scripts, follow this naming convention:
+  • `dev` → Vite dev server  
+  • `build` → Vite production build  
+  • `preview` → Vite preview server  
+  • `test` → Vitest  
+  • `lint` → eslint  
+  • `type-check` → `tsc --noEmit`
+- Any instructions, comments, or CI steps produced by Cursor must use Yarn syntax (e.g., `- run: yarn install --immutable` in GitHub Actions).

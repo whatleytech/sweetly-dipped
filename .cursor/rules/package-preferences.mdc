@@ -1,0 +1,15 @@
+---
+description: Prefer proven libraries over custom code
+globs: ["src/**/*.{ts,tsx,js,jsx}", "server/**/*.{ts,js}"]
+alwaysApply: true
+---
+
+- When a well-maintained, battle-tested package exists, prefer it over reinventing the wheel. Examples:
+  • Lodash for collection utilities  
+  • date-fns or dayjs for date manipulation  
+  • Zod or Yup for runtime validation  
+  • React Hook Form for forms  
+  • TanStack Query for server state
+- Evaluate lib health: ≥ 5k GitHub stars, recent commits (< 12 months), permissive license.
+- Wrap third-party code behind a thin adapter when helpful to avoid vendor lock-in.
+- Every new dependency must be added with `pnpm add pkg@latest` and properly typed (use `@types/*` if needed).

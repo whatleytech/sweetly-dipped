@@ -1,0 +1,13 @@
+---
+description: Keep React components and functions small & single-responsibility
+globs: ["src/**/*.{tsx,ts,jsx,js}"]
+alwaysApply: false
+---
+
+- A React component should:
+  • Have ≤ 250 LOC (including types and styles).  
+  • Receive **typed props** and export those props for reuse (`export type { FooProps }`).  
+  • Contain no more than one `useEffect` (split into custom hooks when logic grows).  
+  • Extract reusable logic into `src/hooks/` and pure helpers into `src/utils/`.
+- A function should do ONE thing; if it’s > 40 LOC or has nested conditionals, break it up.
+- Prefer composition over prop drilling; use context sparingly and only for cross-cutting concerns (theme, auth, cart).
