@@ -1,0 +1,17 @@
+:root {
+  --brown-dark: #3e2723;
+  --brown-light: #795548;
+  --cream: #fff8f1;
+  --gold-accent: #bfa276;
+  --text-base: #2b2b2b;
+
+  --font-heading: 'Playfair Display', serif;
+  --font-body: 'Inter', sans-serif;
+
+  --max-width: 1440px;
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 1rem;
+  --spacing-md: 1.5rem;
+  --spacing-lg: 2rem;
+  --spacing-xl: 3rem;
+}
