@@ -1,69 +1,86 @@
-# React + TypeScript + Vite
+# Sweetly Dipped
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A luxury-but-accessible chocolate-treat e-commerce site built with React, TypeScript, and Vite.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Responsive Design**: Mobile-first approach with tablet and desktop breakpoints
+- **Brand Consistency**: Sweetly Dipped color palette and typography
+- **Component Architecture**: Modular, reusable components with CSS Modules
+- **Type Safety**: Full TypeScript implementation
+- **Testing**: Comprehensive test coverage with Vitest and React Testing Library
 
-## Expanding the ESLint configuration
+## Landing Page
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+The landing page showcases our chocolate-covered treats with:
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- **Hero Section**: Lifestyle imagery with compelling headline and sub-copy
+- **Treats Grid**: Four treat categories (Pretzels, Oreos, Marshmallows, Rice Krispies)
+- **Packages Table**: Four pricing tiers with "Medium" highlighted as most popular
+- **CTA Band**: Prominent call-to-action to start the order funnel
+- **Footer**: Brand information and social links
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+### Running Locally
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+1. **Install dependencies**:
+   ```bash
+   yarn install
+   ```
+
+2. **Start development server**:
+   ```bash
+   yarn dev
+   ```
+
+3. **Open your browser** and navigate to `http://localhost:5173`
+
+### Available Scripts
+
+- `yarn dev` - Start development server
+- `yarn build` - Build for production
+- `yarn preview` - Preview production build
+- `yarn test` - Run tests once
+- `yarn test:watch` - Run tests in watch mode
+- `yarn lint` - Run ESLint
+
+### Tech Stack
+
+- **Frontend**: React 19, TypeScript, Vite
+- **Styling**: CSS Modules with custom properties
+- **Testing**: Vitest, React Testing Library
+- **Routing**: React Router DOM
+- **Package Manager**: Yarn
+
+### Project Structure
+
+```
+src/
+├── components/          # Reusable UI components
+│   ├── Layout/         # Main layout wrapper
+│   ├── HeroSection/    # Landing page hero
+│   ├── TreatsGrid/     # Treat categories grid
+│   ├── PackagesTable/  # Pricing packages
+│   ├── CtaBand/        # Call-to-action section
+│   └── Footer/         # Site footer
+├── pages/              # Route components
+│   └── LandingPage.tsx # Main landing page
+├── assets/             # Static assets
+│   ├── theme.css       # Global CSS variables
+│   └── images/         # Image assets
+├── types/              # TypeScript type definitions
+└── main.tsx           # App entry point
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Brand Colors
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Our design system uses a carefully crafted color palette:
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- **Chocolate Coating**: `#4b2e2b` (Dark brown)
+- **Drip Highlight**: `#6b433f` (Light brown)
+- **Logo Pink**: `#ff66a0` (Primary accent)
+- **Background Tint**: `#ffe6f1` (Light pink)
+- **Frosting**: `#fffaf6` (Cream)
+- **Pure White**: `#ffffff` (White)
+- **Gold Accent**: `#bfa276` (Secondary accent)
+
+All colors are defined as CSS custom properties for consistent usage across components.
