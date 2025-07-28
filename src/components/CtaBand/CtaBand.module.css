@@ -1,0 +1,56 @@
+.ctaSection {
+  padding: var(--spacing-xl) var(--spacing-sm);
+  background: var(--sd-brown-dark);
+  text-align: center;
+}
+
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+.ctaButton {
+  background: var(--sd-gold-accent);
+  color: var(--sd-brown-dark);
+  border: none;
+  border-radius: 8px;
+  padding: var(--spacing-md) var(--spacing-xl);
+  font-family: var(--font-body);
+  font-size: 1.25rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 16px rgba(191, 162, 118, 0.3);
+}
+
+.ctaButton:hover {
+  background: #d4b88a;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(191, 162, 118, 0.4);
+}
+
+.ctaButton:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(191, 162, 118, 0.3);
+}
+
+.ctaButton:focus {
+  outline: 3px solid var(--sd-pink-base);
+  outline-offset: 2px;
+}
+
+/* Tablet and up */
+@media (min-width: 768px) {
+  .ctaButton {
+    font-size: 1.5rem;
+    padding: var(--spacing-lg) var(--spacing-xl);
+  }
+}
+
+/* Desktop and up */
+@media (min-width: 1024px) {
+  .ctaButton {
+    font-size: 1.75rem;
+    padding: var(--spacing-lg) calc(var(--spacing-xl) * 2);
+  }
+} 

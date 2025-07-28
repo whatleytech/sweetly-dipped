@@ -1,0 +1,78 @@
+.hero {
+  padding: var(--spacing-xl) var(--spacing-sm);
+  background: var(--sd-cream);
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+}
+
+.content {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-lg);
+  align-items: center;
+}
+
+.text {
+  text-align: center;
+}
+
+.headline {
+  font-family: var(--font-heading);
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--sd-brown-dark);
+  margin-bottom: var(--spacing-md);
+  line-height: 1.2;
+}
+
+.subcopy {
+  font-family: var(--font-body);
+  font-size: 1.25rem;
+  color: var(--sd-brown-light);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.image {
+  display: flex;
+  justify-content: center;
+}
+
+.lifestyleImage {
+  width: 100%;
+  max-width: 600px;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(75, 46, 43, 0.15);
+}
+
+/* Tablet and up */
+@media (min-width: 768px) {
+  .content {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-xl);
+    text-align: left;
+  }
+  
+  .text {
+    text-align: left;
+  }
+  
+  .headline {
+    font-size: 3rem;
+  }
+}
+
+/* Desktop and up */
+@media (min-width: 1024px) {
+  .headline {
+    font-size: 3.5rem;
+  }
+  
+  .subcopy {
+    font-size: 1.5rem;
+  }
+} 
