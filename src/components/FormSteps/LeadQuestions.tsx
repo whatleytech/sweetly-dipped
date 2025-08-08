@@ -13,17 +13,51 @@ interface FormStepProps {
 }
 
 export const LeadQuestions = ({ formData, updateFormData, onNext }: FormStepProps) => {
+  const isValidEmail = (email: string): boolean => {
+    // Basic RFC 5322-inspired email pattern good enough for client-side checks
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailPattern.test(email);
+  };
+
+  const isValidPhone = (phone: string): boolean => {
+    // Enforce 123-456-7890 format
+    const phonePattern = /^\d{3}-\d{3}-\d{4}$/;
+    return phonePattern.test(phone);
+  };
+
   const handleInputChange =
     (field: keyof FormData) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (field === "phone") {
+        const rawValue = e.target.value;
+        const digitsOnly = rawValue.replace(/\D/g, "").slice(0, 10);
+
+        const formatPhone = (digits: string): string => {
+          if (digits.length <= 3) return digits;
+          if (digits.length <= 6)
+            return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+          return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(
+            6
+          )}`;
+        };
+
+        updateFormData({ phone: formatPhone(digitsOnly) });
+        return;
+      }
+
       updateFormData({ [field]: e.target.value });
     };
 
   const isFormValid = () => {
+    const hasAllRequiredValues =
+      !!formData.firstName.trim() &&
+      !!formData.lastName.trim() &&
+      !!formData.email.trim() &&
+      !!formData.phone.trim();
+
+    if (!hasAllRequiredValues) return false;
+
     return (
-      formData.firstName.trim() &&
-      formData.lastName.trim() &&
-      formData.email.trim() &&
-      formData.phone.trim()
+      isValidEmail(formData.email.trim()) && isValidPhone(formData.phone.trim())
     );
   };
 
@@ -83,10 +117,12 @@ export const LeadQuestions = ({ formData, updateFormData, onNext }: FormStepProp
           <input
             id="email"
             type="email"
+            inputMode="email"
             value={formData.email}
             onChange={handleInputChange("email")}
             className={styles.input}
             placeholder="Enter your email address"
+            aria-invalid={!!formData.email && !isValidEmail(formData.email)}
             required
           />
         </div>
@@ -98,10 +134,14 @@ export const LeadQuestions = ({ formData, updateFormData, onNext }: FormStepProp
           <input
             id="phone"
             type="tel"
+            inputMode="tel"
+            pattern="\\d{3}-\\d{3}-\\d{4}"
+            maxLength={12}
             value={formData.phone}
             onChange={handleInputChange("phone")}
             className={styles.input}
-            placeholder="Enter your phone number"
+            placeholder="123-456-7890"
+            aria-invalid={!!formData.phone && !isValidPhone(formData.phone)}
             required
           />
         </div>
