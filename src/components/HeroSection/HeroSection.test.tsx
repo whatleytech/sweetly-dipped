@@ -5,12 +5,20 @@ import { HeroSection } from './HeroSection';
 import React from 'react';
 
 describe('HeroSection', () => {
-  it('renders headline, subcopy, and image', () => {
+  it("renders headline, subcopy, and logo", () => {
     render(<HeroSection />);
-    
-    expect(screen.getByText('Personalized Chocolate-Covered Treats')).toBeInTheDocument();
-    expect(screen.getByText('Elevate your next event with handcrafted indulgence.')).toBeInTheDocument();
-    expect(screen.getByAltText('Luxury chocolate-covered treats display')).toBeInTheDocument();
+
+    expect(
+      screen.getByText("Personalized Chocolate-Covered Treats")
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Elevate your next event with handcrafted indulgence.")
+    ).toBeInTheDocument();
+    expect(
+      screen.getByAltText(
+        "Sweetly Dipped by Jas logo - chocolate dripping design with pink text"
+      )
+    ).toBeInTheDocument();
   });
 
   it('has correct heading structure', () => {

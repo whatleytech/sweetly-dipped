@@ -42,11 +42,16 @@
 }
 
 .lifestyleImage {
-  width: 100%;
-  max-width: 600px;
-  height: auto;
-  border-radius: 12px;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  object-fit: cover;
   box-shadow: 0 8px 32px rgba(75, 46, 43, 0.15);
+  transition: transform 0.3s ease;
+}
+
+.lifestyleImage:hover {
+  transform: scale(1.05);
 }
 
 /* Tablet and up */
@@ -64,6 +69,11 @@
   .headline {
     font-size: 3rem;
   }
+  
+  .lifestyleImage {
+    width: 250px;
+    height: 250px;
+  }
 }
 
 /* Desktop and up */
@@ -74,5 +84,10 @@
   
   .subcopy {
     font-size: 1.5rem;
+  }
+  
+  .lifestyleImage {
+    width: 300px;
+    height: 300px;
   }
 } 

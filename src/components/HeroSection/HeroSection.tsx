@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from './HeroSection.module.css';
+import logo from "../../assets/images/logo.png";
 
 export const HeroSection = () => {
   return (
@@ -14,9 +15,9 @@ export const HeroSection = () => {
           </p>
         </div>
         <div className={styles.image}>
-          <img 
-            src="https://unsplash.it/600/400?chocolate" 
-            alt="Luxury chocolate-covered treats display"
+          <img
+            src={logo}
+            alt="Sweetly Dipped by Jas logo - chocolate dripping design with pink text"
             className={styles.lifestyleImage}
           />
         </div>
