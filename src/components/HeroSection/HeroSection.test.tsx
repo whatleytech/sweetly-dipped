@@ -2,7 +2,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import { HeroSection } from './HeroSection';
-import React from 'react';
+
 
 describe('HeroSection', () => {
   it("renders headline, subcopy, and logo", () => {

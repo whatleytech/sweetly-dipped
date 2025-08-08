@@ -1,5 +1,4 @@
-import React from 'react';
-import styles from './HeroSection.module.css';
+import styles from "./HeroSection.module.css";
 import logo from "../../assets/images/logo.png";
 
 export const HeroSection = () => {
@@ -24,4 +23,4 @@ export const HeroSection = () => {
       </div>
     </section>
   );
-}; 
+};

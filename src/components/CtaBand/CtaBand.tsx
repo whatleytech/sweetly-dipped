@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from "react-router-dom";
 import styles from "./CtaBand.module.css";
 
@@ -31,4 +30,4 @@ export const CtaBand = ({ onStartOrder }: CtaBandProps) => {
       </div>
     </section>
   );
-}; 
+};

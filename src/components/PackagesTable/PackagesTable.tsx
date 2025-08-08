@@ -1,35 +1,34 @@
-import React from 'react';
-import styles from './PackagesTable.module.css';
+import styles from "./PackagesTable.module.css";
 
 const packages = [
   {
-    id: 'small',
-    name: 'Small',
-    quantity: '3 dozen',
+    id: "small",
+    name: "Small",
+    quantity: "3 dozen",
     price: 90,
-    popular: false
+    popular: false,
   },
   {
-    id: 'medium',
-    name: 'Medium',
-    quantity: '5 dozen',
+    id: "medium",
+    name: "Medium",
+    quantity: "5 dozen",
     price: 150,
-    popular: true
+    popular: true,
   },
   {
-    id: 'large',
-    name: 'Large',
-    quantity: '8 dozen',
+    id: "large",
+    name: "Large",
+    quantity: "8 dozen",
     price: 250,
-    popular: false
+    popular: false,
   },
   {
-    id: 'xl',
-    name: 'XL',
-    quantity: '12 dozen',
+    id: "xl",
+    name: "XL",
+    quantity: "12 dozen",
     price: 375,
-    popular: false
-  }
+    popular: false,
+  },
 ];
 
 export const PackagesTable = () => {
@@ -39,9 +38,11 @@ export const PackagesTable = () => {
         <h2 className={styles.title}>Packages</h2>
         <div className={styles.table}>
           {packages.map((pkg) => (
-            <div 
-              key={pkg.id} 
-              className={`${styles.package} ${pkg.popular ? styles.popular : ''}`}
+            <div
+              key={pkg.id}
+              className={`${styles.package} ${
+                pkg.popular ? styles.popular : ""
+              }`}
             >
               {pkg.popular && (
                 <div className={styles.popularBadge}>Most Popular</div>
@@ -55,4 +56,4 @@ export const PackagesTable = () => {
       </div>
     </section>
   );
-}; 
+};

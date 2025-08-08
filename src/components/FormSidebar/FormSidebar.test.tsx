@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 import { FormSidebar } from "./FormSidebar";
 import type { FormData } from "../../pages/DesignPackagePage";
-import React from "react";
+
 
 const mockFormData: FormData = {
   firstName: "John",

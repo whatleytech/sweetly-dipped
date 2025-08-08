@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from "react-router-dom";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { CtaBand } from './CtaBand';
-import React from 'react';
+
 
 // Mock react-router-dom's useNavigate
 const mockNavigate = vi.fn();

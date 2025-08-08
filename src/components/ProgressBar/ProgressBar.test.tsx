@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 import { ProgressBar } from "./ProgressBar";
-import React from "react";
+
 
 describe("ProgressBar", () => {
   it("renders step information correctly", () => {

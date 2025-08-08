@@ -2,7 +2,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { DesignPackagePage } from "./DesignPackagePage";
-import React from "react";
+
 
 // Mock react-router-dom's useNavigate
 const mockNavigate = vi.fn();

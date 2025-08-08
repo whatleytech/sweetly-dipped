@@ -2,7 +2,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import { TreatsGrid } from './TreatsGrid';
-import React from 'react';
+
 
 describe('TreatsGrid', () => {
   it('renders all four treats with names and descriptions', () => {

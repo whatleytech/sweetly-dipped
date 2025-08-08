@@ -1,6 +1,5 @@
-import React from 'react';
-import styles from './FormSteps.module.css';
-import type { FormData } from '../../pages/DesignPackagePage';
+import styles from "./FormSteps.module.css";
+import type { FormData } from "../../pages/DesignPackagePage";
 
 interface FormStepProps {
   formData: FormData;

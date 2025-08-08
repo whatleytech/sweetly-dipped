@@ -1,6 +1,5 @@
-import React from 'react';
-import styles from './FormSteps.module.css';
-import type { FormData } from '../../pages/DesignPackagePage';
+import styles from "./FormSteps.module.css";
+import type { FormData } from "../../pages/DesignPackagePage";
 
 interface FormStepProps {
   formData: FormData;
@@ -12,7 +11,11 @@ interface FormStepProps {
   isLastStep: boolean;
 }
 
-export const LeadQuestions = ({ formData, updateFormData, onNext }: FormStepProps) => {
+export const LeadQuestions = ({
+  formData,
+  updateFormData,
+  onNext,
+}: FormStepProps) => {
   const isValidEmail = (email: string): boolean => {
     // Basic RFC 5322-inspired email pattern good enough for client-side checks
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

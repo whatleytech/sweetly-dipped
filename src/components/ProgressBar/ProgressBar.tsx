@@ -1,5 +1,4 @@
-import React from 'react';
-import styles from './ProgressBar.module.css';
+import styles from "./ProgressBar.module.css";
 
 interface ProgressBarProps {
   currentStep: number;
@@ -19,9 +18,9 @@ export const ProgressBar = ({ currentStep, totalSteps }: ProgressBarProps) => {
           {Math.round(progressPercentage)}% Complete
         </span>
       </div>
-      
+
       <div className={styles.progressBar}>
-        <div 
+        <div
           className={styles.progressFill}
           style={{ width: `${progressPercentage}%` }}
           role="progressbar"

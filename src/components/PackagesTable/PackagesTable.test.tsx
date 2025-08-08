@@ -2,7 +2,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import { PackagesTable } from './PackagesTable';
-import React from 'react';
+
 
 describe('PackagesTable', () => {
   it('renders all packages with correct information', () => {

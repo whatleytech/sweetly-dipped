@@ -1,6 +1,5 @@
-import React from 'react';
-import styles from './FormSteps.module.css';
-import type { FormData } from '../../pages/DesignPackagePage';
+import styles from "./FormSteps.module.css";
+import type { FormData } from "../../pages/DesignPackagePage";
 
 interface FormStepProps {
   formData: FormData;
@@ -12,18 +11,18 @@ interface FormStepProps {
   isLastStep: boolean;
 }
 
-export const CommunicationPreference = ({ 
-  formData, 
-  updateFormData, 
-  onNext, 
-  onPrev 
+export const CommunicationPreference = ({
+  formData,
+  updateFormData,
+  onNext,
+  onPrev,
 }: FormStepProps) => {
-  const handleRadioChange = (value: 'email' | 'text') => {
+  const handleRadioChange = (value: "email" | "text") => {
     updateFormData({ communicationMethod: value });
   };
 
   const isFormValid = () => {
-    return formData.communicationMethod !== '';
+    return formData.communicationMethod !== "";
   };
 
   const handleNext = () => {
@@ -39,24 +38,25 @@ export const CommunicationPreference = ({
           How would you like us to contact you?
         </h3>
         <p className={styles.questionDescription}>
-          We'll use this method to confirm your order and keep you updated on your treats!
+          We'll use this method to confirm your order and keep you updated on
+          your treats!
         </p>
       </div>
 
       <div className={styles.formFields}>
         <div className={styles.radioGroup}>
-          <div 
+          <div
             className={`${styles.radioOption} ${
-              formData.communicationMethod === 'email' ? styles.selected : ''
+              formData.communicationMethod === "email" ? styles.selected : ""
             }`}
-            onClick={() => handleRadioChange('email')}
+            onClick={() => handleRadioChange("email")}
           >
             <input
               type="radio"
               name="communicationMethod"
               value="email"
-              checked={formData.communicationMethod === 'email'}
-              onChange={() => handleRadioChange('email')}
+              checked={formData.communicationMethod === "email"}
+              onChange={() => handleRadioChange("email")}
               className={styles.radioInput}
             />
             <div>
@@ -67,18 +67,18 @@ export const CommunicationPreference = ({
             </div>
           </div>
 
-          <div 
+          <div
             className={`${styles.radioOption} ${
-              formData.communicationMethod === 'text' ? styles.selected : ''
+              formData.communicationMethod === "text" ? styles.selected : ""
             }`}
-            onClick={() => handleRadioChange('text')}
+            onClick={() => handleRadioChange("text")}
           >
             <input
               type="radio"
               name="communicationMethod"
               value="text"
-              checked={formData.communicationMethod === 'text'}
-              onChange={() => handleRadioChange('text')}
+              checked={formData.communicationMethod === "text"}
+              onChange={() => handleRadioChange("text")}
               className={styles.radioInput}
             />
             <div>
@@ -104,7 +104,7 @@ export const CommunicationPreference = ({
           onClick={handleNext}
           disabled={!isFormValid()}
           className={`${styles.button} ${styles.primaryButton} ${
-            !isFormValid() ? styles.disabled : ''
+            !isFormValid() ? styles.disabled : ""
           }`}
         >
           Continue →

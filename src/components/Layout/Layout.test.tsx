@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import { describe, it, expect } from "vitest";
 import { Layout } from "./Layout";
-import React from "react";
+
 
 describe("Layout", () => {
   it("renders navigation, main content, and footer", () => {
