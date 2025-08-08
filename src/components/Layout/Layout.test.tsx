@@ -14,18 +14,26 @@ describe("Layout", () => {
         </Layout>
       </BrowserRouter>
     );
-    
-    // Check navigation elements
-    expect(screen.getByRole('link', { name: 'Sweetly Dipped' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Home' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'About Us' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Build Your Box' })).toBeInTheDocument();
-    
+
+    // Check navigation elements (now in Navigation component)
+    expect(
+      screen.getByRole("link", { name: "Sweetly Dipped" })
+    ).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Home" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "About Us" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Build Your Box" })
+    ).toBeInTheDocument();
+
     // Check footer content
-    expect(screen.getByText('Website created by Whatley Technologies, LLC')).toBeInTheDocument();
-    expect(screen.getByText('Website owned by Sweetly Dipped x Jas, LLC')).toBeInTheDocument();
-    
+    expect(
+      screen.getByText("Website created by Whatley Technologies, LLC")
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Website owned by Sweetly Dipped x Jas, LLC")
+    ).toBeInTheDocument();
+
     // Check child content
-    expect(screen.getByTestId('child')).toHaveTextContent('Child content');
+    expect(screen.getByTestId("child")).toHaveTextContent("Child content");
   });
 });
