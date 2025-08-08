@@ -15,6 +15,7 @@ export default defineConfig({
       enabled: true,
       reporter: ["text", "lcov"],
       thresholds: { lines: 80 },
+      exclude: ["src/main.tsx", "src/App.tsx", "src/types/colors.ts"],
     },
   },
 

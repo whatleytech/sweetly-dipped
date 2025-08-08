@@ -1,0 +1,134 @@
+.sidebar {
+  height: 100%;
+}
+
+.title {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  color: var(--sd-brown-dark);
+  margin: 0 0 var(--spacing-lg) 0;
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 2px solid var(--sd-pink-base);
+}
+
+.stepsList {
+  margin-bottom: var(--spacing-lg);
+}
+
+.stepItem {
+  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-sm);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.stepItem.completed {
+  background: rgba(255, 102, 160, 0.1);
+  border-left: 3px solid var(--sd-pink-base);
+}
+
+.stepItem.current {
+  background: rgba(191, 162, 118, 0.1);
+  border-left: 3px solid var(--sd-gold-accent);
+}
+
+.stepItem.pending {
+  background: rgba(107, 67, 63, 0.05);
+  border-left: 3px solid var(--sd-brown-light);
+  opacity: 0.6;
+}
+
+.stepHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-xs);
+}
+
+.stepNumber {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--sd-white);
+}
+
+.stepItem.completed .stepNumber {
+  background: var(--sd-pink-base);
+}
+
+.stepItem.current .stepNumber {
+  background: var(--sd-gold-accent);
+}
+
+.stepItem.pending .stepNumber {
+  background: var(--sd-brown-light);
+}
+
+.stepTitle {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--sd-brown-dark);
+}
+
+.stepSummary {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  color: var(--sd-brown-light);
+  margin-left: 32px;
+  font-style: italic;
+  line-height: 1.3;
+}
+
+.progressInfo {
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--sd-pink-base);
+}
+
+.progressText {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--sd-brown-dark);
+  margin-bottom: var(--spacing-sm);
+  text-align: center;
+}
+
+.progressBar {
+  width: 100%;
+  height: 6px;
+  background: var(--sd-pink-light);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--sd-pink-base), var(--sd-brown-light));
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+/* Mobile responsive */
+@media (max-width: 1023px) {
+  .sidebar {
+    margin-top: var(--spacing-lg);
+  }
+  
+  .title {
+    font-size: 1.1rem;
+  }
+  
+  .stepTitle {
+    font-size: 0.85rem;
+  }
+  
+  .stepSummary {
+    font-size: 0.75rem;
+  }
+}
