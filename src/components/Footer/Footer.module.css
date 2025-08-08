@@ -32,6 +32,19 @@
   opacity: 0.8;
 }
 
+.companyInfo {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  color: var(--sd-cream);
+  opacity: 0.6;
+  text-align: center;
+}
+
+.companyInfo p {
+  margin: 0;
+  line-height: 1.4;
+}
+
 .social {
   display: flex;
   gap: var(--spacing-md);
@@ -54,10 +67,19 @@
   .content {
     flex-direction: row;
     justify-content: space-between;
+    align-items: flex-start;
     text-align: left;
+    flex-wrap: wrap;
   }
   
   .logo h3 {
     font-size: 1.75rem;
+  }
+  
+  .companyInfo {
+    text-align: left;
+    order: 3;
+    flex-basis: 100%;
+    margin-top: var(--spacing-sm);
   }
 } 

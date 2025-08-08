@@ -12,17 +12,21 @@ export const Footer = () => {
             <h3>Sweetly Dipped</h3>
           </div>
           <div className={styles.copyright}>
-            © {currentYear} Sweetly Dipped. All rights reserved.
+            © {currentYear} Sweetly Dipped x Jas, LLC. All rights reserved.
+          </div>
+          <div className={styles.companyInfo}>
+            <p>Website created by Whatley Technologies, LLC</p>
+            <p>Website owned by Sweetly Dipped x Jas, LLC</p>
           </div>
           <div className={styles.social}>
-            <a href="#" aria-label="Facebook" className={styles.socialLink}>
-              📘
-            </a>
-            <a href="#" aria-label="Instagram" className={styles.socialLink}>
+            <a
+              href="https://www.instagram.com/sweetlydippedxjas"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Follow Sweetly Dipped on Instagram"
+              className={styles.socialLink}
+            >
               📷
-            </a>
-            <a href="#" aria-label="Twitter" className={styles.socialLink}>
-              🐦
             </a>
           </div>
         </div>

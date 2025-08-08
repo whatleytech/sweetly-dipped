@@ -5,20 +5,39 @@ import { Footer } from './Footer';
 import React from 'react';
 
 describe('Footer', () => {
-  it('renders logo, copyright, and social links', () => {
+  it("renders logo, copyright, company info, and Instagram link", () => {
     render(<Footer />);
-    
+
     // Check logo
-    expect(screen.getByText('Sweetly Dipped')).toBeInTheDocument();
-    
-    // Check copyright with current year
+    expect(screen.getByText("Sweetly Dipped")).toBeInTheDocument();
+
+    // Check copyright with current year and updated company name
     const currentYear = new Date().getFullYear();
-    expect(screen.getByText(`© ${currentYear} Sweetly Dipped. All rights reserved.`)).toBeInTheDocument();
-    
-    // Check social links
-    expect(screen.getByLabelText('Facebook')).toBeInTheDocument();
-    expect(screen.getByLabelText('Instagram')).toBeInTheDocument();
-    expect(screen.getByLabelText('Twitter')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        `© ${currentYear} Sweetly Dipped x Jas, LLC. All rights reserved.`
+      )
+    ).toBeInTheDocument();
+
+    // Check company information
+    expect(
+      screen.getByText("Website created by Whatley Technologies, LLC")
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Website owned by Sweetly Dipped x Jas, LLC")
+    ).toBeInTheDocument();
+
+    // Check Instagram link
+    const instagramLink = screen.getByLabelText(
+      "Follow Sweetly Dipped on Instagram"
+    );
+    expect(instagramLink).toBeInTheDocument();
+    expect(instagramLink).toHaveAttribute(
+      "href",
+      "https://www.instagram.com/sweetlydippedxjas"
+    );
+    expect(instagramLink).toHaveAttribute("target", "_blank");
+    expect(instagramLink).toHaveAttribute("rel", "noopener noreferrer");
   });
 
   it('has correct heading structure', () => {

@@ -12,6 +12,11 @@ describe('LandingPage', () => {
     expect(screen.getByText('Personalized Chocolate-Covered Treats')).toBeInTheDocument();
     expect(screen.getByText('Our Treats')).toBeInTheDocument();
     expect(screen.getByText('Packages')).toBeInTheDocument();
+    
+    // Check footer content
+    expect(screen.getByText('Sweetly Dipped')).toBeInTheDocument();
+    expect(screen.getByText('Website created by Whatley Technologies, LLC')).toBeInTheDocument();
+    expect(screen.getByText('Website owned by Sweetly Dipped x Jas, LLC')).toBeInTheDocument();
   });
 
   it('renders CTA button and handles click', () => {
@@ -27,5 +32,13 @@ describe('LandingPage', () => {
     expect(consoleSpy).toHaveBeenCalledWith('Start order clicked');
     
     consoleSpy.mockRestore();
+  });
+
+  it('renders Instagram link in footer', () => {
+    render(<LandingPage />);
+    
+    const instagramLink = screen.getByLabelText('Follow Sweetly Dipped on Instagram');
+    expect(instagramLink).toBeInTheDocument();
+    expect(instagramLink).toHaveAttribute('href', 'https://www.instagram.com/sweetlydippedxjas');
   });
 }); 
