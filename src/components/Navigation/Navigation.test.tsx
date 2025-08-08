@@ -19,7 +19,9 @@ describe('Navigation', () => {
     // Check navigation links
     expect(screen.getByRole('link', { name: 'Home' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'About Us' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Build Your Box' })).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Design Your Package" })
+    ).toBeInTheDocument();
   });
 
   it('has correct link destinations', () => {
@@ -31,12 +33,14 @@ describe('Navigation', () => {
     
     const homeLink = screen.getByRole('link', { name: 'Home' });
     const aboutLink = screen.getByRole('link', { name: 'About Us' });
-    const buildBoxLink = screen.getByRole('link', { name: 'Build Your Box' });
+    const designPackageLink = screen.getByRole("link", {
+      name: "Design Your Package",
+    });
     const logoLink = screen.getByRole('link', { name: 'Sweetly Dipped' });
     
     expect(homeLink).toHaveAttribute('href', '/');
     expect(aboutLink).toHaveAttribute('href', '/about');
-    expect(buildBoxLink).toHaveAttribute('href', '/build-box');
+    expect(designPackageLink).toHaveAttribute("href", "/design-package");
     expect(logoLink).toHaveAttribute('href', '/');
   });
 });

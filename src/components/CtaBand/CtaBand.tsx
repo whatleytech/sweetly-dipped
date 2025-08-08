@@ -14,8 +14,8 @@ export const CtaBand = ({ onStartOrder }: CtaBandProps) => {
     if (onStartOrder) {
       onStartOrder();
     }
-    // Navigate to the build-box page
-    navigate("/build-box");
+    // Navigate to the design-package page
+    navigate("/design-package");
   };
 
   return (
@@ -26,7 +26,7 @@ export const CtaBand = ({ onStartOrder }: CtaBandProps) => {
           onClick={handleStartOrder}
           type="button"
         >
-          Start Building Your Box →
+          Start Designing Your Package →
         </button>
       </div>
     </section>

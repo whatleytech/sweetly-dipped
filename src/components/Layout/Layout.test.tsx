@@ -22,7 +22,7 @@ describe("Layout", () => {
     expect(screen.getByRole("link", { name: "Home" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "About Us" })).toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: "Build Your Box" })
+      screen.getByRole("link", { name: "Design Your Package" })
     ).toBeInTheDocument();
 
     // Check footer content

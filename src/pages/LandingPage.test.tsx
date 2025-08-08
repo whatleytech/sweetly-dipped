@@ -46,13 +46,13 @@ describe('LandingPage', () => {
     );
 
     const ctaButton = screen.getByRole("button", {
-      name: /start building your box/i,
+      name: /start designing your package/i,
     });
     expect(ctaButton).toBeInTheDocument();
 
     fireEvent.click(ctaButton);
     expect(consoleSpy).toHaveBeenCalledWith("Start order clicked");
-    expect(mockNavigate).toHaveBeenCalledWith("/build-box");
+    expect(mockNavigate).toHaveBeenCalledWith("/design-package");
 
     consoleSpy.mockRestore();
   });

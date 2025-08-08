@@ -21,8 +21,8 @@ export const Navigation = () => {
             </Link>
           </li>
           <li>
-            <Link to="/build-box" className={styles.navLink}>
-              Build Your Box
+            <Link to="/design-package" className={styles.navLink}>
+              Design Your Package
             </Link>
           </li>
         </ul>

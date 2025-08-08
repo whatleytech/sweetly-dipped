@@ -28,12 +28,12 @@ describe('CtaBand', () => {
     );
 
     const button = screen.getByRole("button", {
-      name: /start building your box/i,
+      name: /start designing your package/i,
     });
     expect(button).toBeInTheDocument();
   });
 
-  it("navigates to build-box page when clicked", () => {
+  it("navigates to design-package page when clicked", () => {
     render(
       <BrowserRouter>
         <CtaBand />
@@ -41,11 +41,11 @@ describe('CtaBand', () => {
     );
 
     const button = screen.getByRole("button", {
-      name: /start building your box/i,
+      name: /start designing your package/i,
     });
     fireEvent.click(button);
 
-    expect(mockNavigate).toHaveBeenCalledWith("/build-box");
+    expect(mockNavigate).toHaveBeenCalledWith("/design-package");
   });
 
   it("calls onStartOrder callback if provided", () => {
@@ -58,11 +58,11 @@ describe('CtaBand', () => {
     );
 
     const button = screen.getByRole("button", {
-      name: /start building your box/i,
+      name: /start designing your package/i,
     });
     fireEvent.click(button);
 
     expect(mockCallback).toHaveBeenCalled();
-    expect(mockNavigate).toHaveBeenCalledWith("/build-box");
+    expect(mockNavigate).toHaveBeenCalledWith("/design-package");
   });
 }); 

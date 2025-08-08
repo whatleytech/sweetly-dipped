@@ -16,8 +16,8 @@ createRoot(document.getElementById("root")!).render(
             element={<div>About Us Page (Coming Soon)</div>}
           />
           <Route
-            path="/build-box"
-            element={<div>Build Your Box Page (Coming Soon)</div>}
+            path="/design-package"
+            element={<div>Design Your Package Page (Coming Soon)</div>}
           />
         </Routes>
       </Layout>
