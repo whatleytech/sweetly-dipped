@@ -21,10 +21,10 @@ describe('Footer', () => {
 
     // Check company information
     expect(
-      screen.getByText("Website created by Whatley Technologies, LLC")
+      screen.getByText("Website owned by Sweetly Dipped x Jas, LLC")
     ).toBeInTheDocument();
     expect(
-      screen.getByText("Website owned by Sweetly Dipped x Jas, LLC")
+      screen.getByText("Website created by Whatley Technologies, LLC")
     ).toBeInTheDocument();
 
     // Check Instagram link

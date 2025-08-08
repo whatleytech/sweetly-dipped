@@ -15,8 +15,8 @@ export const Footer = () => {
             © {currentYear} Sweetly Dipped x Jas, LLC. All rights reserved.
           </div>
           <div className={styles.companyInfo}>
-            <p>Website created by Whatley Technologies, LLC</p>
             <p>Website owned by Sweetly Dipped x Jas, LLC</p>
+            <p>Website created by Whatley Technologies, LLC</p>
           </div>
           <div className={styles.social}>
             <a
