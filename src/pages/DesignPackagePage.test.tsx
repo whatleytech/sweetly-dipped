@@ -1,14 +1,13 @@
- 
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { DesignPackagePage } from './DesignPackagePage';
-import React from 'react';
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { BrowserRouter } from "react-router-dom";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { DesignPackagePage } from "./DesignPackagePage";
+import React from "react";
 
 // Mock react-router-dom's useNavigate
 const mockNavigate = vi.fn();
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom');
+vi.mock("react-router-dom", async () => {
+  const actual = await vi.importActual("react-router-dom");
   return {
     ...actual,
     useNavigate: () => mockNavigate,
@@ -22,11 +21,11 @@ const localStorageMock = {
   removeItem: vi.fn(),
   clear: vi.fn(),
 };
-Object.defineProperty(window, 'localStorage', {
+Object.defineProperty(window, "localStorage", {
   value: localStorageMock,
 });
 
-describe('DesignPackagePage', () => {
+describe("DesignPackagePage", () => {
   beforeEach(() => {
     mockNavigate.mockClear();
     localStorageMock.getItem.mockClear();
@@ -39,15 +38,17 @@ describe('DesignPackagePage', () => {
     vi.clearAllMocks();
   });
 
-  it('renders the page title and description', () => {
+  it("renders the page title and description", () => {
     render(
       <BrowserRouter>
         <DesignPackagePage />
       </BrowserRouter>
     );
 
-    expect(screen.getByText('Design Your Package')).toBeInTheDocument();
-    expect(screen.getByText("Let's create your perfect chocolate-covered treats!")).toBeInTheDocument();
+    expect(screen.getByText("Design Your Package")).toBeInTheDocument();
+    expect(
+      screen.getByText("Let's create your perfect chocolate-covered treats!")
+    ).toBeInTheDocument();
   });
 
   it("renders step header with correct step information (7 visible steps by default)", () => {
