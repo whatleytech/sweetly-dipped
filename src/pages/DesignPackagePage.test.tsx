@@ -25,9 +25,17 @@ Object.defineProperty(window, "localStorage", {
   value: localStorageMock,
 });
 
+// Mock window.scrollTo for scroll functionality tests
+const mockScrollTo = vi.fn();
+Object.defineProperty(window, "scrollTo", {
+  value: mockScrollTo,
+  writable: true,
+});
+
 describe("DesignPackagePage", () => {
   beforeEach(() => {
     mockNavigate.mockClear();
+    mockScrollTo.mockClear();
     localStorageMock.getItem.mockClear();
     localStorageMock.setItem.mockClear();
     localStorageMock.removeItem.mockClear();
@@ -148,5 +156,49 @@ describe("DesignPackagePage", () => {
 
     expect(screen.getByText("Your Progress")).toBeInTheDocument();
     expect(screen.getByText(/1 of 7 steps completed/)).toBeInTheDocument();
+  });
+
+  it("scrolls to position step header at top when navigating between steps", async () => {
+    // Mock querySelector to return a mock element
+    const mockElement = {
+      getBoundingClientRect: () => ({
+        top: 100,
+        height: 50,
+      }),
+    };
+    const originalQuerySelector = document.querySelector;
+    document.querySelector = vi.fn().mockReturnValue(mockElement);
+
+    render(
+      <BrowserRouter>
+        <DesignPackagePage />
+      </BrowserRouter>
+    );
+
+    // Fill out required fields to enable Continue button
+    const firstNameInput = screen.getByLabelText("First Name *");
+    const lastNameInput = screen.getByLabelText("Last Name *");
+    const emailInput = screen.getByLabelText("Email Address *");
+    const phoneInput = screen.getByLabelText("Phone Number *");
+
+    fireEvent.change(firstNameInput, { target: { value: "John" } });
+    fireEvent.change(lastNameInput, { target: { value: "Doe" } });
+    fireEvent.change(emailInput, { target: { value: "john@example.com" } });
+    fireEvent.change(phoneInput, { target: { value: "123-456-7890" } });
+
+    // Click Continue to go to next step
+    const continueButton = screen.getByRole("button", { name: /continue/i });
+    fireEvent.click(continueButton);
+
+    // Wait for the scroll function to be called
+    await waitFor(() => {
+      expect(mockScrollTo).toHaveBeenCalledWith({
+        top: 20, // Should scroll to element top (100) minus padding (80)
+        behavior: "smooth",
+      });
+    });
+
+    // Restore original querySelector
+    document.querySelector = originalQuerySelector;
   });
 });
