@@ -307,6 +307,19 @@
     font-size: 0.7rem;
   }
 
+  .timeWindows {
+    gap: var(--spacing-md);
+  }
+
+  .timeWindow {
+    gap: var(--spacing-xs);
+  }
+
+  .timeWindowLabel {
+    font-size: 0.9rem;
+    padding-bottom: var(--spacing-xs);
+  }
+
   .timeGrid {
     grid-template-columns: repeat(3, 1fr);
     gap: var(--spacing-xs);
@@ -319,11 +332,33 @@
 }
 
 /* Time Grid Styles */
+.timeWindows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-sm);
+}
+
+.timeWindow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.timeWindowLabel {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--sd-brown-dark);
+  margin: 0;
+  padding-bottom: var(--spacing-xs);
+  border-bottom: 2px solid var(--sd-pink-light);
+}
+
 .timeGrid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: var(--spacing-sm);
-  margin-top: var(--spacing-sm);
 }
 
 .timeSlot {

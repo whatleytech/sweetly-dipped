@@ -152,7 +152,7 @@ describe('PickupDetails', () => {
     expect(onSubmit).toHaveBeenCalled();
   });
 
-  it("shows time slots in grid when date is selected", () => {
+  it("shows time slots grouped by windows when date is selected", () => {
     const data = {
       ...baseData,
       pickupDate: "2025-01-10", // Friday
@@ -170,7 +170,11 @@ describe('PickupDetails', () => {
       />
     );
 
-    // Should show all available time slots for Friday
+    // Should show window labels for Friday
+    expect(screen.getByText("8:00 AM - 9:00 AM")).toBeInTheDocument();
+    expect(screen.getByText("5:00 PM - 8:00 PM")).toBeInTheDocument();
+
+    // Should show time slots for each window
     expect(screen.getByText("8:00 AM")).toBeInTheDocument();
     expect(screen.getByText("8:15 AM")).toBeInTheDocument();
     expect(screen.getByText("8:30 AM")).toBeInTheDocument();

@@ -36,10 +36,11 @@ export const PickupDetails = ({
   const dayOfWeek = getDayOfWeek(formData.pickupDate);
   const availableWindows = dayOfWeek ? TIME_SLOTS[dayOfWeek] : [];
 
-  // Generate all available time slots for the selected date
-  const availableTimeSlots = availableWindows.flatMap((window) =>
-    generateTimeIntervals(window)
-  );
+  // Generate time slots grouped by window for better visual organization
+  const timeSlotsByWindow = availableWindows.map((window) => ({
+    window,
+    slots: generateTimeIntervals(window)
+  }));
 
   const isValid = Boolean(formData.pickupDate) && Boolean(formData.pickupTime);
 
@@ -66,21 +67,28 @@ export const PickupDetails = ({
         {formData.pickupDate && (
           <div className={styles.fieldGroup}>
             <label className={styles.label}>Available Pickup Times *</label>
-            {availableTimeSlots.length > 0 ? (
-              <div className={styles.timeGrid}>
-                {availableTimeSlots.map((time) => (
-                  <button
-                    key={time}
-                    type="button"
-                    className={`${styles.timeSlot} ${
-                      formData.pickupTime === time
-                        ? styles.timeSlotSelected
-                        : ""
-                    }`}
-                    onClick={() => handleTimeSlotClick(time)}
-                  >
-                    {time}
-                  </button>
+            {timeSlotsByWindow.length > 0 ? (
+              <div className={styles.timeWindows}>
+                {timeSlotsByWindow.map(({ window, slots }, windowIndex) => (
+                  <div key={window} className={styles.timeWindow}>
+                    <h4 className={styles.timeWindowLabel}>{window}</h4>
+                    <div className={styles.timeGrid}>
+                      {slots.map((time) => (
+                        <button
+                          key={time}
+                          type="button"
+                          className={`${styles.timeSlot} ${
+                            formData.pickupTime === time
+                              ? styles.timeSlotSelected
+                              : ""
+                          }`}
+                          onClick={() => handleTimeSlotClick(time)}
+                        >
+                          {time}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
             ) : (
