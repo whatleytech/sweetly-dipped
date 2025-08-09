@@ -314,4 +314,116 @@ describe('PickupDetails', () => {
     expect(dateInput).toHaveAttribute("min", tomorrow);
     expect(dateInput.type).toBe("date");
   });
+
+  it("shows unavailable date error message for dates in unavailable period", () => {
+    render(
+      <PickupDetails
+        formData={{ ...baseData, pickupDate: "2025-08-30" }} // Within vacation period
+        updateFormData={updateFormData}
+        onNext={vi.fn()}
+        onPrev={onPrev}
+        onSubmit={onSubmit}
+        isFirstStep={false}
+        isLastStep={true}
+      />
+    );
+
+    // Should show unavailable date error message
+    expect(
+      screen.getByText(
+        "I am unavailable for pickup between Aug 28 - Sep 3. Sorry for the inconvenience. Please select another date."
+      )
+    ).toBeInTheDocument();
+
+    // Should not show time slots
+    expect(screen.queryByText("8:00 AM - 9:00 AM")).not.toBeInTheDocument();
+
+    // Submit button should be disabled
+    expect(
+      screen.getByRole("button", { name: /submit order/i })
+    ).toBeDisabled();
+  });
+
+  it("shows unavailable date error message for dates in second unavailable period", () => {
+    render(
+      <PickupDetails
+        formData={{ ...baseData, pickupDate: "2025-10-11" }} // Within business trip period
+        updateFormData={updateFormData}
+        onNext={vi.fn()}
+        onPrev={onPrev}
+        onSubmit={onSubmit}
+        isFirstStep={false}
+        isLastStep={true}
+      />
+    );
+
+    // Should show unavailable date error message
+    expect(
+      screen.getByText(
+        "I am unavailable for pickup between Oct 9 - Oct 13. Sorry for the inconvenience. Please select another date."
+      )
+    ).toBeInTheDocument();
+
+    // Should not show time slots
+    expect(screen.queryByText("8:00 AM - 9:00 AM")).not.toBeInTheDocument();
+
+    // Submit button should be disabled
+    expect(
+      screen.getByRole("button", { name: /submit order/i })
+    ).toBeDisabled();
+  });
+
+  it("shows time slots normally for available dates", () => {
+    render(
+      <PickupDetails
+        formData={{ ...baseData, pickupDate: getFutureFriday() }} // Available date
+        updateFormData={updateFormData}
+        onNext={vi.fn()}
+        onPrev={onPrev}
+        onSubmit={onSubmit}
+        isFirstStep={false}
+        isLastStep={true}
+      />
+    );
+
+    // Should not show any error messages
+    expect(
+      screen.queryByText(/I am unavailable for pickup/)
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/Same-day pickup is not available/)
+    ).not.toBeInTheDocument();
+
+    // Should show time slots
+    expect(screen.getByText("8:00 AM - 9:00 AM")).toBeInTheDocument();
+  });
+
+  it("shows single-day unavailable error message correctly", () => {
+    render(
+      <PickupDetails
+        formData={{ ...baseData, pickupDate: "2025-11-15" }} // Single-day unavailability
+        updateFormData={updateFormData}
+        onNext={vi.fn()}
+        onPrev={onPrev}
+        onSubmit={onSubmit}
+        isFirstStep={false}
+        isLastStep={true}
+      />
+    );
+
+    // Should show single-day unavailable error message
+    expect(
+      screen.getByText(
+        "I am unavailable for pickup on Nov 15. Sorry for the inconvenience. Please select another date."
+      )
+    ).toBeInTheDocument();
+
+    // Should not show time slots
+    expect(screen.queryByText("8:00 AM - 9:00 AM")).not.toBeInTheDocument();
+
+    // Submit button should be disabled
+    expect(
+      screen.getByRole("button", { name: /submit order/i })
+    ).toBeDisabled();
+  });
 });

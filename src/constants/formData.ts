@@ -1,4 +1,9 @@
-import type { PackageOption, TreatOption, TimeSlots } from "../types/formTypes";
+import type {
+  PackageOption,
+  TreatOption,
+  TimeSlots,
+  UnavailablePeriod,
+} from "../types/formTypes";
 
 export const PACKAGE_OPTIONS: PackageOption[] = [
   { id: "small", label: "Small (3 dozen – 36 treats)", price: "$110" },
@@ -90,3 +95,21 @@ export const TIME_SLOTS: TimeSlots = {
     },
   ],
 };
+
+export const UNAVAILABLE_PERIODS: UnavailablePeriod[] = [
+  {
+    startDate: "2025-08-28",
+    endDate: "2025-09-03",
+    reason: "Vacation",
+  },
+  {
+    startDate: "2025-10-09",
+    endDate: "2025-10-13",
+    reason: "Business trip",
+  },
+  {
+    startDate: "2025-11-15",
+    // No endDate - single day unavailability
+    reason: "Personal appointment",
+  },
+];

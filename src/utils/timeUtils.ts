@@ -117,3 +117,53 @@ export function timeSlotToWindow(timeSlot: {
   const endTimeStr = formatTimeObject(timeSlot.endTime);
   return `${startTimeStr} - ${endTimeStr}`;
 }
+
+/**
+ * Checks if a date falls within any unavailable period
+ * @param dateStr - Date string in YYYY-MM-DD format
+ * @param unavailablePeriods - Array of unavailable periods
+ * @returns The unavailable period if date falls within one, null otherwise
+ */
+export function getUnavailablePeriod(
+  dateStr: string, 
+  unavailablePeriods: { startDate: string; endDate?: string; reason?: string }[]
+): { startDate: string; endDate?: string; reason?: string } | null {
+  if (!dateStr) return null;
+  
+  const selectedDate = new Date(dateStr);
+  if (Number.isNaN(selectedDate.getTime())) return null;
+
+  for (const period of unavailablePeriods) {
+    const startDate = new Date(period.startDate);
+    
+    // Handle single-day unavailability (no endDate)
+    if (!period.endDate) {
+      if (selectedDate.getTime() === startDate.getTime()) {
+        return period;
+      }
+    } else {
+      // Handle period unavailability (startDate to endDate)
+      const endDate = new Date(period.endDate);
+      if (selectedDate >= startDate && selectedDate <= endDate) {
+        return period;
+      }
+    }
+  }
+  
+  return null;
+}
+
+/**
+ * Formats a date string for display in error messages
+ * @param dateStr - Date string in YYYY-MM-DD format
+ * @returns Formatted date string like "Aug 28"
+ */
+export function formatDateForDisplay(dateStr: string): string {
+  // Add T00:00:00 to ensure consistent parsing as local time, then use UTC methods
+  const date = new Date(dateStr + 'T00:00:00');
+  return date.toLocaleDateString('en-US', { 
+    month: 'short', 
+    day: 'numeric',
+    timeZone: 'UTC'  // Use UTC to avoid timezone issues 
+  });
+}

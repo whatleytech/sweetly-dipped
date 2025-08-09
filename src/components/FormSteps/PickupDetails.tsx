@@ -2,8 +2,13 @@ import type { ChangeEvent } from "react";
 import styles from "./FormSteps.module.css";
 import type { FormStepProps, DayOfWeek } from "../../types/formTypes";
 import { FormButtons, FormStepContainer } from "../shared";
-import { TIME_SLOTS } from "../../constants/formData";
-import { generateTimeIntervals, timeSlotToWindow } from "../../utils/timeUtils";
+import { TIME_SLOTS, UNAVAILABLE_PERIODS } from "../../constants/formData";
+import {
+  generateTimeIntervals,
+  timeSlotToWindow,
+  getUnavailablePeriod,
+  formatDateForDisplay,
+} from "../../utils/timeUtils";
 
 function getDayOfWeek(dateStr: string): DayOfWeek | null {
   if (!dateStr) return null;
@@ -46,6 +51,12 @@ export const PickupDetails = ({
     formData.pickupDate &&
     new Date(formData.pickupDate) <= new Date(new Date().toDateString());
 
+  // Check if the selected date falls within an unavailable period
+  const unavailablePeriod = getUnavailablePeriod(
+    formData.pickupDate,
+    UNAVAILABLE_PERIODS
+  );
+
   // Generate time slots grouped by window for better visual organization
   const timeSlotsByWindow = availableTimeSlots.map((timeSlot) => ({
     timeSlot,
@@ -56,7 +67,8 @@ export const PickupDetails = ({
   const isValid =
     Boolean(formData.pickupDate) &&
     Boolean(formData.pickupTime) &&
-    !isPastOrTodayDate;
+    !isPastOrTodayDate &&
+    !unavailablePeriod;
 
   return (
     <FormStepContainer
@@ -90,6 +102,23 @@ export const PickupDetails = ({
               <div className={styles.errorMessage} role="alert">
                 Please select a date in the future. Same-day pickup is not
                 available.
+              </div>
+            ) : unavailablePeriod ? (
+              <div className={styles.errorMessage} role="alert">
+                {unavailablePeriod.endDate ? (
+                  <>
+                    I am unavailable for pickup between{" "}
+                    {formatDateForDisplay(unavailablePeriod.startDate)} -{" "}
+                    {formatDateForDisplay(unavailablePeriod.endDate)}. Sorry for
+                    the inconvenience. Please select another date.
+                  </>
+                ) : (
+                  <>
+                    I am unavailable for pickup on{" "}
+                    {formatDateForDisplay(unavailablePeriod.startDate)}. Sorry
+                    for the inconvenience. Please select another date.
+                  </>
+                )}
               </div>
             ) : timeSlotsByWindow.length > 0 ? (
               <div className={styles.timeWindows}>

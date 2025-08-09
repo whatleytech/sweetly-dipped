@@ -4,6 +4,8 @@ import {
   parseTimeWindow,
   timeSlotToWindow,
   formatTimeObject,
+  getUnavailablePeriod,
+  formatDateForDisplay,
 } from "./timeUtils";
 
 describe("timeUtils", () => {
@@ -216,6 +218,122 @@ describe("timeUtils", () => {
       const result = timeSlotToWindow(timeSlot);
 
       expect(result).toBe("11:30 AM - 1:15 PM");
+    });
+  });
+
+  describe("getUnavailablePeriod", () => {
+    const unavailablePeriods = [
+      {
+        startDate: "2025-08-28",
+        endDate: "2025-09-03",
+        reason: "Vacation",
+      },
+      {
+        startDate: "2025-10-09",
+        endDate: "2025-10-13",
+        reason: "Business trip",
+      },
+      {
+        startDate: "2025-11-15",
+        // No endDate - single day
+        reason: "Personal appointment",
+      },
+    ];
+
+    it("returns null for empty date string", () => {
+      const result = getUnavailablePeriod("", unavailablePeriods);
+      expect(result).toBeNull();
+    });
+
+    it("returns null for invalid date string", () => {
+      const result = getUnavailablePeriod("invalid-date", unavailablePeriods);
+      expect(result).toBeNull();
+    });
+
+    it("returns null for date not in any unavailable period", () => {
+      const result = getUnavailablePeriod("2025-08-15", unavailablePeriods);
+      expect(result).toBeNull();
+    });
+
+    it("returns unavailable period for date within first period", () => {
+      const result = getUnavailablePeriod("2025-08-30", unavailablePeriods);
+      expect(result).toEqual({
+        startDate: "2025-08-28",
+        endDate: "2025-09-03",
+        reason: "Vacation",
+      });
+    });
+
+    it("returns unavailable period for date within second period", () => {
+      const result = getUnavailablePeriod("2025-10-11", unavailablePeriods);
+      expect(result).toEqual({
+        startDate: "2025-10-09",
+        endDate: "2025-10-13",
+        reason: "Business trip",
+      });
+    });
+
+    it("returns unavailable period for date on start date", () => {
+      const result = getUnavailablePeriod("2025-08-28", unavailablePeriods);
+      expect(result).toEqual({
+        startDate: "2025-08-28",
+        endDate: "2025-09-03",
+        reason: "Vacation",
+      });
+    });
+
+    it("returns unavailable period for date on end date", () => {
+      const result = getUnavailablePeriod("2025-09-03", unavailablePeriods);
+      expect(result).toEqual({
+        startDate: "2025-08-28",
+        endDate: "2025-09-03",
+        reason: "Vacation",
+      });
+    });
+
+    it("works with empty unavailable periods array", () => {
+      const result = getUnavailablePeriod("2025-08-30", []);
+      expect(result).toBeNull();
+    });
+
+    it("returns unavailable period for single-day unavailability", () => {
+      const result = getUnavailablePeriod("2025-11-15", unavailablePeriods);
+      expect(result).toEqual({
+        startDate: "2025-11-15",
+        reason: "Personal appointment",
+      });
+    });
+
+    it("returns null for date near but not on single-day unavailability", () => {
+      const result = getUnavailablePeriod("2025-11-14", unavailablePeriods);
+      expect(result).toBeNull();
+    });
+
+    it("returns null for date after single-day unavailability", () => {
+      const result = getUnavailablePeriod("2025-11-16", unavailablePeriods);
+      expect(result).toBeNull();
+    });
+  });
+
+  describe("formatDateForDisplay", () => {
+    it("formats date correctly", () => {
+      const result = formatDateForDisplay("2025-08-28");
+      expect(result).toBe("Aug 28");
+    });
+
+    it("formats date with different month correctly", () => {
+      const result = formatDateForDisplay("2025-10-09");
+      expect(result).toBe("Oct 9");
+    });
+
+    it("handles single digit day", () => {
+      const result = formatDateForDisplay("2025-10-01");
+      expect(result).toBe("Oct 1");
+    });
+
+    it("handles december", () => {
+      const result = formatDateForDisplay("2025-12-25");
+      expect(result).toBe("Dec 25");
     });
   });
 });

@@ -72,6 +72,12 @@ export type DayOfWeek =
   | "Friday"
   | "Saturday";
 
+export interface UnavailablePeriod {
+  startDate: string; // ISO date string (YYYY-MM-DD)
+  endDate?: string; // ISO date string (YYYY-MM-DD) - optional for single-day unavailability
+  reason?: string; // Optional reason for unavailability
+}
+
 export type TimeSlots = {
   [key in DayOfWeek]: TimeSlot[];
 };
