@@ -1,42 +1,27 @@
 import type { ChangeEvent } from "react";
 import styles from "./FormSteps.module.css";
-import type { FormData } from "../../pages/DesignPackagePage";
-
-interface FormStepProps {
-  formData: FormData;
-  updateFormData: (updates: Partial<FormData>) => void;
-  onNext: () => void;
-  onPrev: () => void;
-  onSubmit: () => void;
-  isFirstStep: boolean;
-  isLastStep: boolean;
-}
+import type { FormStepProps, FormData } from "../../types/formTypes";
+import { FormButtons, FormStepContainer } from "../shared";
 
 export const EventDetails = ({
   formData,
   updateFormData,
   onNext,
   onPrev,
+  isFirstStep,
+  isLastStep,
+  onSubmit,
 }: FormStepProps) => {
   const handleChange =
     (field: keyof FormData) => (e: ChangeEvent<HTMLInputElement>) => {
       updateFormData({ [field]: e.target.value } as Partial<FormData>);
     };
 
-  const handleContinue = () => {
-    onNext();
-  };
-
   return (
-    <div className={styles.stepContainer}>
-      <div className={styles.questionSection}>
-        <h3 className={styles.questionTitle}>Event details (optional)</h3>
-        <p className={styles.questionDescription}>
-          If these treats are for an event, tell us the type and any theme you
-          have in mind.
-        </p>
-      </div>
-
+    <FormStepContainer
+      title="Event details (optional)"
+      description="If these treats are for an event, tell us the type and any theme you have in mind."
+    >
       <div className={styles.formFields}>
         <div className={styles.fieldGroup}>
           <label htmlFor="eventType" className={styles.label}>
@@ -67,22 +52,14 @@ export const EventDetails = ({
         </div>
       </div>
 
-      <div className={styles.buttonContainer}>
-        <button
-          type="button"
-          onClick={onPrev}
-          className={`${styles.button} ${styles.secondaryButton}`}
-        >
-          ← Back
-        </button>
-        <button
-          type="button"
-          onClick={handleContinue}
-          className={`${styles.button} ${styles.primaryButton}`}
-        >
-          Continue →
-        </button>
-      </div>
-    </div>
+      <FormButtons
+        onPrev={onPrev}
+        onNext={onNext}
+        onSubmit={onSubmit}
+        isFirstStep={isFirstStep}
+        isLastStep={isLastStep}
+        isValid={true} // This step is always valid (optional fields)
+      />
+    </FormStepContainer>
   );
 };

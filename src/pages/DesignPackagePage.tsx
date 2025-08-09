@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./DesignPackagePage.module.css";
+import type { FormData } from "../types/formTypes";
 import { FormSidebar } from "../components/FormSidebar/FormSidebar";
 import { LeadQuestions } from "../components/FormSteps/LeadQuestions.tsx";
 import { CommunicationPreference } from "../components/FormSteps/CommunicationPreference.tsx";
@@ -10,36 +11,6 @@ import { ColorScheme } from "../components/FormSteps/ColorScheme.tsx";
 import { EventDetails } from "../components/FormSteps/EventDetails.tsx";
 import { AdditionalDesigns } from "../components/FormSteps/AdditionalDesigns.tsx";
 import { PickupDetails } from "../components/FormSteps/PickupDetails.tsx";
-
-export interface FormData {
-  // Lead Questions
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-
-  // Communication Preference
-  communicationMethod: "email" | "text" | "";
-
-  // Package Selection
-  packageType: "small" | "medium" | "large" | "xl" | "by-dozen" | "";
-
-  // By The Dozen
-  riceKrispies: number;
-  oreos: number;
-  pretzels: number;
-  marshmallows: number;
-
-  // Design Details
-  colorScheme: string;
-  eventType: string;
-  theme: string;
-  additionalDesigns: string;
-
-  // Pickup Details
-  pickupDate: string;
-  pickupTime: string;
-}
 
 const FORM_STEPS = [
   { id: "lead", title: "Contact Information", component: LeadQuestions },

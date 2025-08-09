@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { CommunicationPreference } from "./CommunicationPreference";
-import type { FormData } from "../../pages/DesignPackagePage";
+import type { FormData } from "../../types/formTypes";
 
 
 const mockFormData: FormData = {

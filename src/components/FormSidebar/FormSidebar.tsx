@@ -1,5 +1,5 @@
 import styles from "./FormSidebar.module.css";
-import type { FormData } from "../../pages/DesignPackagePage";
+import type { FormData } from "../../types/formTypes";
 
 interface FormSidebarProps {
   formData: FormData;

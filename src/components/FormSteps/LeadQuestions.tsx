@@ -1,15 +1,6 @@
 import styles from "./FormSteps.module.css";
-import type { FormData } from "../../pages/DesignPackagePage";
-
-interface FormStepProps {
-  formData: FormData;
-  updateFormData: (updates: Partial<FormData>) => void;
-  onNext: () => void;
-  onPrev: () => void;
-  onSubmit: () => void;
-  isFirstStep: boolean;
-  isLastStep: boolean;
-}
+import type { FormStepProps, FormData } from "../../types/formTypes";
+import { FormButtons, FormStepContainer } from "../shared";
 
 export const LeadQuestions = ({
   formData,
@@ -64,24 +55,11 @@ export const LeadQuestions = ({
     );
   };
 
-  const handleNext = () => {
-    if (isFormValid()) {
-      onNext();
-    }
-  };
-
   return (
-    <div className={styles.stepContainer}>
-      <div className={styles.questionSection}>
-        <h3 className={styles.questionTitle}>
-          Let's start with your contact information
-        </h3>
-        <p className={styles.questionDescription}>
-          We'll use this information to confirm your order and keep you updated
-          on your treats!
-        </p>
-      </div>
-
+    <FormStepContainer
+      title="Let's start with your contact information"
+      description="We'll use this information to confirm your order and keep you updated on your treats!"
+    >
       <div className={styles.formFields}>
         <div className={styles.fieldGroup}>
           <label htmlFor="firstName" className={styles.label}>
@@ -150,18 +128,12 @@ export const LeadQuestions = ({
         </div>
       </div>
 
-      <div className={styles.buttonContainer}>
-        <button
-          type="button"
-          onClick={handleNext}
-          disabled={!isFormValid()}
-          className={`${styles.button} ${styles.primaryButton} ${
-            !isFormValid() ? styles.disabled : ""
-          }`}
-        >
-          Continue →
-        </button>
-      </div>
-    </div>
+      <FormButtons
+        onNext={onNext}
+        isFirstStep={true}
+        isLastStep={false}
+        isValid={isFormValid()}
+      />
+    </FormStepContainer>
   );
 };

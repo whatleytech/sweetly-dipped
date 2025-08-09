@@ -1,42 +1,15 @@
 import type { ChangeEvent } from "react";
 import styles from "./FormSteps.module.css";
-import type { FormData } from "../../pages/DesignPackagePage";
-
-interface FormStepProps {
-  formData: FormData;
-  updateFormData: (updates: Partial<FormData>) => void;
-  onNext: () => void;
-  onPrev: () => void;
-  onSubmit: () => void;
-  isFirstStep: boolean;
-  isLastStep: boolean;
-}
-
-const TIME_SLOTS: Record<string, string[]> = {
-  Monday: ["8:00 AM - 9:00 AM", "5:00 PM - 8:00 PM"],
-  Tuesday: ["8:00 AM - 9:00 AM", "5:00 PM - 8:00 PM"],
-  Wednesday: ["8:00 AM - 9:00 AM", "5:00 PM - 8:00 PM"],
-  Thursday: ["8:00 AM - 9:00 AM", "5:00 PM - 8:00 PM"],
-  Friday: ["8:00 AM - 9:00 AM", "5:00 PM - 8:00 PM"],
-  Saturday: ["9:00 AM - 12:00 PM"],
-  Sunday: ["3:00 PM - 7:00 PM"],
-};
+import type { FormStepProps } from "../../types/formTypes";
+import { FormButtons, FormStepContainer } from "../shared";
+import { TIME_SLOTS, DAY_MAP } from "../../constants/formData";
 
 function getDayOfWeek(dateStr: string): keyof typeof TIME_SLOTS | null {
   if (!dateStr) return null;
   const d = new Date(dateStr + "T00:00:00");
   if (Number.isNaN(d.getTime())) return null;
   const day = d.getUTCDay(); // 0 Sun .. 6 Sat (UTC to avoid TZ flakiness)
-  const map: Array<keyof typeof TIME_SLOTS> = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ];
-  return map[day];
+  return DAY_MAP[day];
 }
 
 export const PickupDetails = ({
@@ -44,6 +17,8 @@ export const PickupDetails = ({
   updateFormData,
   onPrev,
   onSubmit,
+  isFirstStep,
+  isLastStep,
 }: FormStepProps) => {
   const handleDateChange = (e: ChangeEvent<HTMLInputElement>) => {
     updateFormData({ pickupDate: e.target.value, pickupTime: "" });
@@ -57,14 +32,10 @@ export const PickupDetails = ({
   const isValid = Boolean(formData.pickupDate) && Boolean(formData.pickupTime);
 
   return (
-    <div className={styles.stepContainer}>
-      <div className={styles.questionSection}>
-        <h3 className={styles.questionTitle}>Pickup date and time</h3>
-        <p className={styles.questionDescription}>
-          Choose a date and one of the available pickup windows.
-        </p>
-      </div>
-
+    <FormStepContainer
+      title="Pickup date and time"
+      description="Choose a date and one of the available pickup windows."
+    >
       <div className={styles.formFields}>
         <div className={styles.fieldGroup}>
           <label htmlFor="pickupDate" className={styles.label}>
@@ -104,25 +75,14 @@ export const PickupDetails = ({
         </div>
       </div>
 
-      <div className={styles.buttonContainer}>
-        <button
-          type="button"
-          onClick={onPrev}
-          className={`${styles.button} ${styles.secondaryButton}`}
-        >
-          ← Back
-        </button>
-        <button
-          type="button"
-          onClick={onSubmit}
-          disabled={!isValid}
-          className={`${styles.button} ${styles.primaryButton} ${
-            !isValid ? styles.disabled : ""
-          }`}
-        >
-          Submit Order
-        </button>
-      </div>
-    </div>
+      <FormButtons
+        onPrev={onPrev}
+        onSubmit={onSubmit}
+        isFirstStep={isFirstStep}
+        isLastStep={isLastStep}
+        isValid={isValid}
+        submitLabel="Submit Order"
+      />
+    </FormStepContainer>
   );
 };

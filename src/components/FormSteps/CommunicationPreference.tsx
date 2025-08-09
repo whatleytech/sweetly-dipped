@@ -1,21 +1,15 @@
 import styles from "./FormSteps.module.css";
-import type { FormData } from "../../pages/DesignPackagePage";
-
-interface FormStepProps {
-  formData: FormData;
-  updateFormData: (updates: Partial<FormData>) => void;
-  onNext: () => void;
-  onPrev: () => void;
-  onSubmit: () => void;
-  isFirstStep: boolean;
-  isLastStep: boolean;
-}
+import type { FormStepProps } from "../../types/formTypes";
+import { FormButtons, FormStepContainer } from "../shared";
 
 export const CommunicationPreference = ({
   formData,
   updateFormData,
   onNext,
   onPrev,
+  isFirstStep,
+  isLastStep,
+  onSubmit,
 }: FormStepProps) => {
   const handleRadioChange = (value: "email" | "text") => {
     updateFormData({ communicationMethod: value });
@@ -25,24 +19,11 @@ export const CommunicationPreference = ({
     return formData.communicationMethod !== "";
   };
 
-  const handleNext = () => {
-    if (isFormValid()) {
-      onNext();
-    }
-  };
-
   return (
-    <div className={styles.stepContainer}>
-      <div className={styles.questionSection}>
-        <h3 className={styles.questionTitle}>
-          How would you like us to contact you?
-        </h3>
-        <p className={styles.questionDescription}>
-          We'll use this method to confirm your order and keep you updated on
-          your treats!
-        </p>
-      </div>
-
+    <FormStepContainer
+      title="How would you like us to contact you?"
+      description="We'll use this method to confirm your order and keep you updated on your treats!"
+    >
       <div className={styles.formFields}>
         <div className={styles.radioGroup}>
           <div
@@ -91,25 +72,14 @@ export const CommunicationPreference = ({
         </div>
       </div>
 
-      <div className={styles.buttonContainer}>
-        <button
-          type="button"
-          onClick={onPrev}
-          className={`${styles.button} ${styles.secondaryButton}`}
-        >
-          ← Back
-        </button>
-        <button
-          type="button"
-          onClick={handleNext}
-          disabled={!isFormValid()}
-          className={`${styles.button} ${styles.primaryButton} ${
-            !isFormValid() ? styles.disabled : ""
-          }`}
-        >
-          Continue →
-        </button>
-      </div>
-    </div>
+      <FormButtons
+        onPrev={onPrev}
+        onNext={onNext}
+        onSubmit={onSubmit}
+        isFirstStep={isFirstStep}
+        isLastStep={isLastStep}
+        isValid={isFormValid()}
+      />
+    </FormStepContainer>
   );
 };

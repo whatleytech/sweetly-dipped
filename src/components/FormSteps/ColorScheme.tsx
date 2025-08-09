@@ -1,22 +1,16 @@
 import type { ChangeEvent } from "react";
 import styles from "./FormSteps.module.css";
-import type { FormData } from "../../pages/DesignPackagePage";
-
-interface FormStepProps {
-  formData: FormData;
-  updateFormData: (updates: Partial<FormData>) => void;
-  onNext: () => void;
-  onPrev: () => void;
-  onSubmit: () => void;
-  isFirstStep: boolean;
-  isLastStep: boolean;
-}
+import type { FormStepProps } from "../../types/formTypes";
+import { FormButtons, FormStepContainer } from "../shared";
 
 export const ColorScheme = ({
   formData,
   updateFormData,
   onNext,
   onPrev,
+  isFirstStep,
+  isLastStep,
+  onSubmit,
 }: FormStepProps) => {
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     updateFormData({ colorScheme: e.target.value });
@@ -24,20 +18,11 @@ export const ColorScheme = ({
 
   const isValid = formData.colorScheme.trim().length > 0;
 
-  const handleContinue = () => {
-    if (isValid) onNext();
-  };
-
   return (
-    <div className={styles.stepContainer}>
-      <div className={styles.questionSection}>
-        <h3 className={styles.questionTitle}>Desired color scheme?</h3>
-        <p className={styles.questionDescription}>
-          Tell us the colors you’d like to see in your treats. We’ll do our best
-          to match your palette.
-        </p>
-      </div>
-
+    <FormStepContainer
+      title="Desired color scheme?"
+      description="Tell us the colors you'd like to see in your treats. We'll do our best to match your palette."
+    >
       <div className={styles.formFields}>
         <div className={styles.fieldGroup}>
           <label htmlFor="colorScheme" className={styles.label}>
@@ -55,25 +40,14 @@ export const ColorScheme = ({
         </div>
       </div>
 
-      <div className={styles.buttonContainer}>
-        <button
-          type="button"
-          onClick={onPrev}
-          className={`${styles.button} ${styles.secondaryButton}`}
-        >
-          ← Back
-        </button>
-        <button
-          type="button"
-          onClick={handleContinue}
-          disabled={!isValid}
-          className={`${styles.button} ${styles.primaryButton} ${
-            !isValid ? styles.disabled : ""
-          }`}
-        >
-          Continue →
-        </button>
-      </div>
-    </div>
+      <FormButtons
+        onPrev={onPrev}
+        onNext={onNext}
+        onSubmit={onSubmit}
+        isFirstStep={isFirstStep}
+        isLastStep={isLastStep}
+        isValid={isValid}
+      />
+    </FormStepContainer>
   );
 };
