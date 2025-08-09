@@ -25,6 +25,32 @@ const baseData: FormData = {
   pickupTime: "",
 };
 
+// Helper functions for test dates
+const getFutureDate = (daysFromNow: number = 7): string => {
+  const date = new Date();
+  date.setDate(date.getDate() + daysFromNow);
+  return date.toISOString().split("T")[0];
+};
+
+const getFutureFriday = (): string => {
+  const date = new Date();
+  // Find next Friday (5 = Friday)
+  const daysUntilFriday = (5 - date.getDay() + 7) % 7;
+  const nextFriday = daysUntilFriday === 0 ? 7 : daysUntilFriday; // If today is Friday, get next Friday
+  date.setDate(date.getDate() + nextFriday);
+  return date.toISOString().split("T")[0];
+};
+
+const getPastDate = (daysAgo: number = 1): string => {
+  const date = new Date();
+  date.setDate(date.getDate() - daysAgo);
+  return date.toISOString().split("T")[0];
+};
+
+const getTodayDate = (): string => {
+  return new Date().toISOString().split("T")[0];
+};
+
 describe('PickupDetails', () => {
   const updateFormData = vi.fn();
   const onSubmit = vi.fn();
@@ -55,7 +81,7 @@ describe('PickupDetails', () => {
     // Time grid should appear after selecting a date
     rerender(
       <PickupDetails
-        formData={{ ...baseData, pickupDate: "2025-01-10" }} // Friday
+        formData={{ ...baseData, pickupDate: getFutureDate() }}
         updateFormData={updateFormData}
         onNext={vi.fn()}
         onPrev={onPrev}
@@ -81,19 +107,19 @@ describe('PickupDetails', () => {
       />
     );
 
-    // Choose a Friday date (2025-01-10 is a Friday)
+    // Choose a future date
     const dateInput = screen.getByLabelText("Date *");
-    fireEvent.change(dateInput, { target: { value: "2025-01-10" } });
+    fireEvent.change(dateInput, { target: { value: getFutureDate() } });
 
     expect(updateFormData).toHaveBeenCalledWith({
-      pickupDate: "2025-01-10",
+      pickupDate: getFutureDate(),
       pickupTimeWindow: "",
       pickupTime: "",
     });
   });
 
   it("enables submit only when date and time are selected", () => {
-    const data = { ...baseData, pickupDate: "2025-01-10", pickupTime: "" };
+    const data = { ...baseData, pickupDate: getFutureDate(), pickupTime: "" };
     const { rerender } = render(
       <PickupDetails
         formData={data}
@@ -127,12 +153,12 @@ describe('PickupDetails', () => {
     ).not.toBeDisabled();
   });
 
-  it('calls onPrev and onSubmit appropriately', () => {
+  it("calls onPrev and onSubmit appropriately", () => {
     render(
       <PickupDetails
         formData={{
           ...baseData,
-          pickupDate: "2025-01-10",
+          pickupDate: getFutureDate(),
           pickupTimeWindow: "5:00 PM - 8:00 PM",
           pickupTime: "5:15 PM",
         }}
@@ -145,17 +171,17 @@ describe('PickupDetails', () => {
       />
     );
 
-    fireEvent.click(screen.getByRole('button', { name: /back/i }));
+    fireEvent.click(screen.getByRole("button", { name: /back/i }));
     expect(onPrev).toHaveBeenCalled();
 
-    fireEvent.click(screen.getByRole('button', { name: /submit order/i }));
+    fireEvent.click(screen.getByRole("button", { name: /submit order/i }));
     expect(onSubmit).toHaveBeenCalled();
   });
 
   it("shows time slots grouped by windows when date is selected", () => {
     const data = {
       ...baseData,
-      pickupDate: "2025-01-10", // Friday
+      pickupDate: getFutureFriday(), // Friday
     };
 
     render(
@@ -188,7 +214,7 @@ describe('PickupDetails', () => {
   it("handles time slot selection", () => {
     const data = {
       ...baseData,
-      pickupDate: "2025-01-10", // Friday
+      pickupDate: getFutureFriday(), // Friday
     };
 
     render(
@@ -207,5 +233,85 @@ describe('PickupDetails', () => {
     fireEvent.click(timeButton);
 
     expect(updateFormData).toHaveBeenCalledWith({ pickupTime: "8:15 AM" });
+  });
+
+  it("shows error message when today's date is entered", () => {
+    render(
+      <PickupDetails
+        formData={{ ...baseData, pickupDate: getTodayDate() }}
+        updateFormData={updateFormData}
+        onNext={vi.fn()}
+        onPrev={onPrev}
+        onSubmit={onSubmit}
+        isFirstStep={false}
+        isLastStep={true}
+      />
+    );
+
+    // Should show error message
+    expect(
+      screen.getByText(
+        "Please select a date in the future. Same-day pickup is not available."
+      )
+    ).toBeInTheDocument();
+
+    // Should not show time slots
+    expect(screen.queryByText("8:00 AM - 9:00 AM")).not.toBeInTheDocument();
+
+    // Submit button should be disabled
+    expect(
+      screen.getByRole("button", { name: /submit order/i })
+    ).toBeDisabled();
+  });
+
+  it("shows error message when past date is manually entered", () => {
+    render(
+      <PickupDetails
+        formData={{ ...baseData, pickupDate: getPastDate() }}
+        updateFormData={updateFormData}
+        onNext={vi.fn()}
+        onPrev={onPrev}
+        onSubmit={onSubmit}
+        isFirstStep={false}
+        isLastStep={true}
+      />
+    );
+
+    // Should show error message
+    expect(
+      screen.getByText(
+        "Please select a date in the future. Same-day pickup is not available."
+      )
+    ).toBeInTheDocument();
+
+    // Should not show time slots
+    expect(screen.queryByText("8:00 AM - 9:00 AM")).not.toBeInTheDocument();
+
+    // Submit button should be disabled
+    expect(
+      screen.getByRole("button", { name: /submit order/i })
+    ).toBeDisabled();
+  });
+
+  it("prevents selecting today or past dates by setting min attribute to tomorrow", () => {
+    render(
+      <PickupDetails
+        formData={baseData}
+        updateFormData={updateFormData}
+        onNext={vi.fn()}
+        onPrev={onPrev}
+        onSubmit={onSubmit}
+        isFirstStep={false}
+        isLastStep={true}
+      />
+    );
+
+    const dateInput = screen.getByLabelText(/date/i) as HTMLInputElement;
+    const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000)
+      .toISOString()
+      .split("T")[0];
+
+    expect(dateInput).toHaveAttribute("min", tomorrow);
+    expect(dateInput.type).toBe("date");
   });
 });

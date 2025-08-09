@@ -41,6 +41,11 @@ export const PickupDetails = ({
   const dayOfWeek = getDayOfWeek(formData.pickupDate);
   const availableTimeSlots = dayOfWeek ? TIME_SLOTS[dayOfWeek] : [];
 
+  // Check if the selected date is today or in the past
+  const isPastOrTodayDate =
+    formData.pickupDate &&
+    new Date(formData.pickupDate) <= new Date(new Date().toDateString());
+
   // Generate time slots grouped by window for better visual organization
   const timeSlotsByWindow = availableTimeSlots.map((timeSlot) => ({
     timeSlot,
@@ -48,7 +53,10 @@ export const PickupDetails = ({
     slots: generateTimeIntervals(timeSlotToWindow(timeSlot)),
   }));
 
-  const isValid = Boolean(formData.pickupDate) && Boolean(formData.pickupTime);
+  const isValid =
+    Boolean(formData.pickupDate) &&
+    Boolean(formData.pickupTime) &&
+    !isPastOrTodayDate;
 
   return (
     <FormStepContainer
@@ -66,6 +74,11 @@ export const PickupDetails = ({
             value={formData.pickupDate}
             onChange={handleDateChange}
             className={styles.input}
+            min={
+              new Date(Date.now() + 24 * 60 * 60 * 1000)
+                .toISOString()
+                .split("T")[0]
+            }
             required
           />
         </div>
@@ -73,7 +86,12 @@ export const PickupDetails = ({
         {formData.pickupDate && (
           <div className={styles.fieldGroup}>
             <label className={styles.label}>Available Pickup Times *</label>
-            {timeSlotsByWindow.length > 0 ? (
+            {isPastOrTodayDate ? (
+              <div className={styles.errorMessage} role="alert">
+                Please select a date in the future. Same-day pickup is not
+                available.
+              </div>
+            ) : timeSlotsByWindow.length > 0 ? (
               <div className={styles.timeWindows}>
                 {timeSlotsByWindow.map(({ windowLabel, slots }) => (
                   <div key={windowLabel} className={styles.timeWindow}>
