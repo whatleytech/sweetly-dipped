@@ -6,6 +6,7 @@ import {
   formatTimeObject,
   getUnavailablePeriod,
   formatDateForDisplay,
+  isRushOrder,
 } from "./timeUtils";
 
 describe("timeUtils", () => {
@@ -334,6 +335,67 @@ describe("timeUtils", () => {
     it("handles december", () => {
       const result = formatDateForDisplay("2025-12-25");
       expect(result).toBe("Dec 25");
+    });
+  });
+
+  describe("isRushOrder", () => {
+    // Helper to get date N days from today
+    const getDateFromToday = (daysFromToday: number): string => {
+      const date = new Date();
+      date.setDate(date.getDate() + daysFromToday);
+      return date.toISOString().split("T")[0];
+    };
+
+    it("returns false for empty date string", () => {
+      const result = isRushOrder("");
+      expect(result).toBe(false);
+    });
+
+    it("returns false for invalid date string", () => {
+      const result = isRushOrder("invalid-date");
+      expect(result).toBe(false);
+    });
+
+    it("returns false for today's date", () => {
+      const today = new Date().toISOString().split("T")[0];
+      const result = isRushOrder(today);
+      expect(result).toBe(false);
+    });
+
+    it("returns false for past dates", () => {
+      const pastDate = getDateFromToday(-5);
+      const result = isRushOrder(pastDate);
+      expect(result).toBe(false);
+    });
+
+    it("returns true for dates within 2 weeks (day 1)", () => {
+      const tomorrow = getDateFromToday(1);
+      const result = isRushOrder(tomorrow);
+      expect(result).toBe(true);
+    });
+
+    it("returns true for dates within 2 weeks (day 7)", () => {
+      const oneWeek = getDateFromToday(7);
+      const result = isRushOrder(oneWeek);
+      expect(result).toBe(true);
+    });
+
+    it("returns true for dates within 2 weeks (day 14)", () => {
+      const twoWeeks = getDateFromToday(14);
+      const result = isRushOrder(twoWeeks);
+      expect(result).toBe(true);
+    });
+
+    it("returns false for dates beyond 2 weeks", () => {
+      const beyondTwoWeeks = getDateFromToday(15);
+      const result = isRushOrder(beyondTwoWeeks);
+      expect(result).toBe(false);
+    });
+
+    it("returns false for dates well beyond 2 weeks", () => {
+      const farFuture = getDateFromToday(30);
+      const result = isRushOrder(farFuture);
+      expect(result).toBe(false);
     });
   });
 });

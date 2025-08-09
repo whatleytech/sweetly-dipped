@@ -167,3 +167,25 @@ export function formatDateForDisplay(dateStr: string): string {
     timeZone: 'UTC'  // Use UTC to avoid timezone issues 
   });
 }
+
+/**
+ * Checks if a pickup date is within two weeks (rush order)
+ * @param dateStr - Date string in YYYY-MM-DD format
+ * @returns True if the date is within 2 weeks from today
+ */
+export function isRushOrder(dateStr: string): boolean {
+  if (!dateStr) return false;
+  
+  const selectedDate = new Date(dateStr + 'T00:00:00');
+  if (Number.isNaN(selectedDate.getTime())) return false;
+  
+  const today = new Date();
+  const twoWeeksFromToday = new Date(today.getTime() + (14 * 24 * 60 * 60 * 1000));
+  
+  // Set both dates to start of day for fair comparison
+  const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const twoWeeksStart = new Date(twoWeeksFromToday.getFullYear(), twoWeeksFromToday.getMonth(), twoWeeksFromToday.getDate());
+  const selectedStart = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+  
+  return selectedStart > todayStart && selectedStart <= twoWeeksStart;
+}

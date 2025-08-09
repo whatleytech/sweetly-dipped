@@ -49,6 +49,7 @@ export const DesignPackagePage = () => {
     pickupDate: "",
     pickupTimeWindow: "",
     pickupTime: "",
+    rushOrder: false,
   });
 
   const navigate = useNavigate();

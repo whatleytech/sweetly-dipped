@@ -23,6 +23,7 @@ const baseData: FormData = {
   pickupDate: "",
   pickupTimeWindow: "",
   pickupTime: "",
+  rushOrder: false,
 };
 
 // Helper functions for test dates
@@ -51,7 +52,7 @@ const getTodayDate = (): string => {
   return new Date().toISOString().split("T")[0];
 };
 
-describe('PickupDetails', () => {
+describe("PickupDetails", () => {
   const updateFormData = vi.fn();
   const onSubmit = vi.fn();
   const onPrev = vi.fn();
@@ -115,6 +116,7 @@ describe('PickupDetails', () => {
       pickupDate: getFutureDate(),
       pickupTimeWindow: "",
       pickupTime: "",
+      rushOrder: true, // getFutureDate(7) falls within 2 weeks
     });
   });
 
@@ -425,5 +427,117 @@ describe('PickupDetails', () => {
     expect(
       screen.getByRole("button", { name: /submit order/i })
     ).toBeDisabled();
+  });
+
+  it("shows rush order message for dates within 2 weeks", () => {
+    // Get tomorrow's date (within 2 weeks)
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrowDate = tomorrow.toISOString().split("T")[0];
+
+    render(
+      <PickupDetails
+        formData={{ ...baseData, pickupDate: tomorrowDate, rushOrder: true }}
+        updateFormData={updateFormData}
+        onNext={vi.fn()}
+        onPrev={onPrev}
+        onSubmit={onSubmit}
+        isFirstStep={false}
+        isLastStep={true}
+      />
+    );
+
+    // Should show rush order message
+    expect(screen.getByText(/Rush Order Notice/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Your selected pickup date is within 2 weeks/)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/We will reach out to confirm/)
+    ).toBeInTheDocument();
+
+    // Should still show time slots for rush orders (Sunday has 3:00 PM - 7:00 PM)
+    expect(screen.getByText("3:00 PM - 7:00 PM")).toBeInTheDocument();
+  });
+
+  it("does not show rush order message for dates beyond 2 weeks", () => {
+    render(
+      <PickupDetails
+        formData={{
+          ...baseData,
+          pickupDate: getFutureDate(60), // Far enough to avoid unavailable periods
+          rushOrder: false,
+        }}
+        updateFormData={updateFormData}
+        onNext={vi.fn()}
+        onPrev={onPrev}
+        onSubmit={onSubmit}
+        isFirstStep={false}
+        isLastStep={true}
+      />
+    );
+
+    // Should not show rush order message
+    expect(screen.queryByText(/Rush Order Notice/)).not.toBeInTheDocument();
+
+    // Should show time slots normally (date will depend on what day getFutureDate(20) lands on)
+    // Check for time slots in general rather than specific window
+    expect(screen.getByText(/Available Pickup Times/)).toBeInTheDocument();
+  });
+
+  it("updates rushOrder property when date changes to within 2 weeks", () => {
+    render(
+      <PickupDetails
+        formData={baseData}
+        updateFormData={updateFormData}
+        onNext={vi.fn()}
+        onPrev={onPrev}
+        onSubmit={onSubmit}
+        isFirstStep={false}
+        isLastStep={true}
+      />
+    );
+
+    // Select a date within 2 weeks
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 5);
+    const tomorrowDate = tomorrow.toISOString().split("T")[0];
+
+    const dateInput = screen.getByLabelText("Date *");
+    fireEvent.change(dateInput, { target: { value: tomorrowDate } });
+
+    expect(updateFormData).toHaveBeenCalledWith({
+      pickupDate: tomorrowDate,
+      pickupTimeWindow: "",
+      pickupTime: "",
+      rushOrder: true,
+    });
+  });
+
+  it("updates rushOrder property when date changes to beyond 2 weeks", () => {
+    render(
+      <PickupDetails
+        formData={{ ...baseData, rushOrder: true }}
+        updateFormData={updateFormData}
+        onNext={vi.fn()}
+        onPrev={onPrev}
+        onSubmit={onSubmit}
+        isFirstStep={false}
+        isLastStep={true}
+      />
+    );
+
+    // Select a date beyond 2 weeks
+    const futureDate = getFutureDate(60); // Far enough to avoid unavailable periods
+
+    const dateInput = screen.getByLabelText("Date *");
+    fireEvent.change(dateInput, { target: { value: futureDate } });
+
+    expect(updateFormData).toHaveBeenCalledWith({
+      pickupDate: futureDate,
+      pickupTimeWindow: "",
+      pickupTime: "",
+      rushOrder: false,
+    });
   });
 });

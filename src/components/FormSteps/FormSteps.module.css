@@ -411,3 +411,27 @@
   border-radius: 8px;
   background-color: var(--sd-cream);
 }
+
+.errorMessage {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: #d32f2f;
+  text-align: center;
+  margin: var(--spacing-md) 0;
+  padding: var(--spacing-lg);
+  border: 2px solid #ffcdd2;
+  border-radius: 8px;
+  background-color: #fdeaea;
+}
+
+.infoMessage {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--sd-brown-dark);
+  text-align: center;
+  margin: var(--spacing-md) 0;
+  padding: var(--spacing-lg);
+  border: 2px solid var(--sd-pink-light);
+  border-radius: 8px;
+  background-color: var(--sd-pink-light);
+}

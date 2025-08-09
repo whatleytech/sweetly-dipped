@@ -8,6 +8,7 @@ import {
   timeSlotToWindow,
   getUnavailablePeriod,
   formatDateForDisplay,
+  isRushOrder,
 } from "../../utils/timeUtils";
 
 function getDayOfWeek(dateStr: string): DayOfWeek | null {
@@ -32,10 +33,14 @@ export const PickupDetails = ({
   isLastStep,
 }: FormStepProps) => {
   const handleDateChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const newDate = e.target.value;
+    const isRush = isRushOrder(newDate);
+
     updateFormData({
-      pickupDate: e.target.value,
+      pickupDate: newDate,
       pickupTimeWindow: "",
       pickupTime: "",
+      rushOrder: isRush,
     });
   };
 
@@ -56,6 +61,9 @@ export const PickupDetails = ({
     formData.pickupDate,
     UNAVAILABLE_PERIODS
   );
+
+  // Check if the selected date is a rush order (within 2 weeks)
+  const isRushOrderDate = isRushOrder(formData.pickupDate);
 
   // Generate time slots grouped by window for better visual organization
   const timeSlotsByWindow = availableTimeSlots.map((timeSlot) => ({
@@ -120,36 +128,53 @@ export const PickupDetails = ({
                   </>
                 )}
               </div>
-            ) : timeSlotsByWindow.length > 0 ? (
-              <div className={styles.timeWindows}>
-                {timeSlotsByWindow.map(({ windowLabel, slots }) => (
-                  <div key={windowLabel} className={styles.timeWindow}>
-                    <h4 className={styles.timeWindowLabel}>{windowLabel}</h4>
-                    <div className={styles.timeGrid}>
-                      {slots.map((time) => (
-                        <button
-                          key={time}
-                          type="button"
-                          className={`${styles.timeSlot} ${
-                            formData.pickupTime === time
-                              ? styles.timeSlotSelected
-                              : ""
-                          }`}
-                          onClick={() => handleTimeSlotClick(time)}
-                        >
-                          {time}
-                        </button>
+            ) : isRushOrderDate ? (
+              <div className={styles.infoMessage} role="alert">
+                <strong>Rush Order Notice:</strong> Your selected pickup date is
+                within 2 weeks. We will reach out to confirm if we are able to
+                fulfill your order in this timeframe. Please proceed with your
+                time selection.
+              </div>
+            ) : null}
+
+            {formData.pickupDate &&
+              !isPastOrTodayDate &&
+              !unavailablePeriod && (
+                <>
+                  {timeSlotsByWindow.length > 0 ? (
+                    <div className={styles.timeWindows}>
+                      {timeSlotsByWindow.map(({ windowLabel, slots }) => (
+                        <div key={windowLabel} className={styles.timeWindow}>
+                          <h4 className={styles.timeWindowLabel}>
+                            {windowLabel}
+                          </h4>
+                          <div className={styles.timeGrid}>
+                            {slots.map((time) => (
+                              <button
+                                key={time}
+                                type="button"
+                                className={`${styles.timeSlot} ${
+                                  formData.pickupTime === time
+                                    ? styles.timeSlotSelected
+                                    : ""
+                                }`}
+                                onClick={() => handleTimeSlotClick(time)}
+                              >
+                                {time}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
                       ))}
                     </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className={styles.noTimesMessage}>
-                No pickup times available for this date. Please select a
-                different date.
-              </p>
-            )}
+                  ) : (
+                    <p className={styles.noTimesMessage}>
+                      No pickup times available for this date. Please select a
+                      different date.
+                    </p>
+                  )}
+                </>
+              )}
           </div>
         )}
       </div>
