@@ -47,6 +47,7 @@ export const DesignPackagePage = () => {
     theme: "",
     additionalDesigns: "",
     pickupDate: "",
+    pickupTimeWindow: "",
     pickupTime: "",
   });
 

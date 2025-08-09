@@ -21,6 +21,7 @@ const baseData: FormData = {
   theme: '',
   additionalDesigns: '',
   pickupDate: '',
+  pickupTimeWindow: '',
   pickupTime: '',
 };
 

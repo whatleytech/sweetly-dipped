@@ -20,6 +20,7 @@ const mockFormData: FormData = {
   theme: "",
   additionalDesigns: "",
   pickupDate: "",
+  pickupTimeWindow: "",
   pickupTime: "",
 };
 

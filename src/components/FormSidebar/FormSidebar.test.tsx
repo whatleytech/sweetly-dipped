@@ -170,8 +170,9 @@ describe("FormSidebar", () => {
       eventType: "",
       theme: "",
       additionalDesigns: "",
-      pickupDate: "",
-      pickupTime: "",
+        pickupDate: "",
+  pickupTimeWindow: "",
+  pickupTime: "",
     };
 
     render(

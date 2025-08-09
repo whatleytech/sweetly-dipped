@@ -3,6 +3,7 @@ import styles from "./FormSteps.module.css";
 import type { FormStepProps } from "../../types/formTypes";
 import { FormButtons, FormStepContainer } from "../shared";
 import { TIME_SLOTS, DAY_MAP } from "../../constants/formData";
+import { generateTimeIntervals } from "../../utils/timeUtils";
 
 function getDayOfWeek(dateStr: string): keyof typeof TIME_SLOTS | null {
   if (!dateStr) return null;
@@ -21,20 +22,31 @@ export const PickupDetails = ({
   isLastStep,
 }: FormStepProps) => {
   const handleDateChange = (e: ChangeEvent<HTMLInputElement>) => {
-    updateFormData({ pickupDate: e.target.value, pickupTime: "" });
+    updateFormData({
+      pickupDate: e.target.value,
+      pickupTimeWindow: "",
+      pickupTime: "",
+    });
   };
-  const handleTimeChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    updateFormData({ pickupTime: e.target.value });
+
+  const handleTimeSlotClick = (time: string) => {
+    updateFormData({ pickupTime: time });
   };
 
   const dayOfWeek = getDayOfWeek(formData.pickupDate);
-  const available = dayOfWeek ? TIME_SLOTS[dayOfWeek] : [];
+  const availableWindows = dayOfWeek ? TIME_SLOTS[dayOfWeek] : [];
+
+  // Generate all available time slots for the selected date
+  const availableTimeSlots = availableWindows.flatMap((window) =>
+    generateTimeIntervals(window)
+  );
+
   const isValid = Boolean(formData.pickupDate) && Boolean(formData.pickupTime);
 
   return (
     <FormStepContainer
       title="Pickup date and time"
-      description="Choose a date and one of the available pickup windows."
+      description="Choose a date and select your preferred pickup time from the available slots."
     >
       <div className={styles.formFields}>
         <div className={styles.fieldGroup}>
@@ -51,28 +63,34 @@ export const PickupDetails = ({
           />
         </div>
 
-        <div className={styles.fieldGroup}>
-          <label htmlFor="pickupTime" className={styles.label}>
-            Time Window *
-          </label>
-          <select
-            id="pickupTime"
-            className={styles.input}
-            value={formData.pickupTime}
-            onChange={handleTimeChange}
-            disabled={!dayOfWeek}
-            required
-          >
-            <option value="" disabled>
-              {dayOfWeek ? "Select a time" : "Select a date first"}
-            </option>
-            {available.map((slot) => (
-              <option key={slot} value={slot}>
-                {slot}
-              </option>
-            ))}
-          </select>
-        </div>
+        {formData.pickupDate && (
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>Available Pickup Times *</label>
+            {availableTimeSlots.length > 0 ? (
+              <div className={styles.timeGrid}>
+                {availableTimeSlots.map((time) => (
+                  <button
+                    key={time}
+                    type="button"
+                    className={`${styles.timeSlot} ${
+                      formData.pickupTime === time
+                        ? styles.timeSlotSelected
+                        : ""
+                    }`}
+                    onClick={() => handleTimeSlotClick(time)}
+                  >
+                    {time}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <p className={styles.noTimesMessage}>
+                No pickup times available for this date. Please select a
+                different date.
+              </p>
+            )}
+          </div>
+        )}
       </div>
 
       <FormButtons
