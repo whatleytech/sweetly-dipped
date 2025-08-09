@@ -1,0 +1,70 @@
+---
+# test-coverage-enforcement.mdc
+description: >
+  Enforce comprehensive testing standards with specific coverage thresholds
+  for different types of code to maintain high quality and prevent regressions.
+alwaysApply: true
+---
+
+## Coverage Thresholds
+
+Minimum coverage requirements by file type:
+- **Components** (`src/components/**/*.tsx`): 95%
+- **Pages** (`src/pages/**/*.tsx`): 85% 
+- **Utils/Helpers** (`src/utils/**/*.ts`): 100%
+- **Hooks** (`src/hooks/**/*.ts`): 90%
+- **API layers** (`src/api/**/*.ts`): 80%
+
+## Test File Requirements
+
+Every new or modified file must have a corresponding test:
+- Components: `ComponentName.test.tsx` 
+- Utils: `utilName.test.ts`
+- Hooks: `useHookName.test.ts`
+- Pages: `PageName.test.tsx`
+
+## What to Test
+
+### Components
+- Rendering with default props
+- All user interactions (clicks, form inputs, etc.)
+- Conditional rendering logic
+- Error states and edge cases
+- Accessibility attributes (ARIA labels, roles)
+
+### Utils/Helpers
+- All function paths and branches
+- Edge cases and error handling
+- Input validation and sanitization
+- Return value accuracy
+
+### Hooks
+- State changes and side effects
+- Cleanup functions
+- Error boundaries
+- Dependency array behavior
+
+## Testing Tools & Patterns
+
+- **Framework**: Vitest with React Testing Library
+- **Mocking**: Mock external dependencies, APIs, and localStorage
+- **User interactions**: Use `fireEvent` or `userEvent` for realistic testing
+- **Async testing**: Use `waitFor` for async state changes
+- **Coverage**: `yarn test --coverage` must pass before commits
+
+## Quality Gates
+
+Before any commit:
+1. `yarn test` - all tests pass
+2. Coverage thresholds met per file type
+3. No skipped tests without documented reason
+4. No `console.log` or debugging code in tests
+
+## Exceptions
+
+The only exception to testing requirements:
+- Theme/CSS variable files (like `src/types/colors.ts`)
+- Configuration files
+- Type-only definitions
+
+Document any other exceptions in the test file with a comment explaining why.

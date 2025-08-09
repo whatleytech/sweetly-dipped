@@ -1,0 +1,168 @@
+---
+# form-validation-patterns.mdc
+description: >
+  Standardize form validation patterns across all input types to ensure
+  consistent user experience, accessibility, and maintainable validation logic.
+alwaysApply: true
+---
+
+## Core Validation Principles
+
+1. **Client-side validation** for immediate feedback, **server-side validation** for security
+2. **Progressive enhancement** - forms work without JavaScript
+3. **Accessible error messaging** with proper ARIA attributes
+4. **Consistent visual feedback** across all input types
+
+## Standard Input Validation Patterns
+
+### Text Inputs
+```tsx
+<input
+  type="text"
+  minLength={2}
+  maxLength={50}
+  required
+  aria-describedby="name-error"
+  placeholder="Enter your name"
+/>
+```
+
+### Email Validation
+```javascript
+const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+```
+```tsx
+<input
+  type="email"
+  required
+  aria-describedby="email-error"
+  placeholder="your.email@example.com"
+/>
+```
+
+### Phone Number (US Format)
+```javascript
+const isValidPhone = (phone: string) => /^\d{3}-\d{3}-\d{4}$/.test(phone);
+const formatPhoneNumber = (value: string) => {
+  if (!value) return value;
+  const phoneNumber = value.replace(/[^\d]/g, '');
+  const phoneNumberLength = phoneNumber.length;
+  if (phoneNumberLength < 4) return phoneNumber;
+  if (phoneNumberLength < 7) {
+    return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3)}`;
+  }
+  return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6, 10)}`;
+};
+```
+```tsx
+<input
+  type="tel"
+  inputMode="numeric"
+  pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
+  required
+  aria-describedby="phone-error"
+  placeholder="123-456-7890"
+/>
+```
+
+### Password Inputs
+```javascript
+const isValidPassword = (password: string) => 
+  password.length >= 8 && 
+  /[A-Z]/.test(password) && 
+  /[a-z]/.test(password) && 
+  /\d/.test(password);
+```
+```tsx
+<input
+  type="password"
+  minLength={8}
+  required
+  aria-describedby="password-error password-help"
+  placeholder="Enter secure password"
+/>
+```
+
+### Number Inputs
+```tsx
+<input
+  type="number"
+  min={1}
+  max={999}
+  step={1}
+  required
+  aria-describedby="quantity-error"
+  placeholder="Enter quantity"
+/>
+```
+
+### Date Inputs
+```tsx
+<input
+  type="date"
+  min={new Date().toISOString().split('T')[0]} // Today or later
+  required
+  aria-describedby="date-error"
+/>
+```
+
+### URL Inputs
+```javascript
+const isValidUrl = (url: string) => {
+  try {
+    new URL(url);
+    return true;
+  } catch {
+    return false;
+  }
+};
+```
+
+## Error Message Standards
+
+Use consistent, helpful error messages:
+- **Required fields**: "This field is required"
+- **Email**: "Please enter a valid email address"
+- **Phone**: "Please enter a valid phone number (123-456-7890)"
+- **Password**: "Password must be at least 8 characters with uppercase, lowercase, and number"
+- **Min/Max length**: "Must be between {min} and {max} characters"
+- **Number range**: "Must be between {min} and {max}"
+- **URL**: "Please enter a valid URL (https://example.com)"
+
+## Error Display Pattern
+
+```tsx
+<div className={styles.fieldGroup}>
+  <label htmlFor="input-id" className={styles.label}>
+    Field Name {isRequired && "*"}
+  </label>
+  <input
+    id="input-id"
+    className={`${styles.input} ${hasError ? styles.inputError : ''}`}
+    aria-invalid={hasError}
+    aria-describedby={hasError ? "input-id-error" : undefined}
+    // ... other props
+  />
+  {hasError && (
+    <div 
+      id="input-id-error" 
+      className={styles.errorMessage}
+      role="alert"
+      aria-live="polite"
+    >
+      {errorMessage}
+    </div>
+  )}
+</div>
+```
+
+## Implementation Rules
+
+1. **Extract to utils**: Create shared validation functions in `src/utils/validation.ts`
+2. **Validate on interaction**: Validate on blur/change, not just submission
+3. **Clear errors dynamically**: Remove error when user corrects input
+4. **Accessibility first**: Use proper ARIA attributes and semantic HTML
+5. **Test thoroughly**: Test valid/invalid inputs, edge cases, and accessibility
+6. **Consistent styling**: Use shared CSS classes for error states
+7. **Progressive enhancement**: Ensure forms work without JavaScript
+8. **Security**: Never rely on client-side validation alone

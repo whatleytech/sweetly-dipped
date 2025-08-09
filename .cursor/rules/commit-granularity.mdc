@@ -1,0 +1,84 @@
+---
+# commit-granularity.mdc
+description: >
+  Enforce logical commit grouping and standardized messaging to maintain
+  clean git history and enable effective code review and debugging.
+alwaysApply: true
+---
+
+## Commit Size Limits
+
+- **Maximum**: ~300 lines changed per commit
+- **Ideal**: 50-150 lines changed per commit
+- **Split large changes** into logical chunks (e.g., "add component" then "add tests" then "update integration")
+
+## Commit Type Prefixes
+
+Use conventional commit prefixes:
+- `feat(scope):` - New feature or enhancement
+- `fix(scope):` - Bug fix
+- `chore(scope):` - Maintenance, deps, tooling
+- `docs(scope):` - Documentation only
+- `test(scope):` - Adding/updating tests only
+- `refactor(scope):` - Code restructuring without feature changes
+- `style(scope):` - Formatting, whitespace, code style
+
+## Scope Guidelines
+
+Use meaningful scopes:
+- Component names: `feat(hero): add responsive image gallery`
+- Feature areas: `fix(forms): resolve validation timing issue`
+- Technical areas: `chore(build): update vite config for testing`
+
+## Message Format
+
+```
+<type>(scope): <subject>
+
+[optional body]
+```
+
+### Subject Line Rules
+- **Length**: 50-72 characters (hard limit: 100)
+- **Style**: Imperative mood ("add", not "added" or "adds")
+- **Capitalization**: Lowercase after colon
+- **No period**: Don't end with `.`
+
+### Examples
+✅ Good:
+- `feat(lead): add email/phone validation with live formatting`
+- `fix(sidebar): correct step progress calculation`
+- `chore(deps): update react router to v6.8`
+
+❌ Bad:
+- `Updated some files` (no type/scope, not descriptive)
+- `feat: added a new component for the form validation and phone number formatting with tests` (too long)
+- `Fix bug.` (not descriptive, has period)
+
+## Grouping Strategy
+
+Separate commits for:
+1. **Core functionality** - the main feature implementation
+2. **Tests** - comprehensive test coverage for the feature  
+3. **Styling** - CSS/visual adjustments
+4. **Documentation** - README updates, comments
+
+Example sequence:
+```bash
+git commit -m "feat(package): add multi-step form with local storage"
+git commit -m "test(package): add comprehensive form validation tests"  
+git commit -m "style(package): refine form layout and responsive design"
+git commit -m "docs(package): update README with form usage examples"
+```
+
+## Quality Gates Before Each Commit
+
+Run this checklist:
+```bash
+yarn lint        # ESLint passes
+yarn test        # All tests green  
+yarn type-check  # TypeScript compiles
+yarn test --coverage  # Coverage thresholds met
+```
+
+Only commit when all checks pass.
