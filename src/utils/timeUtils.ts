@@ -91,3 +91,29 @@ export function parseTimeWindow(timeWindow: string): { start: string; end: strin
   
   return { start, end };
 }
+
+/**
+ * Formats a Time object to a time string in 12-hour format
+ * @param time - Time object with hour, minute, timeOfDay
+ * @returns String in format "8:00 AM" or "5:00 PM"
+ */
+export function formatTimeObject(time: { hour: number; minute: number; timeOfDay: "morning" | "evening" }): string {
+  const period = time.timeOfDay === "morning" ? 'AM' : 'PM';
+  const displayHour = time.hour === 0 ? 12 : time.hour > 12 ? time.hour - 12 : time.hour;
+  const displayMinute = time.minute.toString().padStart(2, '0');
+  return `${displayHour}:${displayMinute} ${period}`;
+}
+
+/**
+ * Converts a TimeSlot object to a window string
+ * @param timeSlot - TimeSlot object with startTime and endTime as Time objects
+ * @returns String in format "8:00 AM - 10:00 AM"
+ */
+export function timeSlotToWindow(timeSlot: { 
+  startTime: { hour: number; minute: number; timeOfDay: "morning" | "evening" }; 
+  endTime: { hour: number; minute: number; timeOfDay: "morning" | "evening" } 
+}): string {
+  const startTimeStr = formatTimeObject(timeSlot.startTime);
+  const endTimeStr = formatTimeObject(timeSlot.endTime);
+  return `${startTimeStr} - ${endTimeStr}`;
+}

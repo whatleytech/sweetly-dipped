@@ -52,6 +52,26 @@ export interface TreatOption {
   price: number;
 }
 
-export interface TimeSlots {
-  [key: string]: string[];
+export interface Time {
+  hour: number;
+  minute: number;
+  timeOfDay: "morning" | "evening";
 }
+
+export interface TimeSlot {
+  startTime: Time;
+  endTime: Time;
+}
+
+export type DayOfWeek =
+  | "Sunday"
+  | "Monday"
+  | "Tuesday"
+  | "Wednesday"
+  | "Thursday"
+  | "Friday"
+  | "Saturday";
+
+export type TimeSlots = {
+  [key in DayOfWeek]: TimeSlot[];
+};

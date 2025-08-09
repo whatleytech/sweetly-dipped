@@ -1,16 +1,21 @@
 import type { ChangeEvent } from "react";
 import styles from "./FormSteps.module.css";
-import type { FormStepProps } from "../../types/formTypes";
+import type { FormStepProps, DayOfWeek } from "../../types/formTypes";
 import { FormButtons, FormStepContainer } from "../shared";
-import { TIME_SLOTS, DAY_MAP } from "../../constants/formData";
-import { generateTimeIntervals } from "../../utils/timeUtils";
+import { TIME_SLOTS } from "../../constants/formData";
+import { generateTimeIntervals, timeSlotToWindow } from "../../utils/timeUtils";
 
-function getDayOfWeek(dateStr: string): keyof typeof TIME_SLOTS | null {
+function getDayOfWeek(dateStr: string): DayOfWeek | null {
   if (!dateStr) return null;
   const d = new Date(dateStr + "T00:00:00");
   if (Number.isNaN(d.getTime())) return null;
-  const day = d.getUTCDay(); // 0 Sun .. 6 Sat (UTC to avoid TZ flakiness)
-  return DAY_MAP[day];
+
+  const dayName = d.toLocaleDateString("en-US", {
+    weekday: "long",
+    timeZone: "UTC", // Use UTC to avoid timezone issues
+  }) as DayOfWeek;
+
+  return dayName;
 }
 
 export const PickupDetails = ({
@@ -34,12 +39,13 @@ export const PickupDetails = ({
   };
 
   const dayOfWeek = getDayOfWeek(formData.pickupDate);
-  const availableWindows = dayOfWeek ? TIME_SLOTS[dayOfWeek] : [];
+  const availableTimeSlots = dayOfWeek ? TIME_SLOTS[dayOfWeek] : [];
 
   // Generate time slots grouped by window for better visual organization
-  const timeSlotsByWindow = availableWindows.map((window) => ({
-    window,
-    slots: generateTimeIntervals(window)
+  const timeSlotsByWindow = availableTimeSlots.map((timeSlot) => ({
+    timeSlot,
+    windowLabel: timeSlotToWindow(timeSlot),
+    slots: generateTimeIntervals(timeSlotToWindow(timeSlot)),
   }));
 
   const isValid = Boolean(formData.pickupDate) && Boolean(formData.pickupTime);
@@ -69,9 +75,9 @@ export const PickupDetails = ({
             <label className={styles.label}>Available Pickup Times *</label>
             {timeSlotsByWindow.length > 0 ? (
               <div className={styles.timeWindows}>
-                {timeSlotsByWindow.map(({ window, slots }, windowIndex) => (
-                  <div key={window} className={styles.timeWindow}>
-                    <h4 className={styles.timeWindowLabel}>{window}</h4>
+                {timeSlotsByWindow.map(({ windowLabel, slots }) => (
+                  <div key={windowLabel} className={styles.timeWindow}>
+                    <h4 className={styles.timeWindowLabel}>{windowLabel}</h4>
                     <div className={styles.timeGrid}>
                       {slots.map((time) => (
                         <button

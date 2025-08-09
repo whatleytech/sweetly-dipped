@@ -27,21 +27,66 @@ export const TREAT_OPTIONS: TreatOption[] = [
 export const QUANTITIES = [0, 1, 2, 3, 4] as const;
 
 export const TIME_SLOTS: TimeSlots = {
-  Monday: ["8:00 AM - 9:00 AM", "5:00 PM - 8:00 PM"],
-  Tuesday: ["8:00 AM - 9:00 AM", "5:00 PM - 8:00 PM"],
-  Wednesday: ["8:00 AM - 9:00 AM", "5:00 PM - 8:00 PM"],
-  Thursday: ["8:00 AM - 9:00 AM", "5:00 PM - 8:00 PM"],
-  Friday: ["8:00 AM - 9:00 AM", "5:00 PM - 8:00 PM"],
-  Saturday: ["9:00 AM - 12:00 PM"],
-  Sunday: ["3:00 PM - 7:00 PM"],
+  Monday: [
+    {
+      startTime: { hour: 8, minute: 0, timeOfDay: "morning" },
+      endTime: { hour: 9, minute: 0, timeOfDay: "morning" },
+    },
+    {
+      startTime: { hour: 5, minute: 0, timeOfDay: "evening" },
+      endTime: { hour: 8, minute: 0, timeOfDay: "evening" },
+    },
+  ],
+  Tuesday: [
+    {
+      startTime: { hour: 8, minute: 0, timeOfDay: "morning" },
+      endTime: { hour: 9, minute: 0, timeOfDay: "morning" },
+    },
+    {
+      startTime: { hour: 5, minute: 0, timeOfDay: "evening" },
+      endTime: { hour: 8, minute: 0, timeOfDay: "evening" },
+    },
+  ],
+  Wednesday: [
+    {
+      startTime: { hour: 8, minute: 0, timeOfDay: "morning" },
+      endTime: { hour: 9, minute: 0, timeOfDay: "morning" },
+    },
+    {
+      startTime: { hour: 5, minute: 0, timeOfDay: "evening" },
+      endTime: { hour: 8, minute: 0, timeOfDay: "evening" },
+    },
+  ],
+  Thursday: [
+    {
+      startTime: { hour: 8, minute: 0, timeOfDay: "morning" },
+      endTime: { hour: 9, minute: 0, timeOfDay: "morning" },
+    },
+    {
+      startTime: { hour: 5, minute: 0, timeOfDay: "evening" },
+      endTime: { hour: 8, minute: 0, timeOfDay: "evening" },
+    },
+  ],
+  Friday: [
+    {
+      startTime: { hour: 8, minute: 0, timeOfDay: "morning" },
+      endTime: { hour: 9, minute: 0, timeOfDay: "morning" },
+    },
+    {
+      startTime: { hour: 5, minute: 0, timeOfDay: "evening" },
+      endTime: { hour: 8, minute: 0, timeOfDay: "evening" },
+    },
+  ],
+  Saturday: [
+    {
+      startTime: { hour: 9, minute: 0, timeOfDay: "morning" },
+      endTime: { hour: 12, minute: 0, timeOfDay: "morning" },
+    },
+  ],
+  Sunday: [
+    {
+      startTime: { hour: 3, minute: 0, timeOfDay: "evening" },
+      endTime: { hour: 7, minute: 0, timeOfDay: "evening" },
+    },
+  ],
 };
-
-export const DAY_MAP: Array<keyof typeof TIME_SLOTS> = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-];
