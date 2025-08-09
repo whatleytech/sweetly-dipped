@@ -106,4 +106,76 @@ describe('ByTheDozen', () => {
     fireEvent.click(btn);
     expect(onNext).toHaveBeenCalled();
   });
+
+  it("shows correct selected state for oreos", () => {
+    const data = { ...baseData, oreos: 2 };
+    render(
+      <ByTheDozen
+        formData={data}
+        updateFormData={updateFormData}
+        onNext={onNext}
+        onPrev={onPrev}
+        onSubmit={vi.fn()}
+        isFirstStep={false}
+        isLastStep={false}
+      />
+    );
+
+    // Verify the correct radio is selected
+    const oreosInput = screen
+      .getAllByDisplayValue("2")
+      .find((input) => input.getAttribute("name") === "oreos");
+    expect(oreosInput.checked).toBe(true);
+
+    // Verify continue button is enabled with selection
+    expect(
+      screen.getByRole("button", { name: /continue/i })
+    ).not.toBeDisabled();
+  });
+
+  it("unselects when clicking on already selected option", () => {
+    const data = { ...baseData, oreos: 2 };
+    render(
+      <ByTheDozen
+        formData={data}
+        updateFormData={updateFormData}
+        onNext={onNext}
+        onPrev={onPrev}
+        onSubmit={vi.fn()}
+        isFirstStep={false}
+        isLastStep={false}
+      />
+    );
+
+    // Find the checked oreos radio input and click it
+    const oreosInput = screen
+      .getAllByDisplayValue("2")
+      .find((input) => input.getAttribute("name") === "oreos");
+
+    expect(oreosInput.checked).toBe(true);
+
+    // Click on the already selected option to unselect it
+    fireEvent.click(oreosInput);
+
+    // Should call updateFormData with value 0 (unselected)
+    expect(updateFormData).toHaveBeenCalledWith({ oreos: 0 });
+  });
+
+  it("disables continue when all selections are unselected", () => {
+    const updatedData = { ...baseData, oreos: 0 };
+    render(
+      <ByTheDozen
+        formData={updatedData}
+        updateFormData={updateFormData}
+        onNext={onNext}
+        onPrev={onPrev}
+        onSubmit={vi.fn()}
+        isFirstStep={false}
+        isLastStep={false}
+      />
+    );
+
+    // Continue should be disabled when no selections
+    expect(screen.getByRole("button", { name: /continue/i })).toBeDisabled();
+  });
 });

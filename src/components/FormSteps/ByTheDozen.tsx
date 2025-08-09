@@ -44,7 +44,10 @@ export const ByTheDozen = ({
     >,
     value: number
   ) => {
-    updateFormData({ [key]: value } as Partial<FormData>);
+    // If the same value is already selected, unselect it (set to 0)
+    const currentValue = formData[key] ?? 0;
+    const newValue = currentValue === value ? 0 : value;
+    updateFormData({ [key]: newValue } as Partial<FormData>);
   };
 
   const hasAnySelection =
@@ -100,6 +103,7 @@ export const ByTheDozen = ({
                   value={q}
                   checked={selected}
                   onChange={() => handleSelect(row.key, q)}
+                  onClick={() => handleSelect(row.key, q)}
                 />
                 <span className={styles.gridRadioLabel}>{q}</span>
               </label>
