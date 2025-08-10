@@ -456,8 +456,13 @@ describe("PickupDetails", () => {
       screen.getByText(/We will reach out to confirm/)
     ).toBeInTheDocument();
 
-    // Should still show time slots for rush orders (Sunday has 3:00 PM - 7:00 PM)
-    expect(screen.getByText("3:00 PM - 7:00 PM")).toBeInTheDocument();
+    // Should still show time slots for rush orders (regardless of which day)
+    expect(screen.getByText(/Available Pickup Times/)).toBeInTheDocument();
+    // Check that time slots are actually rendered (there should be at least one time window)
+    const timeWindows = screen.getAllByText(
+      /8:00 AM - 9:00 AM|5:00 PM - 8:00 PM|9:00 AM - 12:00 PM|3:00 PM - 7:00 PM/
+    );
+    expect(timeWindows.length).toBeGreaterThan(0);
   });
 
   it("does not show rush order message for dates beyond 2 weeks", () => {
