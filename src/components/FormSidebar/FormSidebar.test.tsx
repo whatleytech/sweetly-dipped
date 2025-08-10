@@ -20,7 +20,9 @@ const mockFormData: FormData = {
   theme: "Princess",
   additionalDesigns: "Custom sprinkles",
   pickupDate: "2024-01-15",
+  pickupTimeWindow: "",
   pickupTime: "5:00 PM",
+  rushOrder: false,
 };
 
 const mockFormSteps = [
@@ -170,9 +172,10 @@ describe("FormSidebar", () => {
       eventType: "",
       theme: "",
       additionalDesigns: "",
-        pickupDate: "",
-  pickupTimeWindow: "",
-  pickupTime: "",
+      pickupDate: "",
+      pickupTimeWindow: "",
+      pickupTime: "",
+      rushOrder: false,
     };
 
     render(
@@ -185,5 +188,35 @@ describe("FormSidebar", () => {
 
     expect(screen.getByText("Your Progress")).toBeInTheDocument();
     expect(screen.getByText("1 of 8 steps completed")).toBeInTheDocument();
+  });
+
+  it("displays correct progress when by-dozen step is skipped", () => {
+    // Create form data where by-dozen step is skipped (package type is not "by-dozen")
+    const formDataWithoutByDozen = {
+      ...mockFormData,
+      packageType: "medium" as const, // Not "by-dozen", so by-dozen step is skipped
+    };
+
+    // Create visible steps that exclude the by-dozen step
+    const visibleStepsWithoutByDozen = mockFormSteps.filter(
+      (step) => step.id !== "by-dozen"
+    );
+
+    // When we're on step 4 (color scheme) in the full step array,
+    // but the by-dozen step is skipped, the currentVisibleIndex should be 3
+    render(
+      <FormSidebar
+        formData={formDataWithoutByDozen}
+        currentStep={4} // Step 4 in full array (color scheme)
+        formSteps={visibleStepsWithoutByDozen}
+        currentVisibleIndex={3} // Step 3 in visible array (color scheme)
+      />
+    );
+
+    // Should show "4 of 7 steps completed" instead of "5 of 8 steps completed"
+    expect(screen.getByText("4 of 7 steps completed")).toBeInTheDocument();
+
+    // Verify that by-dozen step is not rendered
+    expect(screen.queryByText("By The Dozen")).not.toBeInTheDocument();
   });
 });

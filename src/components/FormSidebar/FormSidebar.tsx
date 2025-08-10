@@ -5,12 +5,14 @@ interface FormSidebarProps {
   formData: FormData;
   currentStep: number;
   formSteps: Array<{ id: string; title: string }>;
+  currentVisibleIndex?: number;
 }
 
 export const FormSidebar = ({
   formData,
   currentStep,
   formSteps,
+  currentVisibleIndex,
 }: FormSidebarProps) => {
   const getStepStatus = (stepIndex: number) => {
     if (stepIndex < currentStep) return "completed";
@@ -119,13 +121,22 @@ export const FormSidebar = ({
 
       <div className={styles.progressInfo}>
         <div className={styles.progressText}>
-          {currentStep + 1} of {formSteps.length} steps completed
+          {currentVisibleIndex !== undefined
+            ? currentVisibleIndex + 1
+            : currentStep + 1}{" "}
+          of {formSteps.length} steps completed
         </div>
         <div className={styles.progressBar}>
           <div
             className={styles.progressFill}
             style={{
-              width: `${((currentStep + 1) / formSteps.length) * 100}%`,
+              width: `${
+                ((currentVisibleIndex !== undefined
+                  ? currentVisibleIndex + 1
+                  : currentStep + 1) /
+                  formSteps.length) *
+                100
+              }%`,
             }}
           />
         </div>

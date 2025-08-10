@@ -213,6 +213,7 @@ export const DesignPackagePage = () => {
             formData={formData}
             currentStep={currentStep}
             formSteps={visibleSteps.map((s) => ({ id: s.id, title: s.title }))}
+            currentVisibleIndex={currentVisibleIndex}
           />
         </div>
       </div>
