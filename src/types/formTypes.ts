@@ -28,6 +28,10 @@ export interface FormData {
   pickupTimeWindow: string; // The selected time window (e.g., "8:00 AM - 10:00 AM")
   pickupTime: string; // The specific time within the window (e.g., "8:15 AM")
   rushOrder: boolean; // True if pickup is within 2 weeks (rush order)
+
+  // Confirmation Page
+  referralSource: string;
+  termsAccepted: boolean;
 }
 
 export interface FormStepProps {

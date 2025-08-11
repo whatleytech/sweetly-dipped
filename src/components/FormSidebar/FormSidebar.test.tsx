@@ -23,6 +23,8 @@ const mockFormData: FormData = {
   pickupTimeWindow: "",
   pickupTime: "5:00 PM",
   rushOrder: false,
+  referralSource: "",
+  termsAccepted: false,
 };
 
 const mockFormSteps = [
@@ -176,6 +178,8 @@ describe("FormSidebar", () => {
       pickupTimeWindow: "",
       pickupTime: "",
       rushOrder: false,
+      referralSource: "",
+      termsAccepted: false,
     };
 
     render(

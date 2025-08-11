@@ -50,6 +50,8 @@ export const DesignPackagePage = () => {
     pickupTimeWindow: "",
     pickupTime: "",
     rushOrder: false,
+    referralSource: "",
+    termsAccepted: false,
   });
 
   const navigate = useNavigate();
@@ -86,46 +88,46 @@ export const DesignPackagePage = () => {
   const getStepIndexById = (id: (typeof FORM_STEPS)[number]["id"]) =>
     FORM_STEPS.findIndex((s) => s.id === id);
 
-    const scrollToStepTop = () => {
-      // Scroll to position the step header with some padding above to show context
-      const stepHeader = document.querySelector(`.${styles.stepHeader}`);
-      if (stepHeader) {
-        const elementRect = stepHeader.getBoundingClientRect();
-        const absoluteElementTop = elementRect.top + window.pageYOffset;
-        // Add some padding above the step header (80px) to show page context
-        const scrollPosition = Math.max(0, absoluteElementTop - 80);
+  const scrollToStepTop = () => {
+    // Scroll to position the step header with some padding above to show context
+    const stepHeader = document.querySelector(`.${styles.stepHeader}`);
+    if (stepHeader) {
+      const elementRect = stepHeader.getBoundingClientRect();
+      const absoluteElementTop = elementRect.top + window.pageYOffset;
+      // Add some padding above the step header (80px) to show page context
+      const scrollPosition = Math.max(0, absoluteElementTop - 80);
 
-        window.scrollTo({
-          top: scrollPosition,
-          behavior: "smooth",
-        });
-      }
-    };
+      window.scrollTo({
+        top: scrollPosition,
+        behavior: "smooth",
+      });
+    }
+  };
 
-    const nextStep = () => {
-      const currentId = FORM_STEPS[currentStep].id;
+  const nextStep = () => {
+    const currentId = FORM_STEPS[currentStep].id;
 
-      // Skip logic: if package selected is not by-dozen, skip the by-dozen step
-      if (currentId === "package" && formData.packageType !== "by-dozen") {
-        setCurrentStep(getStepIndexById("color"));
-        // Scroll after state update
-        setTimeout(scrollToStepTop, 0);
-        return;
-      }
+    // Skip logic: if package selected is not by-dozen, skip the by-dozen step
+    if (currentId === "package" && formData.packageType !== "by-dozen") {
+      setCurrentStep(getStepIndexById("color"));
+      // Scroll after state update
+      setTimeout(scrollToStepTop, 0);
+      return;
+    }
 
-      if (currentId === "by-dozen" && formData.packageType !== "by-dozen") {
-        setCurrentStep(Math.min(currentStep + 1, FORM_STEPS.length - 1));
-        // Scroll after state update
-        setTimeout(scrollToStepTop, 0);
-        return;
-      }
+    if (currentId === "by-dozen" && formData.packageType !== "by-dozen") {
+      setCurrentStep(Math.min(currentStep + 1, FORM_STEPS.length - 1));
+      // Scroll after state update
+      setTimeout(scrollToStepTop, 0);
+      return;
+    }
 
-      if (currentStep < FORM_STEPS.length - 1) {
-        setCurrentStep(currentStep + 1);
-        // Scroll after state update
-        setTimeout(scrollToStepTop, 0);
-      }
-    };
+    if (currentStep < FORM_STEPS.length - 1) {
+      setCurrentStep(currentStep + 1);
+      // Scroll after state update
+      setTimeout(scrollToStepTop, 0);
+    }
+  };
 
   const prevStep = () => {
     const currentId = FORM_STEPS[currentStep].id;
@@ -159,12 +161,8 @@ export const DesignPackagePage = () => {
   };
 
   const handleSubmit = () => {
-    // TODO: Submit form data to backend
-    console.log("Form submitted:", formData);
-    // Clear localStorage after successful submission
-    localStorage.removeItem(STORAGE_KEY);
-    // Navigate to confirmation page or back to home
-    navigate("/");
+    // Navigate to confirmation page
+    navigate("/confirmation");
   };
 
   const CurrentStepComponent = FORM_STEPS[currentStep].component;

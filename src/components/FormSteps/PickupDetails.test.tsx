@@ -24,6 +24,8 @@ const baseData: FormData = {
   pickupTimeWindow: "",
   pickupTime: "",
   rushOrder: false,
+  referralSource: "",
+  termsAccepted: false,
 };
 
 // Helper functions for test dates
