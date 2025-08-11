@@ -1,0 +1,81 @@
+.section {
+  background: var(--sd-white);
+  border: 1px solid var(--sd-pink-light);
+  border-radius: 8px;
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.section h3 {
+  color: var(--sd-brown-dark);
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  margin-bottom: var(--spacing-sm);
+  border-bottom: 2px solid var(--sd-pink-light);
+  padding-bottom: var(--spacing-xs);
+}
+
+.fieldGroup {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-sm);
+  padding: var(--spacing-xs) 0;
+}
+
+.fieldGroup label {
+  font-weight: 600;
+  color: var(--sd-brown-dark);
+  min-width: 120px;
+  flex-shrink: 0;
+}
+
+.fieldValue {
+  color: var(--sd-brown-light);
+  text-align: right;
+  flex: 1;
+}
+
+.treatsBreakdown {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  color: var(--sd-brown-light);
+  text-align: right;
+  flex: 1;
+}
+
+.treatsBreakdown > div {
+  padding: 2px 0;
+}
+
+.total {
+  font-weight: 600;
+  color: var(--sd-brown-dark);
+  border-top: 1px solid var(--sd-pink-light);
+  padding-top: var(--spacing-xs);
+  margin-top: var(--spacing-xs);
+}
+
+.totalPrice {
+  font-weight: 700;
+  color: var(--sd-pink-base);
+  font-size: 1.1rem;
+  text-align: right;
+  flex: 1;
+}
+
+@media (max-width: 768px) {
+  .fieldGroup {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-xs);
+  }
+
+  .fieldValue,
+  .treatsBreakdown,
+  .totalPrice {
+    text-align: left;
+    width: 100%;
+  }
+}

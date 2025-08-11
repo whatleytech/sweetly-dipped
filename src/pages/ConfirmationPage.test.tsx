@@ -85,7 +85,9 @@ describe("ConfirmationPage", () => {
       expect(screen.getByText("John Doe")).toBeInTheDocument();
       expect(screen.getByText("john.doe@example.com")).toBeInTheDocument();
       expect(screen.getByText("123-456-7890")).toBeInTheDocument();
-      expect(screen.getByText("Medium Package")).toBeInTheDocument();
+      expect(
+        screen.getByText("Medium (5 dozen – 60 treats)")
+      ).toBeInTheDocument();
     });
   });
 
@@ -138,7 +140,9 @@ describe("ConfirmationPage", () => {
     renderConfirmationPage();
     
     await waitFor(() => {
-      expect(screen.getByText("By The Dozen")).toBeInTheDocument();
+      expect(
+        screen.getByText("No package — order by the dozen")
+      ).toBeInTheDocument();
       expect(screen.getByText("Rice Krispies: 2")).toBeInTheDocument();
       expect(screen.getByText("Oreos: 1")).toBeInTheDocument();
       expect(screen.getByText("Pretzels: 0")).toBeInTheDocument();
