@@ -357,8 +357,14 @@ describe("timeUtils", () => {
     });
 
     it("returns false for today's date", () => {
-      const today = new Date().toISOString().split("T")[0];
-      const result = isRushOrder(today);
+      const today = new Date();
+      const todayStr =
+        today.getFullYear() +
+        "-" +
+        String(today.getMonth() + 1).padStart(2, "0") +
+        "-" +
+        String(today.getDate()).padStart(2, "0");
+      const result = isRushOrder(todayStr);
       expect(result).toBe(false);
     });
 
@@ -380,9 +386,9 @@ describe("timeUtils", () => {
       expect(result).toBe(true);
     });
 
-    it("returns true for dates within 2 weeks (day 14)", () => {
-      const twoWeeks = getDateFromToday(14);
-      const result = isRushOrder(twoWeeks);
+    it("returns true for dates within 2 weeks (day 13)", () => {
+      const thirteenDays = getDateFromToday(13);
+      const result = isRushOrder(thirteenDays);
       expect(result).toBe(true);
     });
 

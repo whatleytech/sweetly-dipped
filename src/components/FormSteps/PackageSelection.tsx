@@ -47,7 +47,7 @@ export const PackageSelection = ({
                 />
                 <div>
                   <label className={styles.radioLabel}>
-                    {opt.label} {opt.price ? `— ${opt.price}` : ""}
+                    {opt.label} {opt.price ? `— $${opt.price}` : ""}
                   </label>
                   {opt.description && (
                     <div className={styles.radioDescription}>

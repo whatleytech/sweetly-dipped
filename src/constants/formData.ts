@@ -6,13 +6,13 @@ import type {
 } from "../types/formTypes";
 
 export const PACKAGE_OPTIONS: PackageOption[] = [
-  { id: "small", label: "Small (3 dozen – 36 treats)", price: "$110" },
-  { id: "medium", label: "Medium (5 dozen – 60 treats)", price: "$180" },
-  { id: "large", label: "Large (8 dozen – 96 treats)", price: "$280" },
+  { id: "small", label: "Small (3 dozen – 36 treats)", price: 110 },
+  { id: "medium", label: "Medium (5 dozen – 60 treats)", price: 180 },
+  { id: "large", label: "Large (8 dozen – 96 treats)", price: 280 },
   {
     id: "xl",
     label: "XL (12 dozen – 144 treats)",
-    price: "$420",
+    price: 420,
     description: "Requires at least one month notice",
   },
   { id: "by-dozen", label: "No package — order by the dozen" },

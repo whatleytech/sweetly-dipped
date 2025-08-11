@@ -48,7 +48,7 @@ export interface PackageOption {
   id: FormData["packageType"];
   label: string;
   description?: string;
-  price?: string;
+  price?: number;
 }
 
 export interface TreatOption {
