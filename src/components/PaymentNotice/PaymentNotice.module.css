@@ -1,0 +1,34 @@
+.paymentNotice {
+  background: linear-gradient(135deg, var(--sd-pink-light) 0%, #fff5f8 100%);
+  border: 2px solid var(--sd-pink-base);
+  border-radius: 12px;
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  box-shadow: var(--shadow-sm);
+}
+
+.paymentIcon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.paymentText {
+  color: var(--sd-brown-dark);
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.paymentText strong {
+  color: var(--sd-brown-dark);
+}
+
+@media (max-width: 768px) {
+  .paymentNotice {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-xs);
+  }
+}
