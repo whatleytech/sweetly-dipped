@@ -215,6 +215,37 @@ export const DesignPackagePage = () => {
           />
         </div>
       </div>
+
+      <button
+        style={{ color: "black", borderColor: "black" }}
+        onClick={() => {
+          setFormData({
+            firstName: "Test",
+            lastName: "Test",
+            email: "test@test.com",
+            phone: "123-456-7890",
+            communicationMethod: "text",
+            packageType: "by-dozen",
+            riceKrispies: 1,
+            oreos: 2,
+            pretzels: 1,
+            marshmallows: 2,
+            colorScheme: "Red",
+            eventType: "Corporate",
+            theme: "Lawyer Ball",
+            additionalDesigns: "",
+            pickupDate: "2025-09-21",
+            pickupTimeWindow: "",
+            pickupTime: "3:00 PM",
+            rushOrder: false,
+            referralSource: "",
+            termsAccepted: false,
+          });
+          setCurrentStep(7);
+        }}
+      >
+        Fill in form
+      </button>
     </div>
   );
 };
