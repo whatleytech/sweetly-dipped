@@ -1,5 +1,6 @@
 import styles from "./FormSidebar.module.css";
 import type { FormData } from "../../types/formTypes";
+import { formatDateForDisplay } from "../../utils/timeUtils";
 
 interface FormSidebarProps {
   formData: FormData;
@@ -85,7 +86,9 @@ export const FormSidebar = ({
 
       case "pickup":
         if (formData.pickupDate && formData.pickupTime) {
-          return `${formData.pickupDate} at ${formData.pickupTime}`;
+          return `${formatDateForDisplay(formData.pickupDate, {
+            includeYear: true,
+          })} at ${formData.pickupTime}`;
         }
         return null;
 

@@ -85,7 +85,7 @@ export const TIME_SLOTS: TimeSlots = {
   Saturday: [
     {
       startTime: { hour: 9, minute: 0, timeOfDay: "morning" },
-      endTime: { hour: 12, minute: 0, timeOfDay: "morning" },
+      endTime: { hour: 12, minute: 0, timeOfDay: "evening" },
     },
   ],
   Sunday: [

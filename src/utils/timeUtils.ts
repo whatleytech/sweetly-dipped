@@ -158,13 +158,18 @@ export function getUnavailablePeriod(
  * @param dateStr - Date string in YYYY-MM-DD format
  * @returns Formatted date string like "Aug 28"
  */
-export function formatDateForDisplay(dateStr: string): string {
+export function formatDateForDisplay(
+  dateStr: string,
+  options: { includeYear?: boolean } = {}
+): string {
+  const { includeYear = false } = options;
   // Add T00:00:00 to ensure consistent parsing as local time, then use UTC methods
-  const date = new Date(dateStr + 'T00:00:00');
-  return date.toLocaleDateString('en-US', { 
-    month: 'short', 
-    day: 'numeric',
-    timeZone: 'UTC'  // Use UTC to avoid timezone issues 
+  const date = new Date(dateStr + "T04:00:00");
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    ...(includeYear && { year: "numeric" }),
+    timeZone: "EST",
   });
 }
 

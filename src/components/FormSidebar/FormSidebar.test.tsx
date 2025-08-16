@@ -143,7 +143,7 @@ describe("FormSidebar", () => {
       />
     );
 
-    expect(screen.getByText("2024-01-15 at 5:00 PM")).toBeInTheDocument();
+    expect(screen.getByText("Jan 15, 2024 at 5:00 PM")).toBeInTheDocument();
   });
 
   it("displays correct progress information", () => {

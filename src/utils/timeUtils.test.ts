@@ -336,6 +336,11 @@ describe("timeUtils", () => {
       const result = formatDateForDisplay("2025-12-25");
       expect(result).toBe("Dec 25");
     });
+
+    it("includes year", () => {
+      const result = formatDateForDisplay("2025-12-25", { includeYear: true });
+      expect(result).toBe("Dec 25, 2025");
+    });
   });
 
   describe("isRushOrder", () => {
