@@ -19,7 +19,6 @@ const mockFormData: FormData = {
   theme: "Princess",
   additionalDesigns: "Add some sparkles",
   pickupDate: "2024-02-15",
-  pickupTimeWindow: "8:00 AM - 10:00 AM",
   pickupTime: "8:30 AM",
   rushOrder: false,
   referralSource: "",
@@ -45,7 +44,7 @@ describe("PickupDetails", () => {
   it("displays pickup time with window correctly", () => {
     render(<PickupDetails formData={mockFormData} />);
 
-    expect(screen.getByText("8:30 AM (8:00 AM - 10:00 AM)")).toBeInTheDocument();
+    expect(screen.getByText("8:30 AM")).toBeInTheDocument();
   });
 
   it("handles empty pickup date", () => {
@@ -56,16 +55,6 @@ describe("PickupDetails", () => {
     // Empty date should not display any text
     const dateField = screen.getByText("Pickup Date:").nextElementSibling;
     expect(dateField).toHaveTextContent("");
-  });
-
-  it("handles empty pickup time", () => {
-    const emptyTimeData = { ...mockFormData, pickupTime: "", pickupTimeWindow: "" };
-    render(<PickupDetails formData={emptyTimeData} />);
-
-    expect(screen.getByText("Pickup Time:")).toBeInTheDocument();
-    // Empty time should display empty parentheses
-    const timeField = screen.getByText("Pickup Time:").nextElementSibling;
-    expect(timeField?.textContent).toBe(" ()");
   });
 
   it("handles different date formats", () => {
@@ -80,11 +69,10 @@ describe("PickupDetails", () => {
     const differentTimeData = {
       ...mockFormData,
       pickupTime: "2:15 PM",
-      pickupTimeWindow: "2:00 PM - 4:00 PM",
     };
     render(<PickupDetails formData={differentTimeData} />);
 
-    expect(screen.getByText("2:15 PM (2:00 PM - 4:00 PM)")).toBeInTheDocument();
+    expect(screen.getByText("2:15 PM")).toBeInTheDocument();
   });
 
   it("handles edge case date (leap year)", () => {
@@ -124,10 +112,9 @@ describe("PickupDetails", () => {
     const longTimeData = {
       ...mockFormData,
       pickupTime: "12:30 PM",
-      pickupTimeWindow: "A very long time window description that might wrap to multiple lines",
     };
     render(<PickupDetails formData={longTimeData} />);
 
-    expect(screen.getByText("12:30 PM (A very long time window description that might wrap to multiple lines)")).toBeInTheDocument();
+    expect(screen.getByText("12:30 PM")).toBeInTheDocument();
   });
 });

@@ -20,8 +20,10 @@ const mockFormData: FormData = {
   theme: "",
   additionalDesigns: "",
   pickupDate: "",
-  pickupTimeWindow: "",
   pickupTime: "",
+  rushOrder: false,
+  referralSource: "",
+  termsAccepted: false,
 };
 
 describe("CommunicationPreference", () => {

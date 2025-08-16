@@ -19,7 +19,6 @@ const mockFormData: FormData = {
   theme: "Princess",
   additionalDesigns: "Add some sparkles",
   pickupDate: "2024-02-15",
-  pickupTimeWindow: "8:00 AM - 10:00 AM",
   pickupTime: "8:30 AM",
   rushOrder: false,
   referralSource: "Instagram",

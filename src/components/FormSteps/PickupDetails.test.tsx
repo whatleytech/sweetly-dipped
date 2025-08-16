@@ -21,7 +21,6 @@ const baseData: FormData = {
   theme: "",
   additionalDesigns: "",
   pickupDate: "",
-  pickupTimeWindow: "",
   pickupTime: "",
   rushOrder: false,
   referralSource: "",
@@ -49,8 +48,6 @@ const getPastDate = (daysAgo: number = 1): string => {
   date.setDate(date.getDate() - daysAgo);
   return date.toISOString().split("T")[0];
 };
-
-
 
 describe("PickupDetails", () => {
   const updateFormData = vi.fn();
@@ -114,7 +111,7 @@ describe("PickupDetails", () => {
 
     expect(updateFormData).toHaveBeenCalledWith({
       pickupDate: getFutureDate(),
-      pickupTimeWindow: "",
+
       pickupTime: "",
       rushOrder: true, // getFutureDate(7) falls within 2 weeks
     });
@@ -161,7 +158,6 @@ describe("PickupDetails", () => {
         formData={{
           ...baseData,
           pickupDate: getFutureDate(),
-          pickupTimeWindow: "5:00 PM - 8:00 PM",
           pickupTime: "5:15 PM",
         }}
         updateFormData={updateFormData}
@@ -506,7 +502,6 @@ describe("PickupDetails", () => {
 
     expect(updateFormData).toHaveBeenCalledWith({
       pickupDate: tomorrowDate,
-      pickupTimeWindow: "",
       pickupTime: "",
       rushOrder: true,
     });
@@ -533,7 +528,6 @@ describe("PickupDetails", () => {
 
     expect(updateFormData).toHaveBeenCalledWith({
       pickupDate: futureDate,
-      pickupTimeWindow: "",
       pickupTime: "",
       rushOrder: false,
     });

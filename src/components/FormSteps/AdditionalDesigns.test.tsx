@@ -5,23 +5,22 @@ import { AdditionalDesigns } from './AdditionalDesigns';
 import type { FormData } from "../../types/formTypes";
 
 const baseData: FormData = {
-  firstName: '',
-  lastName: '',
-  email: '',
-  phone: '',
-  communicationMethod: '',
-  packageType: '',
+  firstName: "",
+  lastName: "",
+  email: "",
+  phone: "",
+  communicationMethod: "",
+  packageType: "",
   riceKrispies: 0,
   oreos: 0,
   pretzels: 0,
   marshmallows: 0,
-  colorScheme: '',
-  eventType: '',
-  theme: '',
-  additionalDesigns: '',
-  pickupDate: '',
-  pickupTimeWindow: '',
-  pickupTime: '',
+  colorScheme: "",
+  eventType: "",
+  theme: "",
+  additionalDesigns: "",
+  pickupDate: "",
+  pickupTime: "",
 };
 
 describe('AdditionalDesigns', () => {

@@ -19,7 +19,7 @@ export const PickupDetails = ({ formData }: PickupDetailsProps) => {
   return (
     <div className={styles.section}>
       <h3>Pickup Details</h3>
-      
+
       <div className={styles.fieldGroup}>
         <label>Pickup Date:</label>
         <span className={styles.fieldValue}>
@@ -29,9 +29,7 @@ export const PickupDetails = ({ formData }: PickupDetailsProps) => {
 
       <div className={styles.fieldGroup}>
         <label>Pickup Time:</label>
-        <span className={styles.fieldValue}>
-          {formData.pickupTime} ({formData.pickupTimeWindow})
-        </span>
+        <span className={styles.fieldValue}>{formData.pickupTime}</span>
       </div>
     </div>
   );

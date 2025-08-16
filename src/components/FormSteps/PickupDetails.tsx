@@ -38,7 +38,6 @@ export const PickupDetails = ({
 
     updateFormData({
       pickupDate: newDate,
-      pickupTimeWindow: "",
       pickupTime: "",
       rushOrder: isRush,
     });
