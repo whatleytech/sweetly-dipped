@@ -88,37 +88,19 @@ export const ConfirmationPage = () => {
         <h1>Order Confirmation</h1>
         <p>Please review your order details below</p>
       </div>
-
-      {/* Payment Notice */}
       <PaymentNotice />
-
-      {/* Rush Order Notice */}
       {formData.rushOrder && <RushOrderNotice />}
 
       <div className={styles.content}>
         <div className={styles.orderDetails}>
           <h2>Order Details</h2>
-
-          {/* Contact Information */}
           <ContactInformation formData={formData} onUpdate={updateFormData} />
-
-          {/* Package Details */}
           <PackageDetails formData={formData} />
-
-          {/* Design Details */}
           <DesignDetails formData={formData} />
-
-          {/* Pickup Details */}
           <PickupDetails formData={formData} />
-
-          {/* Referral Source */}
           <ReferralSource formData={formData} onUpdate={updateFormData} />
         </div>
-
-        {/* Terms and Conditions */}
         <TermsAndConditions formData={formData} onUpdate={updateFormData} />
-
-        {/* Submit Button */}
         <div className={styles.submitSection}>
           <button
             onClick={handleSubmit}
