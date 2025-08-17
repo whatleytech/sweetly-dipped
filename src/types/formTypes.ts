@@ -31,6 +31,9 @@ export interface FormData {
   // Confirmation Page
   referralSource: string;
   termsAccepted: boolean;
+
+  // Track visited steps
+  visitedSteps: Set<string>;
 }
 
 export interface FormStepProps {

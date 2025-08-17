@@ -51,6 +51,7 @@ export const DesignPackagePage = () => {
     rushOrder: false,
     referralSource: "",
     termsAccepted: false,
+    visitedSteps: new Set(["lead"]), // Start with the first step visited
   });
 
   const navigate = useNavigate();
@@ -61,6 +62,17 @@ export const DesignPackagePage = () => {
     if (savedData) {
       try {
         const parsedData = JSON.parse(savedData);
+        // Convert visitedSteps back to Set if it exists
+        if (
+          parsedData.formData.visitedSteps &&
+          Array.isArray(parsedData.formData.visitedSteps)
+        ) {
+          parsedData.formData.visitedSteps = new Set(
+            parsedData.formData.visitedSteps
+          );
+        } else {
+          parsedData.formData.visitedSteps = new Set(["lead"]);
+        }
         setFormData(parsedData.formData);
         setCurrentStep(parsedData.currentStep);
       } catch (error) {
@@ -71,17 +83,25 @@ export const DesignPackagePage = () => {
 
   // Save form data to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({
-        formData,
-        currentStep,
-      })
-    );
+    const dataToSave = {
+      formData: {
+        ...formData,
+        visitedSteps: Array.from(formData.visitedSteps), // Convert Set to Array for JSON serialization
+      },
+      currentStep,
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
   }, [formData, currentStep]);
 
   const updateFormData = (updates: Partial<FormData>) => {
     setFormData((prev) => ({ ...prev, ...updates }));
+  };
+
+  const markStepAsVisited = (stepId: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      visitedSteps: new Set([...prev.visitedSteps, stepId]),
+    }));
   };
 
   const getStepIndexById = (id: (typeof FORM_STEPS)[number]["id"]) =>
@@ -108,9 +128,14 @@ export const DesignPackagePage = () => {
   const nextStep = () => {
     const currentId = FORM_STEPS[currentStep].id;
 
+    // Mark current step as visited
+    markStepAsVisited(currentId);
+
     // Skip logic: if package selected is not by-dozen, skip the by-dozen step
     if (currentId === "package" && formData.packageType !== "by-dozen") {
-      setCurrentStep(getStepIndexById("color"));
+      const nextStepIndex = getStepIndexById("color");
+      setCurrentStep(nextStepIndex);
+      markStepAsVisited("color"); // Mark the next step as visited
       return;
     }
 
@@ -120,7 +145,9 @@ export const DesignPackagePage = () => {
     }
 
     if (currentStep < FORM_STEPS.length - 1) {
-      setCurrentStep(currentStep + 1);
+      const nextStepIndex = currentStep + 1;
+      setCurrentStep(nextStepIndex);
+      markStepAsVisited(FORM_STEPS[nextStepIndex].id);
     }
   };
 
@@ -196,9 +223,9 @@ export const DesignPackagePage = () => {
         <div className={styles.sidebar}>
           <FormSidebar
             formData={formData}
-            currentStep={currentStep}
             formSteps={visibleSteps.map((s) => ({ id: s.id, title: s.title }))}
             currentVisibleIndex={currentVisibleIndex}
+            setCurrentStep={setCurrentStep}
           />
         </div>
       </div>
@@ -226,6 +253,16 @@ export const DesignPackagePage = () => {
             rushOrder: false,
             referralSource: "",
             termsAccepted: false,
+            visitedSteps: new Set([
+              "lead",
+              "communication",
+              "package",
+              "by-dozen",
+              "color",
+              "event",
+              "designs",
+              "pickup",
+            ]),
           });
           setCurrentStep(7);
         }}

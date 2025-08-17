@@ -1,8 +1,7 @@
-import { render, screen } from "@testing-library/react";
-import { describe, it, expect } from "vitest";
+import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { FormSidebar } from "./FormSidebar";
 import type { FormData } from "../../types/formTypes";
-
 
 const mockFormData: FormData = {
   firstName: "John",
@@ -24,6 +23,16 @@ const mockFormData: FormData = {
   rushOrder: false,
   referralSource: "",
   termsAccepted: false,
+  visitedSteps: new Set([
+    "lead",
+    "communication",
+    "package",
+    "by-dozen",
+    "color",
+    "event",
+    "designs",
+    "pickup",
+  ]),
 };
 
 const mockFormSteps = [
@@ -42,12 +51,19 @@ const mockFormSteps = [
 ];
 
 describe("FormSidebar", () => {
+  const mockSetCurrentStep = vi.fn();
+
+  beforeEach(() => {
+    mockSetCurrentStep.mockClear();
+  });
+
   it("renders the sidebar title", () => {
     render(
       <FormSidebar
         formData={mockFormData}
-        currentStep={2}
         formSteps={mockFormSteps}
+        currentVisibleIndex={2}
+        setCurrentStep={mockSetCurrentStep}
       />
     );
 
@@ -58,8 +74,9 @@ describe("FormSidebar", () => {
     render(
       <FormSidebar
         formData={mockFormData}
-        currentStep={2}
         formSteps={mockFormSteps}
+        currentVisibleIndex={2}
+        setCurrentStep={mockSetCurrentStep}
       />
     );
 
@@ -77,8 +94,9 @@ describe("FormSidebar", () => {
     render(
       <FormSidebar
         formData={mockFormData}
-        currentStep={2}
         formSteps={mockFormSteps}
+        currentVisibleIndex={2}
+        setCurrentStep={mockSetCurrentStep}
       />
     );
 
@@ -101,8 +119,9 @@ describe("FormSidebar", () => {
     render(
       <FormSidebar
         formData={byDozenFormData}
-        currentStep={4}
         formSteps={mockFormSteps}
+        currentVisibleIndex={4}
+        setCurrentStep={mockSetCurrentStep}
       />
     );
 
@@ -113,8 +132,9 @@ describe("FormSidebar", () => {
     render(
       <FormSidebar
         formData={mockFormData}
-        currentStep={5}
         formSteps={mockFormSteps}
+        currentVisibleIndex={5}
+        setCurrentStep={mockSetCurrentStep}
       />
     );
 
@@ -125,8 +145,9 @@ describe("FormSidebar", () => {
     render(
       <FormSidebar
         formData={mockFormData}
-        currentStep={6}
         formSteps={mockFormSteps}
+        currentVisibleIndex={6}
+        setCurrentStep={mockSetCurrentStep}
       />
     );
 
@@ -137,24 +158,27 @@ describe("FormSidebar", () => {
     render(
       <FormSidebar
         formData={mockFormData}
-        currentStep={7}
         formSteps={mockFormSteps}
+        currentVisibleIndex={7}
+        setCurrentStep={mockSetCurrentStep}
       />
     );
 
     expect(screen.getByText("Jan 15, 2024 at 5:00 PM")).toBeInTheDocument();
   });
 
-  it("displays correct progress information", () => {
+  it("displays correct progress information based on completed data", () => {
     render(
       <FormSidebar
         formData={mockFormData}
-        currentStep={2}
         formSteps={mockFormSteps}
+        currentVisibleIndex={2}
+        setCurrentStep={mockSetCurrentStep}
       />
     );
 
-    expect(screen.getByText("3 of 8 steps completed")).toBeInTheDocument();
+    // With mockFormData, all 8 steps have data and are visited, so it should show "8 of 8 steps completed"
+    expect(screen.getByText("8 of 8 steps completed")).toBeInTheDocument();
   });
 
   it("handles empty form data gracefully", () => {
@@ -178,13 +202,15 @@ describe("FormSidebar", () => {
       rushOrder: false,
       referralSource: "",
       termsAccepted: false,
+      visitedSteps: new Set(["lead"]), // Only first step visited
     };
 
     render(
       <FormSidebar
         formData={emptyFormData}
-        currentStep={0}
         formSteps={mockFormSteps}
+        currentVisibleIndex={0}
+        setCurrentStep={mockSetCurrentStep}
       />
     );
 
@@ -204,21 +230,493 @@ describe("FormSidebar", () => {
       (step) => step.id !== "by-dozen"
     );
 
-    // When we're on step 4 (color scheme) in the full step array,
-    // but the by-dozen step is skipped, the currentVisibleIndex should be 3
     render(
       <FormSidebar
         formData={formDataWithoutByDozen}
-        currentStep={4} // Step 4 in full array (color scheme)
         formSteps={visibleStepsWithoutByDozen}
-        currentVisibleIndex={3} // Step 3 in visible array (color scheme)
+        currentVisibleIndex={3}
+        setCurrentStep={mockSetCurrentStep}
       />
     );
 
-    // Should show "4 of 7 steps completed" instead of "5 of 8 steps completed"
-    expect(screen.getByText("4 of 7 steps completed")).toBeInTheDocument();
+    // Should show "7 of 7 steps completed" (all steps except by-dozen have data and are visited)
+    expect(screen.getByText("7 of 7 steps completed")).toBeInTheDocument();
 
     // Verify that by-dozen step is not rendered
     expect(screen.queryByText("By The Dozen")).not.toBeInTheDocument();
+  });
+
+  it("displays partial progress when some steps have data", () => {
+    const partialFormData: FormData = {
+      ...mockFormData,
+      colorScheme: "", // No color scheme
+      eventType: "", // No event type
+      theme: "", // No theme
+      additionalDesigns: "", // No additional designs
+      pickupDate: "", // No pickup time
+      pickupTime: "", // No pickup time
+      visitedSteps: new Set(["lead", "communication", "package", "by-dozen"]), // Only first 4 steps visited
+    };
+
+    render(
+      <FormSidebar
+        formData={partialFormData}
+        formSteps={mockFormSteps}
+        currentVisibleIndex={2}
+        setCurrentStep={mockSetCurrentStep}
+      />
+    );
+
+    // Should show "4 of 8 steps completed" (lead, communication, package, by-dozen have data and are visited)
+    expect(screen.getByText("4 of 8 steps completed")).toBeInTheDocument();
+  });
+
+  it("counts visited steps as completed even without data", () => {
+    const formDataWithVisitedSteps = {
+      ...mockFormData,
+      additionalDesigns: "", // No additional designs
+      visitedSteps: new Set([
+        "lead",
+        "communication",
+        "package",
+        "by-dozen",
+        "color",
+        "event",
+        "designs", // Visited but no data
+        "pickup",
+      ]),
+    };
+
+    render(
+      <FormSidebar
+        formData={formDataWithVisitedSteps}
+        formSteps={mockFormSteps}
+        currentVisibleIndex={7}
+        setCurrentStep={mockSetCurrentStep}
+      />
+    );
+
+    // Should show "8 of 8 steps completed" because all steps are visited
+    expect(screen.getByText("8 of 8 steps completed")).toBeInTheDocument();
+  });
+
+  it("applies hasData class to visited steps even without data", () => {
+    const formDataWithVisitedSteps = {
+      ...mockFormData,
+      additionalDesigns: "", // No additional designs
+      visitedSteps: new Set([
+        "lead",
+        "communication",
+        "package",
+        "by-dozen",
+        "color",
+        "event",
+        "designs", // Visited but no data
+        "pickup",
+      ]),
+    };
+
+    render(
+      <FormSidebar
+        formData={formDataWithVisitedSteps}
+        formSteps={mockFormSteps}
+        currentVisibleIndex={7}
+        setCurrentStep={mockSetCurrentStep}
+      />
+    );
+
+    // The designs step should have the hasData class even though it has no data (because it's visited)
+    const designsStep = screen
+      .getByText("Additional Designs")
+      .closest('[class*="stepItem"]');
+    expect(designsStep?.className).toContain("hasData");
+  });
+
+  describe("clickable steps functionality", () => {
+    it("calls setCurrentStep when clicking on a completed step", () => {
+      render(
+        <FormSidebar
+          formData={mockFormData}
+          formSteps={mockFormSteps}
+          currentVisibleIndex={3}
+          setCurrentStep={mockSetCurrentStep}
+        />
+      );
+
+      // Click on the first step (completed)
+      const firstStep = screen
+        .getByText("Contact Information")
+        .closest('[class*="stepItem"]');
+      fireEvent.click(firstStep!);
+
+      expect(mockSetCurrentStep).toHaveBeenCalledWith(0);
+    });
+
+    it("calls setCurrentStep when clicking on the current step", () => {
+      render(
+        <FormSidebar
+          formData={mockFormData}
+          formSteps={mockFormSteps}
+          currentVisibleIndex={2}
+          setCurrentStep={mockSetCurrentStep}
+        />
+      );
+
+      // Click on the current step (Package Selection)
+      const currentStep = screen
+        .getByText("Package Selection")
+        .closest('[class*="stepItem"]');
+      fireEvent.click(currentStep!);
+
+      expect(mockSetCurrentStep).toHaveBeenCalledWith(2);
+    });
+
+    it("calls setCurrentStep when clicking on the immediate next step", () => {
+      render(
+        <FormSidebar
+          formData={mockFormData}
+          formSteps={mockFormSteps}
+          currentVisibleIndex={2}
+          setCurrentStep={mockSetCurrentStep}
+        />
+      );
+
+      // Click on the next step (By The Dozen) - should be accessible as immediate next step
+      const nextStep = screen
+        .getByText("By The Dozen")
+        .closest('[class*="stepItem"]');
+      fireEvent.click(nextStep!);
+
+      expect(mockSetCurrentStep).toHaveBeenCalledWith(3);
+    });
+
+    it("calls setCurrentStep when clicking on a future step that has data", () => {
+      render(
+        <FormSidebar
+          formData={mockFormData}
+          formSteps={mockFormSteps}
+          currentVisibleIndex={1}
+          setCurrentStep={mockSetCurrentStep}
+        />
+      );
+
+      // Click on Color Scheme (step 4) which has data - should be accessible
+      const futureStep = screen
+        .getByText("Color Scheme")
+        .closest('[class*="stepItem"]');
+      fireEvent.click(futureStep!);
+
+      expect(mockSetCurrentStep).toHaveBeenCalledWith(4);
+    });
+
+    it("calls setCurrentStep when clicking on a future step if any intermediate step has data", () => {
+      render(
+        <FormSidebar
+          formData={mockFormData}
+          formSteps={mockFormSteps}
+          currentVisibleIndex={1}
+          setCurrentStep={mockSetCurrentStep}
+        />
+      );
+
+      // Click on Event Details (step 5) - should be accessible because Color Scheme (step 4) has data
+      const futureStep = screen
+        .getByText("Event Details")
+        .closest('[class*="stepItem"]');
+      fireEvent.click(futureStep!);
+
+      expect(mockSetCurrentStep).toHaveBeenCalledWith(5);
+    });
+
+    it("does not call setCurrentStep when clicking on a future step with no data path", () => {
+      const emptyFormData: FormData = {
+        ...mockFormData,
+        packageType: "", // No package selected
+        colorScheme: "", // No color scheme
+        eventType: "", // No event type
+        theme: "", // No theme
+        visitedSteps: new Set(["lead", "communication"]), // Only first 2 steps visited
+      };
+
+      render(
+        <FormSidebar
+          formData={emptyFormData}
+          formSteps={mockFormSteps}
+          currentVisibleIndex={2}
+          setCurrentStep={mockSetCurrentStep}
+        />
+      );
+
+      // Click on a future step (Color Scheme) - should not be accessible because no intermediate steps have data
+      const futureStep = screen
+        .getByText("Color Scheme")
+        .closest('[class*="stepItem"]');
+      fireEvent.click(futureStep!);
+
+      expect(mockSetCurrentStep).not.toHaveBeenCalled();
+    });
+
+    it("does not allow jumping to future steps when current step is not completed", () => {
+      const formDataWithIncompleteCurrentStep: FormData = {
+        ...mockFormData,
+        packageType: "", // Current step (Package Selection) is not completed
+        visitedSteps: new Set(["lead", "communication"]), // Only first 2 steps visited
+      };
+
+      render(
+        <FormSidebar
+          formData={formDataWithIncompleteCurrentStep}
+          formSteps={mockFormSteps}
+          currentVisibleIndex={2}
+          setCurrentStep={mockSetCurrentStep}
+        />
+      );
+
+      // Click on a future step (Color Scheme) - should not be accessible because current step is not completed
+      const futureStep = screen
+        .getByText("Color Scheme")
+        .closest('[class*="stepItem"]');
+      fireEvent.click(futureStep!);
+
+      expect(mockSetCurrentStep).not.toHaveBeenCalled();
+    });
+
+    it("allows jumping back to any completed step from a later step", () => {
+      render(
+        <FormSidebar
+          formData={mockFormData}
+          formSteps={mockFormSteps}
+          currentVisibleIndex={4}
+          setCurrentStep={mockSetCurrentStep}
+        />
+      );
+
+      // Should be able to jump back to step 1 (Contact Information)
+      const step1 = screen
+        .getByText("Contact Information")
+        .closest('[class*="stepItem"]');
+      fireEvent.click(step1!);
+      expect(mockSetCurrentStep).toHaveBeenCalledWith(0);
+
+      // Should be able to jump back to step 2 (Communication Preference)
+      const step2 = screen
+        .getByText("Communication Preference")
+        .closest('[class*="stepItem"]');
+      fireEvent.click(step2!);
+      expect(mockSetCurrentStep).toHaveBeenCalledWith(1);
+
+      // Should be able to jump back to step 3 (Package Selection)
+      const step3 = screen
+        .getByText("Package Selection")
+        .closest('[class*="stepItem"]');
+      fireEvent.click(step3!);
+      expect(mockSetCurrentStep).toHaveBeenCalledWith(2);
+    });
+
+    it("handles conditional by-dozen step correctly when package type is not by-dozen", () => {
+      const formDataWithoutByDozen = {
+        ...mockFormData,
+        packageType: "medium" as const, // Not "by-dozen"
+      };
+
+      const visibleStepsWithoutByDozen = mockFormSteps.filter(
+        (step) => step.id !== "by-dozen"
+      );
+
+      render(
+        <FormSidebar
+          formData={formDataWithoutByDozen}
+          formSteps={visibleStepsWithoutByDozen}
+          currentVisibleIndex={3}
+          setCurrentStep={mockSetCurrentStep}
+        />
+      );
+
+      // Click on Color Scheme (visible step 3, full step 4)
+      const colorStep = screen
+        .getByText("Color Scheme")
+        .closest('[class*="stepItem"]');
+      fireEvent.click(colorStep!);
+
+      expect(mockSetCurrentStep).toHaveBeenCalledWith(4); // Should call with full step index
+    });
+
+    it("handles conditional by-dozen step correctly when package type is by-dozen", () => {
+      const formDataWithByDozen = {
+        ...mockFormData,
+        packageType: "by-dozen" as const,
+      };
+
+      render(
+        <FormSidebar
+          formData={formDataWithByDozen}
+          formSteps={mockFormSteps}
+          currentVisibleIndex={3}
+          setCurrentStep={mockSetCurrentStep}
+        />
+      );
+
+      // Click on By The Dozen step (use getAllByText to get the step item, not the summary)
+      const byDozenSteps = screen.getAllByText("By The Dozen");
+      const byDozenStepItem = byDozenSteps.find((el) =>
+        el.closest('[class*="stepItem"]')
+      );
+      fireEvent.click(byDozenStepItem!);
+
+      expect(mockSetCurrentStep).toHaveBeenCalledWith(2); // Should call with full step index
+    });
+
+    it("applies clickable class to accessible steps", () => {
+      render(
+        <FormSidebar
+          formData={mockFormData}
+          formSteps={mockFormSteps}
+          currentVisibleIndex={2}
+          setCurrentStep={mockSetCurrentStep}
+        />
+      );
+
+      // Check that completed steps have the clickable class
+      const completedStep = screen
+        .getByText("Contact Information")
+        .closest('[class*="stepItem"]');
+      expect(completedStep?.className).toContain("clickable");
+
+      // Check that current step has the clickable class
+      const currentStep = screen
+        .getByText("Package Selection")
+        .closest('[class*="stepItem"]');
+      expect(currentStep?.className).toContain("clickable");
+
+      // Check that next step has the clickable class
+      const nextStep = screen
+        .getByText("By The Dozen")
+        .closest('[class*="stepItem"]');
+      expect(nextStep?.className).toContain("clickable");
+
+      // Check that future steps with data have the clickable class
+      const futureStep = screen
+        .getByText("Color Scheme")
+        .closest('[class*="stepItem"]');
+      expect(futureStep?.className).toContain("clickable");
+    });
+
+    it("does not apply clickable class to inaccessible steps", () => {
+      const emptyFormData: FormData = {
+        ...mockFormData,
+        packageType: "",
+        colorScheme: "",
+        eventType: "",
+        theme: "",
+        visitedSteps: new Set(["lead", "communication"]), // Only first 2 steps visited
+      };
+
+      render(
+        <FormSidebar
+          formData={emptyFormData}
+          formSteps={mockFormSteps}
+          currentVisibleIndex={2}
+          setCurrentStep={mockSetCurrentStep}
+        />
+      );
+
+      // Check that future steps without data path don't have the clickable class
+      const futureStep = screen
+        .getByText("Color Scheme")
+        .closest('[class*="stepItem"]');
+      expect(futureStep?.className).not.toContain("clickable");
+    });
+
+    it("applies hasData class to steps with data", () => {
+      render(
+        <FormSidebar
+          formData={mockFormData}
+          formSteps={mockFormSteps}
+          currentVisibleIndex={2}
+          setCurrentStep={mockSetCurrentStep}
+        />
+      );
+
+      // Check that steps with data have the hasData class
+      const stepWithData = screen
+        .getByText("Contact Information")
+        .closest('[class*="stepItem"]');
+      expect(stepWithData?.className).toContain("hasData");
+
+      const colorStepWithData = screen
+        .getByText("Color Scheme")
+        .closest('[class*="stepItem"]');
+      expect(colorStepWithData?.className).toContain("hasData");
+    });
+
+    it("does not apply hasData class to steps without data and not visited", () => {
+      const emptyFormData: FormData = {
+        ...mockFormData,
+        colorScheme: "",
+        eventType: "",
+        theme: "",
+        visitedSteps: new Set(["lead", "communication", "package", "by-dozen"]), // Only first 4 steps visited
+      };
+
+      render(
+        <FormSidebar
+          formData={emptyFormData}
+          formSteps={mockFormSteps}
+          currentVisibleIndex={2}
+          setCurrentStep={mockSetCurrentStep}
+        />
+      );
+
+      // Check that steps without data and not visited don't have the hasData class
+      const stepWithoutData = screen
+        .getByText("Color Scheme")
+        .closest('[class*="stepItem"]');
+      expect(stepWithoutData?.className).not.toContain("hasData");
+    });
+
+    it("sets proper ARIA attributes for clickable steps", () => {
+      render(
+        <FormSidebar
+          formData={mockFormData}
+          formSteps={mockFormSteps}
+          currentVisibleIndex={3}
+          setCurrentStep={mockSetCurrentStep}
+        />
+      );
+
+      // Check that clickable steps have proper ARIA attributes
+      const clickableStep = screen
+        .getByText("Contact Information")
+        .closest('[class*="stepItem"]');
+      expect(clickableStep).toHaveAttribute("role", "button");
+      expect(clickableStep).toHaveAttribute("tabIndex", "0");
+    });
+
+    it("does not set ARIA attributes for non-clickable steps", () => {
+      const emptyFormData: FormData = {
+        ...mockFormData,
+        packageType: "",
+        colorScheme: "",
+        eventType: "",
+        theme: "",
+        visitedSteps: new Set(["lead", "communication"]), // Only first 2 steps visited
+      };
+
+      render(
+        <FormSidebar
+          formData={emptyFormData}
+          formSteps={mockFormSteps}
+          currentVisibleIndex={2}
+          setCurrentStep={mockSetCurrentStep}
+        />
+      );
+
+      // Check that non-clickable steps don't have ARIA attributes
+      const nonClickableStep = screen
+        .getByText("Color Scheme")
+        .closest('[class*="stepItem"]');
+      expect(nonClickableStep).not.toHaveAttribute("role");
+      expect(nonClickableStep).not.toHaveAttribute("tabIndex");
+    });
   });
 });
