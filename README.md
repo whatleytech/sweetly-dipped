@@ -60,7 +60,6 @@ src/
 │   ├── HeroSection/    # Landing page hero
 │   ├── TreatsGrid/     # Treat categories grid
 │   ├── PackagesTable/  # Pricing packages
-│   ├── CtaBand/        # Call-to-action section
 │   └── Footer/         # Site footer
 ├── pages/              # Route components
 │   └── LandingPage.tsx # Main landing page

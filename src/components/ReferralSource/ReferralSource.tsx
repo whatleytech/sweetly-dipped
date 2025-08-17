@@ -17,7 +17,7 @@ const REFERRAL_OPTIONS = [
 export const ReferralSource = ({ formData, onUpdate }: ReferralSourceProps) => {
   return (
     <div className={styles.section}>
-      <h3>How did you hear about us?</h3>
+      <h3>How did you hear about us?*</h3>
       <div className={styles.fieldGroup}>
         <label>Referral Source:</label>
         <select

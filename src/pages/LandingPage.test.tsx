@@ -1,21 +1,20 @@
  
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { LandingPage } from './LandingPage';
-
+import { LandingPage } from "./LandingPage";
 
 // Mock react-router-dom's useNavigate
 const mockNavigate = vi.fn();
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom');
+vi.mock("react-router-dom", async () => {
+  const actual = await vi.importActual("react-router-dom");
   return {
     ...actual,
     useNavigate: () => mockNavigate,
   };
 });
 
-describe('LandingPage', () => {
+describe("LandingPage", () => {
   beforeEach(() => {
     mockNavigate.mockClear();
   });
@@ -35,25 +34,17 @@ describe('LandingPage', () => {
     expect(screen.getByText("Packages")).toBeInTheDocument();
   });
 
-  it("renders CTA button and handles click", () => {
-    // Mock console.log to verify it's called
-    const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
-
+  it("renders package selection link correctly", () => {
     render(
       <BrowserRouter>
         <LandingPage />
       </BrowserRouter>
     );
 
-    const ctaButton = screen.getByRole("button", {
-      name: /start designing your package/i,
+    const packageLink = screen.getByRole("link", {
+      name: /packages small 3 dozen \$90 most popular medium 5 dozen \$150 large 8 dozen \$250 xl 12 dozen \$375/i,
     });
-    expect(ctaButton).toBeInTheDocument();
-
-    fireEvent.click(ctaButton);
-    expect(consoleSpy).toHaveBeenCalledWith("Start order clicked");
-    expect(mockNavigate).toHaveBeenCalledWith("/design-package");
-
-    consoleSpy.mockRestore();
+    expect(packageLink).toBeInTheDocument();
+    expect(packageLink).toHaveAttribute("href", "/design-package");
   });
 }); 

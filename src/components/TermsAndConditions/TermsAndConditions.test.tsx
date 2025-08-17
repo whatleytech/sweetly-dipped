@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { TermsAndConditions } from "./TermsAndConditions";
 import type { FormData } from "../../types/formTypes";
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const mockFormData: FormData = {
   firstName: "John",
@@ -42,7 +42,9 @@ describe("TermsAndConditions", () => {
   it("displays information box content correctly", () => {
     render(<TermsAndConditions formData={mockFormData} onUpdate={mockOnUpdate} />);
 
-    expect(screen.getByText(/After you fill out this order form/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/After you complete this order form/)
+    ).toBeInTheDocument();
     expect(screen.getByText(/Completion of this form does NOT mean/)).toBeInTheDocument();
     expect(screen.getByText(/You should hear from us within 48 hours/)).toBeInTheDocument();
     expect(screen.getByText(/If you have any questions or concerns/)).toBeInTheDocument();

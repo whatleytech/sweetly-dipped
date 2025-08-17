@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { ReferralSource } from "./ReferralSource";
 import type { FormData } from "../../types/formTypes";
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const mockFormData: FormData = {
   firstName: "John",
@@ -35,7 +35,7 @@ describe("ReferralSource", () => {
   it("renders referral source section correctly", () => {
     render(<ReferralSource formData={mockFormData} onUpdate={mockOnUpdate} />);
 
-    expect(screen.getByText("How did you hear about us?")).toBeInTheDocument();
+    expect(screen.getByText("How did you hear about us?*")).toBeInTheDocument();
     expect(screen.getByText("Referral Source:")).toBeInTheDocument();
   });
 
@@ -83,7 +83,9 @@ describe("ReferralSource", () => {
     const select = screen.getByRole("combobox");
     fireEvent.change(select, { target: { value: "Returning customer" } });
 
-    expect(mockOnUpdate).toHaveBeenCalledWith({ referralSource: "Returning customer" });
+    expect(mockOnUpdate).toHaveBeenCalledWith({
+      referralSource: "Returning customer",
+    });
   });
 
   it("calls onUpdate when selecting referral", () => {
@@ -117,12 +119,14 @@ describe("ReferralSource", () => {
     render(<ReferralSource formData={mockFormData} onUpdate={mockOnUpdate} />);
 
     const select = screen.getByRole("combobox");
-    
+
     fireEvent.change(select, { target: { value: "Tiktok" } });
     expect(mockOnUpdate).toHaveBeenCalledWith({ referralSource: "Tiktok" });
 
     fireEvent.change(select, { target: { value: "Returning customer" } });
-    expect(mockOnUpdate).toHaveBeenCalledWith({ referralSource: "Returning customer" });
+    expect(mockOnUpdate).toHaveBeenCalledWith({
+      referralSource: "Returning customer",
+    });
 
     fireEvent.change(select, { target: { value: "Other" } });
     expect(mockOnUpdate).toHaveBeenCalledWith({ referralSource: "Other" });

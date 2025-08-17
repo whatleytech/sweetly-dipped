@@ -103,28 +103,24 @@ export const DesignPackagePage = () => {
     }
   };
 
+  setTimeout(scrollToStepTop, 0);
+
   const nextStep = () => {
     const currentId = FORM_STEPS[currentStep].id;
 
     // Skip logic: if package selected is not by-dozen, skip the by-dozen step
     if (currentId === "package" && formData.packageType !== "by-dozen") {
       setCurrentStep(getStepIndexById("color"));
-      // Scroll after state update
-      setTimeout(scrollToStepTop, 0);
       return;
     }
 
     if (currentId === "by-dozen" && formData.packageType !== "by-dozen") {
       setCurrentStep(Math.min(currentStep + 1, FORM_STEPS.length - 1));
-      // Scroll after state update
-      setTimeout(scrollToStepTop, 0);
       return;
     }
 
     if (currentStep < FORM_STEPS.length - 1) {
       setCurrentStep(currentStep + 1);
-      // Scroll after state update
-      setTimeout(scrollToStepTop, 0);
     }
   };
 
@@ -135,27 +131,19 @@ export const DesignPackagePage = () => {
       // If not by-dozen, go back to package; otherwise back to by-dozen
       if (formData.packageType !== "by-dozen") {
         setCurrentStep(getStepIndexById("package"));
-        // Scroll after state update
-        setTimeout(scrollToStepTop, 0);
         return;
       }
       setCurrentStep(getStepIndexById("by-dozen"));
-      // Scroll after state update
-      setTimeout(scrollToStepTop, 0);
       return;
     }
 
     if (currentId === "by-dozen" && formData.packageType !== "by-dozen") {
       setCurrentStep(getStepIndexById("package"));
-      // Scroll after state update
-      setTimeout(scrollToStepTop, 0);
       return;
     }
 
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
-      // Scroll after state update
-      setTimeout(scrollToStepTop, 0);
     }
   };
 
