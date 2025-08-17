@@ -15,6 +15,8 @@
   padding-bottom: var(--spacing-xs);
 }
 
+.totalGroup,
+.priceGroup,
 .fieldGroup {
   display: flex;
   justify-content: space-between;
@@ -23,6 +25,8 @@
   padding: var(--spacing-xs) 0;
 }
 
+.totalGroup label,
+.priceGroup label,
 .fieldGroup label {
   font-weight: 600;
   color: var(--sd-brown-dark);
@@ -57,12 +61,29 @@
   margin-top: var(--spacing-xs);
 }
 
+.priceGroup {
+  margin-bottom: var(--spacing-xs);
+}
+
+.priceGroup label {
+  font-weight: 600;
+}
+
+.totalGroup {
+  border-top: 1px solid var(--sd-pink-light);
+}
+
+.priceBreakdown,
 .totalPrice {
   font-weight: 700;
   color: var(--sd-pink-base);
   font-size: 1.1rem;
   text-align: right;
   flex: 1;
+}
+
+.priceBreakdown {
+  font-weight: 500;
 }
 
 @media (max-width: 768px) {
@@ -74,6 +95,8 @@
 
   .fieldValue,
   .treatsBreakdown,
+  .priceGroup,
+  .priceBreakdown,
   .totalPrice {
     text-align: left;
     width: 100%;

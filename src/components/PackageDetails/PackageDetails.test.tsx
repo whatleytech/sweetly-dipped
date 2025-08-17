@@ -66,14 +66,22 @@ describe("PackageDetails", () => {
       ...mockFormData,
       packageType: "by-dozen" as const,
       riceKrispies: 2, // 2 * $40 = $80
-      oreos: 1,        // 1 * $30 = $30
-      pretzels: 0,     // 0 * $30 = $0
+      oreos: 1, // 1 * $30 = $30
+      pretzels: 0, // 0 * $30 = $0
       marshmallows: 1, // 1 * $40 = $40
     };
 
     render(<PackageDetails formData={byDozenData} />);
-    
+
+    expect(
+      screen.getByText("Deposit due within 48 hours:")
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Remainder due 1 week before event:")
+    ).toBeInTheDocument();
+    expect(screen.getAllByText("$75")).toHaveLength(2);
     // Total: $80 + $30 + $0 + $40 = $150
+    expect(screen.getByText("Total:")).toBeInTheDocument();
     expect(screen.getByText("$150")).toBeInTheDocument();
   });
 
@@ -104,9 +112,9 @@ describe("PackageDetails", () => {
     };
 
     render(<PackageDetails formData={emptyData} />);
-    
+
     expect(screen.getByText("Package Type:")).toBeInTheDocument();
-    expect(screen.getByText("$0")).toBeInTheDocument();
+    expect(screen.getAllByText("$0")).toHaveLength(3);
   });
 
   it("calculates complex by-dozen order correctly", () => {

@@ -48,7 +48,9 @@ export const PackageDetails = ({ formData }: PackageDetailsProps) => {
       <h3>Package Details</h3>
       <div className={styles.fieldGroup}>
         <label>Package Type:</label>
-        <span className={styles.fieldValue}>{getPackageLabel(formData.packageType)}</span>
+        <span className={styles.fieldValue}>
+          {getPackageLabel(formData.packageType)}
+        </span>
       </div>
 
       {formData.packageType === "by-dozen" && (
@@ -64,7 +66,15 @@ export const PackageDetails = ({ formData }: PackageDetailsProps) => {
         </div>
       )}
 
-      <div className={styles.fieldGroup}>
+      <div className={styles.priceGroup}>
+        <label>Deposit due within 48 hours:</label>
+        <span className={styles.priceBreakdown}>${total / 2}</span>
+      </div>
+      <div className={styles.priceGroup}>
+        <label>Remainder due 1 week before event:</label>
+        <span className={styles.priceBreakdown}>${total / 2}</span>
+      </div>
+      <div className={styles.totalGroup}>
         <label>Total:</label>
         <span className={styles.totalPrice}>${total}</span>
       </div>
