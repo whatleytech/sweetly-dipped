@@ -12,7 +12,7 @@ describe('HeroSection', () => {
       screen.getByText("Personalized Chocolate-Covered Treats")
     ).toBeInTheDocument();
     expect(
-      screen.getByText("Elevate your next event with handcrafted indulgence.")
+      screen.getByText("Sweetly Made, Perfectly Dipped")
     ).toBeInTheDocument();
     expect(
       screen.getByAltText(
@@ -26,5 +26,15 @@ describe('HeroSection', () => {
     
     const headline = screen.getByRole('heading', { level: 1 });
     expect(headline).toHaveTextContent('Personalized Chocolate-Covered Treats');
+  });
+
+  it('renders background video with proper attributes', () => {
+    const { container } = render(<HeroSection />);
+    
+    const video = container.querySelector('video');
+    expect(video).toBeInTheDocument();
+    expect(video).toHaveClass('_backgroundVideo_aa8e4d');
+    expect(video).toHaveAttribute('aria-hidden', 'true');
+    expect(video).toHaveAttribute('src');
   });
 }); 

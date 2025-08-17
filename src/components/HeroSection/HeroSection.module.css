@@ -1,9 +1,23 @@
 .hero {
   padding: var(--spacing-xl) var(--spacing-sm);
   background: var(--sd-cream);
-  min-height: 60vh;
+  min-height: 50vh;
   display: flex;
   align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.backgroundVideo {
+  position: absolute;
+  top: -30%;
+  left: 0;
+  width: 100%;
+  height: 120%;
+  object-fit: cover;
+  opacity: 0.3;
+  z-index: 1;
 }
 
 .content {
@@ -13,6 +27,8 @@
   grid-template-columns: 1fr;
   gap: var(--spacing-lg);
   align-items: center;
+  position: relative;
+  z-index: 2;
 }
 
 .text {
@@ -42,8 +58,8 @@
 }
 
 .lifestyleImage {
-  width: 200px;
-  height: 200px;
+  width: 150px;
+  height: 150px;
   border-radius: 50%;
   object-fit: cover;
   box-shadow: 0 8px 32px rgba(75, 46, 43, 0.15);
@@ -87,7 +103,7 @@
   }
   
   .lifestyleImage {
-    width: 300px;
-    height: 300px;
+    width: 250px;
+    height: 250px;
   }
 } 
