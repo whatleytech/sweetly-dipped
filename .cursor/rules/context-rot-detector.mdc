@@ -7,31 +7,32 @@ description: >
 alwaysApply: true
 ---
 
-## 1 Detection Heuristics
+## 1 Detection Heuristics
 
 Trigger the **Context-Rot Response** if **any** of the following is true:
 
 1. The conversation exceeds **30 turns** *or* **15 000 tokens**
    (`CONTEXT_TURNS_THRESHOLD = 30`, `TOKEN_THRESHOLD = 15000`).
-2. Cursor’s time-to-first-token (`TTFT`) > **3 s** on **two consecutive** messages.
+2. Cursor's time-to-first-token (`TTFT`) > **3 s** on **two consecutive** messages.
    (`LATENCY_SPIKE_LIMIT = 2`, `TTFT_THRESHOLD = 3000 ms`)
 3. The last two assistant messages contain a combined repetition ratio
    ≥ 20 % (same sentences or code blocks repeated verbatim).  
-4. The user explicitly complains about slowness, confusion, or “context rot”.
+4. The user explicitly complains about slowness, confusion, or "context rot".
 
 When triggered, immediately perform Steps 2–4 below instead of a normal
 response.
 
-## 2 Create /history if needed
+## 2 Create /history if needed
 
 ```bash
 mkdir -p history
 ```
-## 3 Generate a markdown conversation snapshot
+## 3 Generate a markdown conversation snapshot
 1. Filename format:
 ```
 history/YYYY-MM-DD_HH-mm_context-rot-summary.md
 ```
+   **Note:** Use `date '+%Y-%m-%d'` to get the correct current date and `date '+%H-%M'` to get the correct current time for the filename.
 
 2. File contents (template):
 ```
@@ -58,12 +59,12 @@ _Generated automatically by context-rot-detector.mdc_
 ```
 3. Write the completed file to disk and add it to git if VCS is enabled.
 
-## 4 Propose new rules (agent reply to user)
+## 4 Propose new rules (agent reply to user)
 After writing the snapshot, reply to the user with:
 
 1. A brief note that a snapshot was taken (`history/<filename>`).
 2. A bullet list of up to 3 candidate rules extracted from
-“Recurring Requests,” each in the form:
+"Recurring Requests," each in the form:
 ```
 - <concise rule name>: <one-sentence description>
 ```

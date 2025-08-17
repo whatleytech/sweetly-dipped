@@ -1,0 +1,79 @@
+---
+description: Standardize video optimization workflow using FFmpeg for web assets, with MP4 as the preferred format
+globs: []
+alwaysApply: false
+---
+
+## Video Optimization Workflow
+
+### Preferred Format
+- **Primary format**: MP4 with H.264 codec
+- **Reason**: Best web compatibility, good compression, and fast loading
+
+### FFmpeg Command Structure
+
+#### Basic Conversion (MOV/AVI to MP4)
+```bash
+ffmpeg -i input.mov -c:v libx264 -preset slow -crf 28 -an -movflags +faststart output.mp4
+```
+
+#### Web-Optimized Conversion
+```bash
+ffmpeg -i input.mov -c:v libx264 -preset slow -crf 32 -vf "scale=960:540,fps=20" -an -movflags +faststart output.mp4
+```
+
+### Parameter Guidelines
+
+#### Quality Settings
+- **CRF (Constant Rate Factor)**: 
+  - 18-23: High quality (larger files)
+  - 24-28: Good quality (balanced)
+  - 29-32: Web optimized (smaller files)
+  - 33+: Low quality (very small files)
+
+#### Resolution Scaling
+- **1080p**: `scale=1920:1080`
+- **720p**: `scale=1280:720` 
+- **Web optimized**: `scale=960:540`
+- **Mobile optimized**: `scale=640:360`
+
+#### Frame Rate
+- **24fps**: Standard film
+- **30fps**: Standard video
+- **20fps**: Web optimized (good balance)
+
+#### Audio
+- **No audio**: `-an` (recommended for background videos)
+- **With audio**: `-c:a aac -b:a 128k`
+
+### File Size Targets
+- **Background videos**: < 5MB
+- **Hero videos**: < 10MB
+- **Content videos**: < 20MB
+
+### Optimization Checklist
+1. ✅ Convert to MP4 with H.264
+2. ✅ Use `-movflags +faststart` for web streaming
+3. ✅ Scale resolution appropriately
+4. ✅ Reduce frame rate if needed
+5. ✅ Remove audio unless required
+6. ✅ Test file size and quality
+7. ✅ Verify web playback compatibility
+
+### Common Use Cases
+
+#### Background Video (Hero Section)
+```bash
+ffmpeg -i input.mov -c:v libx264 -preset slow -crf 32 -vf "scale=960:540,fps=20" -an -movflags +faststart hero-background.mp4
+```
+
+#### Content Video (Medium Quality)
+```bash
+ffmpeg -i input.mov -c:v libx264 -preset medium -crf 28 -vf "scale=1280:720,fps=24" -an -movflags +faststart content-video.mp4
+```
+
+### Quality Verification
+- Test video playback in multiple browsers
+- Verify smooth playback on mobile devices
+- Check file size meets target requirements
+- Ensure visual quality is acceptable for intended use
