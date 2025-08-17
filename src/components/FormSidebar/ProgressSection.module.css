@@ -1,0 +1,27 @@
+.progressInfo {
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--sd-pink-base);
+}
+
+.progressText {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--sd-brown-dark);
+  margin-bottom: var(--spacing-sm);
+  text-align: center;
+}
+
+.progressBar {
+  width: 100%;
+  height: 6px;
+  background: var(--sd-pink-light);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--sd-pink-base), var(--sd-brown-light));
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}

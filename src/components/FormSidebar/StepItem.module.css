@@ -1,0 +1,107 @@
+.stepItem {
+  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-sm);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.stepItem.clickable {
+  cursor: pointer;
+}
+
+.stepItem.clickable:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(107, 67, 63, 0.15);
+}
+
+.stepItem.clickable:focus {
+  outline: 2px solid var(--sd-pink-base);
+  outline-offset: 2px;
+}
+
+.stepItem.completed {
+  background: rgba(255, 102, 160, 0.1);
+  border-left: 3px solid var(--sd-pink-base);
+}
+
+.stepItem.current {
+  background: rgba(191, 162, 118, 0.1);
+  border-left: 3px solid var(--sd-gold-accent);
+}
+
+.stepItem.pending {
+  background: rgba(107, 67, 63, 0.05);
+  border-left: 3px solid var(--sd-brown-light);
+  opacity: 0.6;
+}
+
+/* Override opacity for pending steps that have data */
+.stepItem.pending.hasData {
+  opacity: 1;
+  background: rgba(255, 102, 160, 0.05);
+  border-left: 3px solid var(--sd-pink-base);
+}
+
+.stepHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-xs);
+}
+
+.stepNumber {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--sd-white);
+}
+
+.stepItem.completed .stepNumber {
+  background: var(--sd-pink-base);
+}
+
+.stepItem.current .stepNumber {
+  background: var(--sd-gold-accent);
+}
+
+.stepItem.pending .stepNumber {
+  background: var(--sd-brown-light);
+}
+
+/* Override step number color for pending steps that have data */
+.stepItem.pending.hasData .stepNumber {
+  background: var(--sd-pink-base);
+}
+
+.stepTitle {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--sd-brown-dark);
+}
+
+.stepSummary {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  color: var(--sd-brown-light);
+  margin-left: 32px;
+  font-style: italic;
+  line-height: 1.3;
+}
+
+/* Mobile responsive */
+@media (max-width: 1023px) {
+  .stepTitle {
+    font-size: 0.85rem;
+  }
+  
+  .stepSummary {
+    font-size: 0.75rem;
+  }
+}
