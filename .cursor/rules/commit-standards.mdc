@@ -1,20 +1,28 @@
 ---
-# commit-granularity.mdc
-description: >
-  Enforce logical commit grouping and standardized messaging to maintain
-  clean git history and enable effective code review and debugging.
+description: Comprehensive commit standards for size limits, messaging, quality gates, and workflow
+globs: ["**/*"]
 alwaysApply: true
 ---
 
-## Commit Size Limits
+# Commit Standards
 
-- **Maximum**: ~300 lines changed per commit
-- **Ideal**: 50-150 lines changed per commit
-- **Split large changes** into logical chunks (e.g., "add component" then "add tests" then "update integration")
+## Commit Policy
 
-## Commit Type Prefixes
+1. **One cohesive task per commit** (e.g., "Add PackagesTable component" or "Fix TreatsGrid test")
+2. **Keep diffs small**: ≤ 300 total lines changed per commit
+3. **Ideal size**: 50-150 lines changed per commit
+4. **Split large changes** into logical chunks (e.g., "add component" then "add tests" then "update integration")
 
-Use conventional commit prefixes:
+## Commit Message Format
+
+### Structure
+```
+<type>(scope): <subject>
+
+[optional body]
+```
+
+### Type Prefixes
 - `feat(scope):` - New feature or enhancement
 - `fix(scope):` - Bug fix
 - `chore(scope):` - Maintenance, deps, tooling
@@ -23,20 +31,10 @@ Use conventional commit prefixes:
 - `refactor(scope):` - Code restructuring without feature changes
 - `style(scope):` - Formatting, whitespace, code style
 
-## Scope Guidelines
-
-Use meaningful scopes:
-- Component names: `feat(hero): add responsive image gallery`
-- Feature areas: `fix(forms): resolve validation timing issue`
-- Technical areas: `chore(build): update vite config for testing`
-
-## Message Format
-
-```
-<type>(scope): <subject>
-
-[optional body]
-```
+### Scope Guidelines
+- **Component names**: `feat(hero): add responsive image gallery`
+- **Feature areas**: `fix(forms): resolve validation timing issue`
+- **Technical areas**: `chore(build): update vite config for testing`
 
 ### Subject Line Rules
 - **Length**: 50-72 characters (hard limit: 100)
@@ -71,14 +69,41 @@ git commit -m "style(package): refine form layout and responsive design"
 git commit -m "docs(package): update README with form usage examples"
 ```
 
-## Quality Gates Before Each Commit
+## Quality Gates
 
-Run this checklist:
+Run this checklist before every commit:
 ```bash
 yarn lint        # ESLint passes
-yarn test        # All tests green  
 yarn type-check  # TypeScript compiles
+yarn test        # All tests green  
 yarn test --coverage  # Coverage thresholds met
 ```
 
-Only commit when all checks pass.
+If any step fails:
+1. Fix the issue (code, tests, or config)
+2. Re-run the checklist
+3. Commit only when everything is green
+
+## Tooling Setup
+
+### Husky & lint-staged
+Install/setup automatically if absent:
+```bash
+yarn add -D husky lint-staged
+husky install
+```
+
+Add a "pre-commit" hook running the quality gate checklist.
+
+### Coverage Integration
+- Use Vitest's Istanbul integration
+- Configure thresholds in `vitest.config.ts`
+- Total coverage must be ≥ 80%
+
+## CI Alignment
+
+- GitHub Actions (or equivalent) must replicate the quality gate checklist
+- Block pushes to `main` on failure
+- Ensure consistent standards across all environments
+
+Cursor must adhere to this workflow whenever it generates, edits, or removes code.
