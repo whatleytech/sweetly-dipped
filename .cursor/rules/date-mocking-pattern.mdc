@@ -1,0 +1,88 @@
+---
+description: Always use Vitest's fake timers for date-dependent tests to ensure deterministic behavior
+globs: ["**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/*.spec.tsx"]
+alwaysApply: false
+---
+
+# Date Mocking Pattern
+
+## Problem
+Tests that depend on the current date are flaky and unreliable. Using `new Date()` or `Date.now()` directly in tests causes them to fail when run on different dates, making them non-deterministic.
+
+## Solution
+Always use Vitest's fake timers for date-dependent tests to ensure deterministic behavior.
+
+## Implementation
+
+### For Date-Dependent Functions
+```typescript
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+
+describe("dateDependentFunction", () => {
+  beforeEach(() => {
+    // Set a fixed date for all tests
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2025-01-15T10:00:00.000Z'));
+  });
+
+  afterEach(() => {
+    // Restore real timers
+    vi.useRealTimers();
+  });
+
+  it("should work with fixed date", () => {
+    // Test logic here - will use 2025-01-15 consistently
+  });
+});
+```
+
+### For Async Tests with Date Dependencies
+```typescript
+it("async test with date dependency", async () => {
+  // Setup with fake timers
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date('2025-01-15T10:00:00.000Z'));
+  
+  // Test logic...
+  
+  // Switch to real timers for async operations if needed
+  vi.useRealTimers();
+  
+  await waitFor(() => {
+    // Async assertions
+  });
+});
+```
+
+## Rules
+1. **Never rely on actual current date** in tests
+2. **Always use `vi.useFakeTimers()`** in `beforeEach` for date-dependent tests
+3. **Always restore with `vi.useRealTimers()`** in `afterEach`
+4. **Use consistent fixed dates** across related tests (e.g., always use 2025-01-15)
+5. **For async tests**, switch to real timers only when necessary for `waitFor` or similar
+
+## Examples of What to Mock
+- `new Date()` - returns fixed date
+- `Date.now()` - returns fixed timestamp
+- `toISOString()` - returns consistent string
+- `toLocaleDateString()` - returns consistent formatted date
+
+## Benefits
+- **Deterministic tests** that pass regardless of when they're run
+- **Consistent order numbers** and date-based IDs in tests
+- **No more flaky date-dependent failures**
+- **Easier debugging** with predictable date values
+
+## Anti-Patterns to Avoid
+```typescript
+// ❌ Don't do this - relies on actual current date
+it("should generate order number", () => {
+  const result = generateOrderNumber();
+  expect(result).toBe("2025-08-23-001"); // Will fail tomorrow!
+});
+
+// ❌ Don't do this - inconsistent mocking
+it("should work", () => {
+  vi.spyOn(Date, "now").mockReturnValue(1234567890); // Incomplete mocking
+});
+```
