@@ -3,11 +3,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useFormData } from './useFormData';
-import { formDataApi } from '../api/formDataApi';
-import type { FormData } from '../types/formTypes';
+import { formDataApi } from '@/api/formDataApi';
+import type { FormData } from '@/types/formTypes';
 
 // Mock the API
-vi.mock("../api/formDataApi", () => ({
+vi.mock("@/api/formDataApi", () => ({
   formDataApi: {
     create: vi.fn(),
     get: vi.fn(),

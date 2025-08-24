@@ -1,5 +1,5 @@
 import styles from "./FormSidebar.module.css";
-import type { FormData } from "../../types/formTypes";
+import type { FormData } from "@/types/formTypes";
 
 import {
   getStepStatus,
@@ -7,7 +7,7 @@ import {
   isStepCompleted,
   getCompletedStepsCount,
   getFullStepIndex,
-} from "../../utils/formStepUtils";
+} from "@/utils/formStepUtils";
 import { StepItem } from "./StepItem";
 import { ProgressSection } from "./ProgressSection";
 

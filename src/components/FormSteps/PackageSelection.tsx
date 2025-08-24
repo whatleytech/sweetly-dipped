@@ -1,7 +1,7 @@
 import styles from "./FormSteps.module.css";
-import type { FormStepProps, FormData } from "../../types/formTypes";
-import { FormButtons, FormStepContainer } from "../shared";
-import { PACKAGE_OPTIONS } from "../../constants/formData";
+import type { FormStepProps, FormData } from "@/types/formTypes";
+import { FormButtons, FormStepContainer } from "@/components/shared";
+import { PACKAGE_OPTIONS } from "@/constants/formData";
 
 export const PackageSelection = ({
   formData,

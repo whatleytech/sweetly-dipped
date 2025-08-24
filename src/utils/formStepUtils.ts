@@ -1,4 +1,4 @@
-import type { FormData } from "../types/formTypes";
+import type { FormData } from '@/types/formTypes';
 
 export interface FormStep {
   id: string;

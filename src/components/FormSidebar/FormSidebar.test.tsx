@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { FormSidebar } from "./FormSidebar";
-import type { FormData } from "../../types/formTypes";
+import type { FormData } from '@/types/formTypes';
 
 const mockFormData: FormData = {
   firstName: "John",

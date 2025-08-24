@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { ContactInformation } from "./ContactInformation";
-import type { FormData } from "../../types/formTypes";
+import type { FormData } from '@/types/formTypes';
 import { describe, it, expect, vi } from "vitest";
 
 const mockFormData: FormData = {

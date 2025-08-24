@@ -1,5 +1,5 @@
 import styles from "./DesignDetails.module.css";
-import type { FormData } from "../../types/formTypes";
+import type { FormData } from "@/types/formTypes";
 
 interface DesignDetailsProps {
   formData: FormData;

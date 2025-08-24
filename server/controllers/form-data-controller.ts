@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import type { FormData } from '../../src/types/formTypes';
+import type { FormData } from '@/types/formTypes';
 
 // In-memory storage
 interface StoredFormData {

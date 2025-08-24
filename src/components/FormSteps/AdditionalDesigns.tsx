@@ -1,7 +1,7 @@
 import type { ChangeEvent } from "react";
 import styles from "./FormSteps.module.css";
-import type { FormStepProps } from "../../types/formTypes";
-import { FormButtons, FormStepContainer } from "../shared";
+import type { FormStepProps } from "@/types/formTypes";
+import { FormButtons, FormStepContainer } from "@/components/shared";
 
 export const AdditionalDesigns = ({
   formData,

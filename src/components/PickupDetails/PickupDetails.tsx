@@ -1,5 +1,5 @@
 import styles from "./PickupDetails.module.css";
-import type { FormData } from "../../types/formTypes";
+import type { FormData } from "@/types/formTypes";
 
 interface PickupDetailsProps {
   formData: FormData;

@@ -2,7 +2,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ColorScheme } from './ColorScheme';
-import type { FormData } from "../../types/formTypes";
+import type { FormData } from '@/types/formTypes';
 
 
 const baseData: FormData = {

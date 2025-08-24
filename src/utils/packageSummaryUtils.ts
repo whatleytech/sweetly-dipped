@@ -1,5 +1,5 @@
-import type { FormData } from "../types/formTypes";
-import { PACKAGE_OPTIONS } from "../constants/formData";
+import type { FormData } from '@/types/formTypes';
+import { PACKAGE_OPTIONS } from '@/constants/formData';
 
 /**
  * Generates a summary of the selected package

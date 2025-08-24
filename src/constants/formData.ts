@@ -3,7 +3,7 @@ import type {
   TreatOption,
   TimeSlots,
   UnavailablePeriod,
-} from "../types/formTypes";
+} from "@/types/formTypes";
 
 export const PACKAGE_OPTIONS: PackageOption[] = [
   { id: "small", label: "Small (3 dozen – 36 treats)", price: 110 },

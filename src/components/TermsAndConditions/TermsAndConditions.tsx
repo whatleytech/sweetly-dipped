@@ -1,5 +1,5 @@
 import styles from "./TermsAndConditions.module.css";
-import type { FormData } from "../../types/formTypes";
+import type { FormData } from "@/types/formTypes";
 
 interface TermsAndConditionsProps {
   formData: FormData;

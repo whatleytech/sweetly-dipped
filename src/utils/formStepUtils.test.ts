@@ -9,7 +9,7 @@ import {
   getVisibleStepIndex,
   type FormStep,
 } from "./formStepUtils";
-import type { FormData } from "../types/formTypes";
+import type { FormData } from "@/types/formTypes";
 
 const mockFormSteps: FormStep[] = [
   { id: "lead", title: "Contact Information" },

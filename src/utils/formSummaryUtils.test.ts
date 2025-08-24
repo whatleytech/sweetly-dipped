@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { getStepSummary } from "./formSummaryUtils";
-import type { FormData } from "../types/formTypes";
+import type { FormData } from '@/types/formTypes';
 
 const mockFormData: FormData = {
   firstName: "John",

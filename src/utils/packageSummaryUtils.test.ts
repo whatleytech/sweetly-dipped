@@ -4,7 +4,7 @@ import {
   generateByDozenBreakdown, 
   generatePickupSummary 
 } from "./packageSummaryUtils";
-import type { FormData } from "../types/formTypes";
+import type { FormData } from '@/types/formTypes';
 
 describe("packageSummaryUtils", () => {
   describe("generatePackageSummary", () => {

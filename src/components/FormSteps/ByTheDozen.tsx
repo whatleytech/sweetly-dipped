@@ -1,7 +1,7 @@
 import styles from "./FormSteps.module.css";
-import type { FormStepProps } from "../../types/formTypes";
-import { FormButtons, FormStepContainer } from "../shared";
-import { QUANTITIES, TREAT_OPTIONS } from "../../constants/formData";
+import type { FormStepProps } from "@/types/formTypes";
+import { FormButtons, FormStepContainer } from "@/components/shared";
+import { QUANTITIES, TREAT_OPTIONS } from "@/constants/formData";
 
 export const ByTheDozen = ({
   formData,

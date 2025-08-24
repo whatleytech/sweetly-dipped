@@ -1,5 +1,5 @@
 import styles from "./ReferralSource.module.css";
-import type { FormData } from "../../types/formTypes";
+import type { FormData } from "@/types/formTypes";
 
 interface ReferralSourceProps {
   formData: FormData;

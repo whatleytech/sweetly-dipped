@@ -1,15 +1,15 @@
 import type { ChangeEvent } from "react";
 import styles from "./FormSteps.module.css";
-import type { FormStepProps, DayOfWeek } from "../../types/formTypes";
-import { FormButtons, FormStepContainer } from "../shared";
-import { TIME_SLOTS, UNAVAILABLE_PERIODS } from "../../constants/formData";
+import type { FormStepProps, DayOfWeek } from "@/types/formTypes";
+import { FormButtons, FormStepContainer } from "@/components/shared";
+import { TIME_SLOTS, UNAVAILABLE_PERIODS } from "@/constants/formData";
 import {
   generateTimeIntervals,
   timeSlotToWindow,
   getUnavailablePeriod,
   formatDateForDisplay,
   isRushOrder,
-} from "../../utils/timeUtils";
+} from "@/utils/timeUtils";
 
 function getDayOfWeek(dateStr: string): DayOfWeek | null {
   if (!dateStr) return null;

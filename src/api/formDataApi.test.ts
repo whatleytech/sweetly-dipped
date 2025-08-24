@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { formDataApi } from './formDataApi';
-import type { FormData } from '../types/formTypes';
+import type { FormData } from '@/types/formTypes';
 
 // Mock fetch
 const mockFetch = vi.fn();

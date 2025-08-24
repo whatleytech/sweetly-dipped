@@ -3,11 +3,11 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import './index.css'
-import { LandingPage } from "./pages/LandingPage";
-import { DesignPackagePage } from "./pages/DesignPackagePage";
-import { ConfirmationPage } from "./pages/ConfirmationPage";
-import { ThankYouPage } from "./pages/ThankYouPage";
-import { Layout } from "./components/Layout/Layout";
+import { LandingPage } from "@/pages/LandingPage";
+import { DesignPackagePage } from "@/pages/DesignPackagePage";
+import { ConfirmationPage } from "@/pages/ConfirmationPage";
+import { ThankYouPage } from "@/pages/ThankYouPage";
+import { Layout } from "@/components/Layout/Layout";
 
 // Create a client
 const queryClient = new QueryClient({

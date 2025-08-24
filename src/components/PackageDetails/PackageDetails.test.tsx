@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { PackageDetails } from "./PackageDetails";
-import type { FormData } from "../../types/formTypes";
+import type { FormData } from '@/types/formTypes';
 import { describe, it, expect } from "vitest";
 
 const mockFormData: FormData = {

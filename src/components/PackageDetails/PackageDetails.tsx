@@ -1,6 +1,6 @@
 import styles from "./PackageDetails.module.css";
-import type { FormData } from "../../types/formTypes";
-import { PACKAGE_OPTIONS } from "../../constants/formData";
+import type { FormData } from "@/types/formTypes";
+import { PACKAGE_OPTIONS } from "@/constants/formData";
 
 interface PackageDetailsProps {
   formData: FormData;

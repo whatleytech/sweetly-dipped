@@ -1,4 +1,4 @@
-import styles from "../FormSteps/FormSteps.module.css";
+import styles from "@/components/FormSteps/FormSteps.module.css";
 
 interface FormStepContainerProps {
   title: string;

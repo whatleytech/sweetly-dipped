@@ -2,16 +2,16 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./ConfirmationPage.module.css";
 
-import { formDataApi } from "../api/formDataApi";
-import { PackageDetails } from "../components/PackageDetails/PackageDetails";
-import { ContactInformation } from "../components/ContactInformation/ContactInformation";
-import { DesignDetails } from "../components/DesignDetails/DesignDetails";
-import { PickupDetails } from "../components/PickupDetails/PickupDetails";
-import { ReferralSource } from "../components/ReferralSource/ReferralSource";
-import { TermsAndConditions } from "../components/TermsAndConditions/TermsAndConditions";
-import { PaymentNotice } from "../components/PaymentNotice/PaymentNotice";
-import { RushOrderNotice } from "../components/RushOrderNotice/RushOrderNotice";
-import { useFormData } from "../hooks/useFormData";
+import { formDataApi } from "@/api/formDataApi";
+import { PackageDetails } from "@/components/PackageDetails/PackageDetails";
+import { ContactInformation } from "@/components/ContactInformation/ContactInformation";
+import { DesignDetails } from "@/components/DesignDetails/DesignDetails";
+import { PickupDetails } from "@/components/PickupDetails/PickupDetails";
+import { ReferralSource } from "@/components/ReferralSource/ReferralSource";
+import { TermsAndConditions } from "@/components/TermsAndConditions/TermsAndConditions";
+import { PaymentNotice } from "@/components/PaymentNotice/PaymentNotice";
+import { RushOrderNotice } from "@/components/RushOrderNotice/RushOrderNotice";
+import { useFormData } from "@/hooks/useFormData";
 
 export const ConfirmationPage = () => {
   const navigate = useNavigate();

@@ -1,6 +1,6 @@
 import styles from "./FormSteps.module.css";
-import type { FormStepProps, FormData } from "../../types/formTypes";
-import { FormButtons, FormStepContainer } from "../shared";
+import type { FormStepProps, FormData } from "@/types/formTypes";
+import { FormButtons, FormStepContainer } from "@/components/shared";
 
 export const LeadQuestions = ({
   formData,

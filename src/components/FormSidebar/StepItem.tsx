@@ -1,7 +1,7 @@
 import styles from "./StepItem.module.css";
-import type { FormStep } from "../../utils/formStepUtils";
-import { getStepSummary } from "../../utils/formSummaryUtils";
-import type { FormData } from "../../types/formTypes";
+import type { FormStep } from "@/utils/formStepUtils";
+import { getStepSummary } from "@/utils/formSummaryUtils";
+import type { FormData } from "@/types/formTypes";
 
 interface StepItemProps {
   step: FormStep;

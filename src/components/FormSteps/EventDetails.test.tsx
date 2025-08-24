@@ -2,7 +2,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { EventDetails } from './EventDetails';
-import type { FormData } from "../../types/formTypes";
+import type { FormData } from '@/types/formTypes';
 
 
 const baseData: FormData = {

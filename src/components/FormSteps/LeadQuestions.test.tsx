@@ -1,7 +1,7 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from "vitest";
 import { LeadQuestions } from "./LeadQuestions";
-import type { FormData } from "../../types/formTypes";
+import type { FormData } from '@/types/formTypes';
 
 
 const mockFormData: FormData = {

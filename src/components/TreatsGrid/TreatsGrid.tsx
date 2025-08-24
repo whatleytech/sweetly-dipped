@@ -1,8 +1,8 @@
 import styles from "./TreatsGrid.module.css";
-import pretzel from "../../assets/images/pretzels.png";
-import oreo from "../../assets/images/oreos.png";
-import marshmallow from "../../assets/images/marshmallows.png";
-import riceKrispies from "../../assets/images/rice-krispies.png";
+import pretzel from "@/assets/images/pretzels.png";
+import oreo from "@/assets/images/oreos.png";
+import marshmallow from "@/assets/images/marshmallows.png";
+import riceKrispies from "@/assets/images/rice-krispies.png";
 
 const treats = [
   {

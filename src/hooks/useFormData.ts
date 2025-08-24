@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import type { FormData } from '../types/formTypes';
-import { formDataApi, type StoredFormData } from '../api/formDataApi';
+import type { FormData } from '@/types/formTypes';
+import { formDataApi, type StoredFormData } from '@/api/formDataApi';
 
 const STORAGE_KEY = 'sweetly-dipped-form-id';
 

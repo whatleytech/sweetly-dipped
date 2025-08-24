@@ -6,8 +6,8 @@ import {
   generatePackageSummary,
   generateByDozenBreakdown,
   generatePickupSummary,
-} from "../utils/packageSummaryUtils";
-import { useFormData } from "../hooks/useFormData";
+} from "@/utils/packageSummaryUtils";
+import { useFormData } from "@/hooks/useFormData";
 
 export const ThankYouPage = () => {
   const navigate = useNavigate();

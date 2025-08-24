@@ -1,6 +1,6 @@
 import { useState } from "react";
 import styles from "./ContactInformation.module.css";
-import type { FormData } from "../../types/formTypes";
+import type { FormData } from "@/types/formTypes";
 
 interface ContactInformationProps {
   formData: FormData;

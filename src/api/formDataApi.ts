@@ -1,4 +1,4 @@
-import type { FormData } from '../types/formTypes';
+import type { FormData } from '@/types/formTypes';
 
 const API_BASE_URL = 'http://localhost:3001/api';
 
