@@ -1,0 +1,157 @@
+---
+# Repo-quality audit: Manual rule
+description: >
+  When explicitly invoked, analyse the entire repository for code-smells,
+  bugs, refactor opportunities, inconsistent style, missing or weak tests,
+  and risky architecture decisions.  
+  Technologies expected: TypeScript, React, Vite, Express, monorepo
+  layouts, ESLint.  Use official docs and broadly-accepted industry
+  guidelines as the quality baseline.
+globs:
+  # Include every source & config file that could influence quality
+  - "**/*.{ts,tsx,js,jsx,cts,mts}"
+  - "**/*.{json,yml,yaml}"
+  - "**/*.{md,mdx}"
+  - "**/*.{spec,test}.*"
+  - "**/vite.config.*"
+  - "**/eslint*.{js,cjs,mjs,ts}"
+  - "**/package.json"
+alwaysApply: false
+---
+
+# How to produce the audit
+
+1. Scan every matched file for:
+   • Bugs or incorrect logic  
+   • Violations of TS/React/Node best-practices  
+   • Test coverage holes (missing happy-path *and* edge-case tests)  
+   • Long or deeply-nested functions / components  
+   • Inconsistent naming / formatting / project structure  
+   • Duplicated code or dead code  
+   • Non-idiomatic use of Vite, Express routing, React hooks, etc.
+
+2. Assign an **overall health score** between **0 (horrible) – 10 (perfect)**.  
+   Base this solely on the evidence you find and what the official docs
+   recommend (TypeScript, React, Vite, Express, ESLint, monorepo tooling).
+
+3. Build a **“Suggestions” table**.  
+   For **each** issue you report include:
+
+   • `severity`: integer 0 – 5  
+   • `summary`: one concise sentence  
+   • `problemSnippet`: minimal code excerpt (surround with triple-backticks,
+     annotate with file path and line numbers if helpful)  
+   • `whyProblem`: 2-5 bullet points (1-3 sentences each) explaining the risk  
+   • `suggestedFix`: improved code snippet (also fenced)  
+   • `whyFix`: 2-5 bullet points justifying the change
+
+   Sort the table by descending severity.
+
+4. Create markdown files for each suggestion in a `suggestions/` directory:
+   • Generate current datetime using `date '+%Y%m%d%H%M'` command
+   • Create directory structure: `suggestions/<datetime>/`
+   • Organize suggestions by severity: `severity-1/`, `severity-2/`, etc.
+   • Name files using kebab-case: `<kebab-case-3-word-summary>.md`
+   • Include problem description, code snippets, suggested fixes, and rationale
+   • Create a `README.md` index file with overview and implementation priority
+
+5. Keep the whole answer under **2 000 tokens**.
+
+6. If the repo already follows an opinionated style (e.g. Airbnb ESLint),
+   respect that style and only flag true inconsistencies.
+
+# Formatting template (use exactly this order)
+
+```txt
+Overall score: <integer>/10
+
+Suggestions:
+1. [severity:<0-5>] <summary sentence>
+   Problem:
+   ```<language>
+   <problemSnippet>
+   ```
+   Why it’s problematic:
+   • bullet 1
+   • bullet 2
+   ...
+   Suggested change:
+   ```<language>
+   <suggestedFix>
+   ```
+   Why it helps:
+   • bullet 1
+   • bullet 2
+   ...
+
+2. ...
+```
+
+# Markdown file format template
+
+Each suggestion should be saved as a separate markdown file with this structure:
+
+```markdown
+# <Title of the Issue>
+
+**Severity:** <0-5>  
+**File:** `<file-path>`
+
+## Problem
+
+Description of the issue with code examples:
+
+```<language>
+<problemSnippet>
+```
+
+## Why It's Problematic
+
+- bullet 1
+- bullet 2
+- bullet 3
+
+## Suggested Fix
+
+Code example of the solution:
+
+```<language>
+<suggestedFix>
+```
+
+## Why This Helps
+
+- bullet 1
+- bullet 2
+- bullet 3
+```
+
+Directory structure:
+```
+suggestions/
+└── <datetime>/                    # YYYYMMDDHHmm format
+    ├── README.md                   # Index with overview
+    ├── severity-4/                 # Critical issues
+    ├── severity-3/                 # High priority issues
+    ├── severity-2/                 # Medium priority issues
+    └── severity-1/                 # Low priority issues
+```
+
+# Reference quality sources
+
+When deciding whether something is a problem or what score to give, consult
+(in order of priority):
+
+1. Official docs:  
+   • TypeScript Handbook & 5.0+ release notes  
+   • React 18+ docs (functional components & hooks)  
+   • Vite guide (vite.dev/guide)  
+   • Express routing guide (expressjs.com/guide/routing.html)  
+   • ESLint “latest” rule docs  
+2. Accepted community-wide best practices (e.g. Twelve-Factor, test pyramid,
+   SOLID, composable React components, small modules, fully typed code).  
+
+# Tone
+
+Be direct, actionable, and avoid filler language.  
+Focus on helping engineers make tangible improvements quickly.
