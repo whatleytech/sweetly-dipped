@@ -1,7 +1,9 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ConfirmationPage } from "./ConfirmationPage";
 import { vi, describe, it, expect, beforeEach } from "vitest";
+import React from "react";
 
 // Mock react-router-dom
 const mockNavigate = vi.fn();
@@ -10,6 +12,96 @@ vi.mock("react-router-dom", async () => {
   return {
     ...actual,
     useNavigate: () => mockNavigate,
+  };
+});
+
+// Mock the API with proper return values
+vi.mock("../api/formDataApi", () => {
+  const mockFormData = {
+    firstName: "John",
+    lastName: "Doe",
+    email: "john.doe@example.com",
+    phone: "123-456-7890",
+    communicationMethod: "email",
+    packageType: "medium",
+    riceKrispies: 2,
+    oreos: 1,
+    pretzels: 0,
+    marshmallows: 1,
+    colorScheme: "Pink and Gold",
+    eventType: "Birthday",
+    theme: "Princess",
+    additionalDesigns: "Add some sparkles",
+    pickupDate: "2024-02-15",
+    pickupTime: "8:30 AM",
+    rushOrder: false,
+    referralSource: "",
+    termsAccepted: false,
+    visitedSteps: new Set(["lead", "contact", "package", "design", "pickup"]),
+  };
+
+  const mockCreatedForm = {
+    id: "form-123",
+    formData: mockFormData,
+    currentStep: 6, // Confirmation step
+    createdAt: "2025-01-15T10:00:00Z",
+    updatedAt: "2025-01-15T10:00:00Z",
+    orderNumber: "2025-01-15-001",
+  };
+
+  return {
+    formDataApi: {
+      create: vi.fn().mockResolvedValue(mockCreatedForm),
+      get: vi.fn().mockResolvedValue(mockCreatedForm),
+      update: vi.fn().mockImplementation(
+        (
+          id: string,
+          updates: {
+            formData?: {
+              firstName?: string;
+              lastName?: string;
+              email?: string;
+              phone?: string;
+              communicationMethod?: "email" | "text";
+              packageType?: "small" | "medium" | "large" | "by-dozen";
+              riceKrispies?: number;
+              oreos?: number;
+              pretzels?: number;
+              marshmallows?: number;
+              colorScheme?: string;
+              eventType?: string;
+              theme?: string;
+              additionalDesigns?: string;
+              pickupDate?: string;
+              pickupTime?: string;
+              rushOrder?: boolean;
+              referralSource?: string;
+              termsAccepted?: boolean;
+              visitedSteps?: Set<string>;
+            };
+            currentStep?: number;
+            orderNumber?: string;
+          }
+        ) => {
+          // Return updated data based on the updates provided
+          const updatedForm = {
+            ...mockCreatedForm,
+            formData: {
+              ...mockCreatedForm.formData,
+              ...updates.formData,
+            },
+            ...updates,
+          };
+          return Promise.resolve(updatedForm);
+        }
+      ),
+      delete: vi.fn().mockResolvedValue(undefined),
+      list: vi.fn().mockResolvedValue([]),
+      health: vi.fn().mockResolvedValue({ status: "ok" }),
+      generateOrderNumber: vi
+        .fn()
+        .mockResolvedValue({ orderNumber: "2025-01-15-001" }),
+    },
   };
 });
 
@@ -23,48 +115,96 @@ Object.defineProperty(window, "localStorage", {
   value: localStorageMock,
 });
 
-const mockFormData = {
-  firstName: "John",
-  lastName: "Doe",
-  email: "john.doe@example.com",
-  phone: "123-456-7890",
-  communicationMethod: "email" as const,
-  packageType: "medium" as const,
-  riceKrispies: 2,
-  oreos: 1,
-  pretzels: 0,
-  marshmallows: 1,
-  colorScheme: "Pink and Gold",
-  eventType: "Birthday",
-  theme: "Princess",
-  additionalDesigns: "Add some sparkles",
-  pickupDate: "2024-02-15",
-  pickupTime: "8:30 AM",
-  rushOrder: false,
-  referralSource: "",
-  termsAccepted: false,
-};
+const renderConfirmationPage = (customMockData?: {
+  id: string;
+  formData: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    communicationMethod: "email" | "text";
+    packageType: "small" | "medium" | "large" | "by-dozen";
+    riceKrispies: number;
+    oreos: number;
+    pretzels: number;
+    marshmallows: number;
+    colorScheme: string;
+    eventType: string;
+    theme: string;
+    additionalDesigns: string;
+    pickupDate: string;
+    pickupTime: string;
+    rushOrder: boolean;
+    referralSource: string;
+    termsAccepted: boolean;
+    visitedSteps: Set<string>;
+  };
+  currentStep: number;
+  createdAt: string;
+  updatedAt: string;
+}) => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+      mutations: { retry: false },
+    },
+  });
 
-const renderConfirmationPage = () => {
+  // Default mock data if none provided
+  const defaultMockData = {
+    id: "form-123",
+    formData: {
+      firstName: "John",
+      lastName: "Doe",
+      email: "john.doe@example.com",
+      phone: "123-456-7890",
+      communicationMethod: "email" as const,
+      packageType: "medium" as const,
+      riceKrispies: 2,
+      oreos: 1,
+      pretzels: 0,
+      marshmallows: 1,
+      colorScheme: "Pink and Gold",
+      eventType: "Birthday",
+      theme: "Princess",
+      additionalDesigns: "Add some sparkles",
+      pickupDate: "2024-02-15",
+      pickupTime: "8:30 AM",
+      rushOrder: false,
+      referralSource: "",
+      termsAccepted: false,
+      visitedSteps: new Set(["lead", "contact", "package", "design", "pickup"]),
+    },
+    currentStep: 6,
+    createdAt: "2025-01-15T10:00:00Z",
+    updatedAt: "2025-01-15T10:00:00Z",
+  };
+
+  // Use custom mock data if provided, otherwise use the default
+  const mockData = customMockData || defaultMockData;
+  queryClient.setQueryData(["formData", "form-123"], mockData);
+
   return render(
-    <BrowserRouter>
-      <ConfirmationPage />
-    </BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <ConfirmationPage />
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 };
 
 describe("ConfirmationPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    localStorageMock.getItem.mockReturnValue(
-      JSON.stringify({ formData: mockFormData, currentStep: 0 })
-    );
+    localStorageMock.getItem.mockReturnValue("form-123");
   });
 
   it("renders loading state initially", () => {
     localStorageMock.getItem.mockReturnValue(null);
     renderConfirmationPage();
-    expect(screen.getByText("Loading...")).toBeInTheDocument();
+    expect(
+      screen.getByText("Loading your order details...")
+    ).toBeInTheDocument();
   });
 
   it("redirects to form page when no data exists", async () => {
@@ -101,12 +241,36 @@ describe("ConfirmationPage", () => {
   });
 
   it("displays rush order notice when rush order is true", async () => {
-    const rushOrderData = { ...mockFormData, rushOrder: true };
-    localStorageMock.getItem.mockReturnValue(
-      JSON.stringify({ formData: rushOrderData, currentStep: 0 })
-    );
-
-    renderConfirmationPage();
+    const mockFormData = {
+      firstName: "John",
+      lastName: "Doe",
+      email: "john.doe@example.com",
+      phone: "123-456-7890",
+      communicationMethod: "email" as const,
+      packageType: "medium" as const,
+      riceKrispies: 2,
+      oreos: 1,
+      pretzels: 0,
+      marshmallows: 1,
+      colorScheme: "Pink and Gold",
+      eventType: "Birthday",
+      theme: "Princess",
+      additionalDesigns: "Add some sparkles",
+      pickupDate: "2024-02-15",
+      pickupTime: "8:30 AM",
+      rushOrder: true,
+      referralSource: "",
+      termsAccepted: false,
+      visitedSteps: new Set(["lead", "contact", "package", "design", "pickup"]),
+    };
+    const rushOrderForm = {
+      id: "form-123",
+      formData: mockFormData,
+      currentStep: 6,
+      createdAt: "2025-01-15T10:00:00Z",
+      updatedAt: "2025-01-15T10:00:00Z",
+    };
+    renderConfirmationPage(rushOrderForm);
 
     await waitFor(() => {
       expect(screen.getByText(/Rush Order Notice:/)).toBeInTheDocument();
@@ -133,12 +297,36 @@ describe("ConfirmationPage", () => {
   });
 
   it("displays by-dozen breakdown when package type is by-dozen", async () => {
-    const byDozenData = { ...mockFormData, packageType: "by-dozen" as const };
-    localStorageMock.getItem.mockReturnValue(
-      JSON.stringify({ formData: byDozenData, currentStep: 0 })
-    );
-
-    renderConfirmationPage();
+    const mockFormData = {
+      firstName: "John",
+      lastName: "Doe",
+      email: "john.doe@example.com",
+      phone: "123-456-7890",
+      communicationMethod: "email" as const,
+      packageType: "by-dozen" as const,
+      riceKrispies: 2,
+      oreos: 1,
+      pretzels: 0,
+      marshmallows: 1,
+      colorScheme: "Pink and Gold",
+      eventType: "Birthday",
+      theme: "Princess",
+      additionalDesigns: "Add some sparkles",
+      pickupDate: "2024-02-15",
+      pickupTime: "8:30 AM",
+      rushOrder: false,
+      referralSource: "",
+      termsAccepted: false,
+      visitedSteps: new Set(["lead", "contact", "package", "design", "pickup"]),
+    };
+    const byDozenForm = {
+      id: "form-123",
+      formData: mockFormData,
+      currentStep: 6,
+      createdAt: "2025-01-15T10:00:00Z",
+      updatedAt: "2025-01-15T10:00:00Z",
+    };
+    renderConfirmationPage(byDozenForm);
 
     await waitFor(() => {
       expect(
@@ -198,23 +386,34 @@ describe("ConfirmationPage", () => {
     expect(submitButton).not.toBeDisabled();
   });
 
-  it("submits form and clears localStorage when terms are accepted", async () => {
+  it("submits form and navigates to thank you page when terms are accepted", async () => {
     const alertMock = vi.spyOn(window, "alert").mockImplementation(() => {});
 
     renderConfirmationPage();
 
+    // Wait for the checkbox to be available and click it
     await waitFor(() => {
       const checkbox = screen.getByRole("checkbox");
       fireEvent.click(checkbox);
-
-      const submitButton = screen.getByText("Submit Order");
-      fireEvent.click(submitButton);
     });
 
-    expect(localStorageMock.removeItem).toHaveBeenCalledWith(
-      "sweetly-dipped-form-data"
+    // Wait for the submit button to be enabled
+    await waitFor(() => {
+      const submitButton = screen.getByText("Submit Order");
+      expect(submitButton).not.toBeDisabled();
+    });
+
+    // Click the submit button
+    const submitButton = screen.getByText("Submit Order");
+    fireEvent.click(submitButton);
+
+    // Wait for the async operations to complete
+    await waitFor(
+      () => {
+        expect(mockNavigate).toHaveBeenCalledWith("/thank-you");
+      },
+      { timeout: 5000 }
     );
-    expect(mockNavigate).toHaveBeenCalledWith("/");
 
     alertMock.mockRestore();
   });

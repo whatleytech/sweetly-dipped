@@ -52,16 +52,7 @@ export const ThankYouPage = () => {
     }
   };
 
-  // Show loading state
-  if (isLoadingFormId || isLoading || !formData || !orderNumber) {
-    return (
-      <div className={styles.container}>
-        <div className={styles.loading}>Loading your order confirmation...</div>
-      </div>
-    );
-  }
-
-  // Show error state
+  // Show error state first
   if (error) {
     return (
       <div className={styles.container}>
@@ -69,6 +60,15 @@ export const ThankYouPage = () => {
           <p>Error loading order confirmation: {error.message}</p>
           <button onClick={() => navigate("/")}>Return to Home</button>
         </div>
+      </div>
+    );
+  }
+
+  // Show loading state
+  if (isLoadingFormId || isLoading || !formData || !orderNumber) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.loading}>Loading your order confirmation...</div>
       </div>
     );
   }
