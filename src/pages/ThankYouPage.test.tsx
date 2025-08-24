@@ -243,4 +243,37 @@ describe("ThankYouPage", () => {
     // Should not show loading for more than a brief moment
     expect(screen.queryByText("Loading...")).not.toBeInTheDocument();
   });
+
+  it("generates order number only once to prevent double incrementing", () => {
+    localStorageMock.getItem
+      .mockReturnValueOnce(JSON.stringify({ formData: mockFormData })) // Form data
+      .mockReturnValueOnce("0"); // Order count for 2025-01-15
+
+    // Render the component
+    const { unmount } = render(
+      <BrowserRouter>
+        <ThankYouPage />
+      </BrowserRouter>
+    );
+
+    // Verify the order number was generated
+    expect(screen.getByText(/Order #: 2025-01-15-001/)).toBeInTheDocument();
+    
+    // Unmount and remount to simulate React StrictMode double rendering
+    unmount();
+    
+    // Mock the same data for the second render
+    localStorageMock.getItem
+      .mockReturnValueOnce(JSON.stringify({ formData: mockFormData })) // Form data
+      .mockReturnValueOnce("0"); // Order count should still be 0, not 1
+    
+    render(
+      <BrowserRouter>
+        <ThankYouPage />
+      </BrowserRouter>
+    );
+
+    // Should still show 001, not 002, because the ref prevents double generation
+    expect(screen.getByText(/Order #: 2025-01-15-001/)).toBeInTheDocument();
+  });
 });
