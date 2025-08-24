@@ -24,6 +24,7 @@ The application has been migrated from localStorage to a backend API for form da
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/health` | Health check endpoint |
+| POST | `/order/number` | Generate a new order number |
 | POST | `/form-data` | Create new form data |
 | GET | `/form-data/:id` | Get form data by ID |
 | PUT | `/form-data/:id` | Update form data |

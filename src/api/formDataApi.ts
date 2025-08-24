@@ -148,10 +148,10 @@ export const formDataApi = {
 
   // Generate order number
   async generateOrderNumber(): Promise<{ orderNumber: string }> {
-    const response = await fetch(`${API_BASE_URL}/order-number`, {
-      method: 'POST',
+    const response = await fetch(`${API_BASE_URL}/order/number`, {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     });
     return handleResponse<{ orderNumber: string }>(response);

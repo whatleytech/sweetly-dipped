@@ -208,11 +208,11 @@ describe('formDataApi', () => {
       const result = await formDataApi.generateOrderNumber();
 
       expect(mockFetch).toHaveBeenCalledWith(
-        'http://localhost:3001/api/order-number',
+        "http://localhost:3001/api/order/number",
         {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
         }
       );
