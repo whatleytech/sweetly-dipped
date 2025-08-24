@@ -1,50 +1,76 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./ThankYouPage.module.css";
-import type { FormData } from "../types/formTypes";
+
 import {
   generatePackageSummary,
   generateByDozenBreakdown,
   generatePickupSummary,
 } from "../utils/packageSummaryUtils";
-
-const STORAGE_KEY = "sweetly-dipped-form-data";
+import { useFormData } from "../hooks/useFormData";
 
 export const ThankYouPage = () => {
-  const [formData, setFormData] = useState<FormData | null>(null);
-  const [orderNumber, setOrderNumber] = useState<string>("");
   const navigate = useNavigate();
+  const {
+    formData,
+    orderNumber,
+    isLoading,
+    isLoadingFormId,
+    error,
+    clearFormData,
+  } = useFormData();
 
+  // Redirect to home if no data or order number exists
   useEffect(() => {
-    const savedData = localStorage.getItem(STORAGE_KEY);
-    if (savedData) {
-      try {
-        const parsedData = JSON.parse(savedData);
-        setFormData(parsedData.formData);
-        // Retrieve existing order number from localStorage
-        if (parsedData.orderNumber) {
-          setOrderNumber(parsedData.orderNumber);
-        } else {
-          // If no order number exists, redirect to home (shouldn't happen in normal flow)
-          console.error("No order number found in localStorage");
-          navigate("/");
-        }
-      } catch (error) {
-        console.error("Error loading form data:", error);
-        navigate("/");
-      }
-    } else {
+    console.log("ThankYouPage useEffect:", {
+      formData,
+      orderNumber,
+      isLoading,
+      isLoadingFormId,
+      error,
+    });
+    // Only redirect if we're not loading formId AND not loading data AND we have no form data or order number AND no error
+    if (
+      !isLoadingFormId &&
+      !isLoading &&
+      (!formData || !orderNumber) &&
+      !error
+    ) {
+      console.error("No form data or order number found");
       navigate("/");
     }
-  }, [navigate]);
+  }, [formData, orderNumber, isLoading, isLoadingFormId, error, navigate]);
 
-  const handleReturnHome = () => {
-    localStorage.removeItem(STORAGE_KEY);
-    navigate("/");
+  const handleReturnHome = async () => {
+    try {
+      await clearFormData();
+      navigate("/");
+    } catch (error) {
+      console.error("Error clearing form data:", error);
+      // Navigate anyway
+      navigate("/");
+    }
   };
 
-  if (!formData) {
-    return <div className={styles.loading}>Loading...</div>;
+  // Show loading state
+  if (isLoadingFormId || isLoading || !formData || !orderNumber) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.loading}>Loading your order confirmation...</div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.error}>
+          <p>Error loading order confirmation: {error.message}</p>
+          <button onClick={() => navigate("/")}>Return to Home</button>
+        </div>
+      </div>
+    );
   }
 
   const packageSummary = generatePackageSummary(formData);

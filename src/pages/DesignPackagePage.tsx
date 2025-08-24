@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./DesignPackagePage.module.css";
 import type { FormData } from "../types/formTypes";
@@ -11,6 +11,7 @@ import { ColorScheme } from "../components/FormSteps/ColorScheme.tsx";
 import { EventDetails } from "../components/FormSteps/EventDetails.tsx";
 import { AdditionalDesigns } from "../components/FormSteps/AdditionalDesigns.tsx";
 import { PickupDetails } from "../components/FormSteps/PickupDetails.tsx";
+import { useFormData } from "../hooks/useFormData";
 
 const FORM_STEPS = [
   { id: "lead", title: "Contact Information", component: LeadQuestions },
@@ -27,81 +28,87 @@ const FORM_STEPS = [
   { id: "pickup", title: "Pickup Details", component: PickupDetails },
 ] as const;
 
-const STORAGE_KEY = "sweetly-dipped-form-data";
-
 export const DesignPackagePage = () => {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [formData, setFormData] = useState<FormData>({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    communicationMethod: "",
-    packageType: "",
-    riceKrispies: 0,
-    oreos: 0,
-    pretzels: 0,
-    marshmallows: 0,
-    colorScheme: "",
-    eventType: "",
-    theme: "",
-    additionalDesigns: "",
-    pickupDate: "",
-    pickupTime: "",
-    rushOrder: false,
-    referralSource: "",
-    termsAccepted: false,
-    visitedSteps: new Set(["lead"]), // Start with the first step visited
-  });
-
   const navigate = useNavigate();
+  const {
+    formData,
+    currentStep,
+    isLoading,
+    error,
+    isInitializing,
+    isLoadingFormId,
+    initializeForm,
+    updateFormData,
+    updateCurrentStep,
+  } = useFormData();
 
-  // Load form data from localStorage on component mount
+  // Initialize form if no data exists
   useEffect(() => {
-    const savedData = localStorage.getItem(STORAGE_KEY);
-    if (savedData) {
-      try {
-        const parsedData = JSON.parse(savedData);
-        // Convert visitedSteps back to Set if it exists
-        if (
-          parsedData.formData.visitedSteps &&
-          Array.isArray(parsedData.formData.visitedSteps)
-        ) {
-          parsedData.formData.visitedSteps = new Set(
-            parsedData.formData.visitedSteps
-          );
-        } else {
-          parsedData.formData.visitedSteps = new Set(["lead"]);
-        }
-        setFormData(parsedData.formData);
-        setCurrentStep(parsedData.currentStep);
-      } catch (error) {
-        console.error("Error loading form data:", error);
-      }
+    if (!formData && !isLoading && !isInitializing && !isLoadingFormId) {
+      const initialFormData: FormData = {
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+        communicationMethod: "",
+        packageType: "",
+        riceKrispies: 0,
+        oreos: 0,
+        pretzels: 0,
+        marshmallows: 0,
+        colorScheme: "",
+        eventType: "",
+        theme: "",
+        additionalDesigns: "",
+        pickupDate: "",
+        pickupTime: "",
+        rushOrder: false,
+        referralSource: "",
+        termsAccepted: false,
+        visitedSteps: new Set(["lead"]),
+      };
+      initializeForm(initialFormData, 0);
     }
-  }, []);
+  }, [formData, isLoading, isInitializing, isLoadingFormId, initializeForm]);
 
-  // Save form data to localStorage whenever it changes
-  useEffect(() => {
-    const dataToSave = {
-      formData: {
-        ...formData,
-        visitedSteps: Array.from(formData.visitedSteps), // Convert Set to Array for JSON serialization
-      },
-      currentStep,
-    };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
-  }, [formData, currentStep]);
+  // Show loading state
+  if (isLoading || isLoadingFormId || (!formData && !isInitializing)) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.loading}>
+          <p>Loading your form data...</p>
+        </div>
+      </div>
+    );
+  }
 
-  const updateFormData = (updates: Partial<FormData>) => {
-    setFormData((prev) => ({ ...prev, ...updates }));
-  };
+  // Show error state
+  if (error) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.error}>
+          <p>Error loading form data: {error.message}</p>
+          <button onClick={() => window.location.reload()}>Retry</button>
+        </div>
+      </div>
+    );
+  }
+
+  // Ensure formData exists before proceeding
+  if (!formData) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.loading}>
+          <p>Initializing form...</p>
+        </div>
+      </div>
+    );
+  }
 
   const markStepAsVisited = (stepId: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      visitedSteps: new Set([...prev.visitedSteps, stepId]),
-    }));
+    updateFormData({
+      visitedSteps: new Set([...formData.visitedSteps, stepId]),
+    });
   };
 
   const getStepIndexById = (id: (typeof FORM_STEPS)[number]["id"]) =>
@@ -134,19 +141,19 @@ export const DesignPackagePage = () => {
     // Skip logic: if package selected is not by-dozen, skip the by-dozen step
     if (currentId === "package" && formData.packageType !== "by-dozen") {
       const nextStepIndex = getStepIndexById("color");
-      setCurrentStep(nextStepIndex);
+      updateCurrentStep(nextStepIndex);
       markStepAsVisited("color"); // Mark the next step as visited
       return;
     }
 
     if (currentId === "by-dozen" && formData.packageType !== "by-dozen") {
-      setCurrentStep(Math.min(currentStep + 1, FORM_STEPS.length - 1));
+      updateCurrentStep(Math.min(currentStep + 1, FORM_STEPS.length - 1));
       return;
     }
 
     if (currentStep < FORM_STEPS.length - 1) {
       const nextStepIndex = currentStep + 1;
-      setCurrentStep(nextStepIndex);
+      updateCurrentStep(nextStepIndex);
       markStepAsVisited(FORM_STEPS[nextStepIndex].id);
     }
   };
@@ -157,24 +164,25 @@ export const DesignPackagePage = () => {
     if (currentId === "color") {
       // If not by-dozen, go back to package; otherwise back to by-dozen
       if (formData.packageType !== "by-dozen") {
-        setCurrentStep(getStepIndexById("package"));
+        updateCurrentStep(getStepIndexById("package"));
         return;
       }
-      setCurrentStep(getStepIndexById("by-dozen"));
+      updateCurrentStep(getStepIndexById("by-dozen"));
       return;
     }
 
     if (currentId === "by-dozen" && formData.packageType !== "by-dozen") {
-      setCurrentStep(getStepIndexById("package"));
+      updateCurrentStep(getStepIndexById("package"));
       return;
     }
 
     if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
+      updateCurrentStep(currentStep - 1);
     }
   };
 
   const handleSubmit = () => {
+    console.log("Submit button clicked - navigating to confirmation page");
     // Navigate to confirmation page
     navigate("/confirmation");
   };
@@ -225,7 +233,7 @@ export const DesignPackagePage = () => {
             formData={formData}
             formSteps={visibleSteps.map((s) => ({ id: s.id, title: s.title }))}
             currentVisibleIndex={currentVisibleIndex}
-            setCurrentStep={setCurrentStep}
+            setCurrentStep={updateCurrentStep}
           />
         </div>
       </div>
@@ -233,7 +241,7 @@ export const DesignPackagePage = () => {
       <button
         style={{ color: "black", borderColor: "black" }}
         onClick={() => {
-          setFormData({
+          updateFormData({
             firstName: "Test",
             lastName: "Test",
             email: "test@test.com",
@@ -264,7 +272,7 @@ export const DesignPackagePage = () => {
               "pickup",
             ]),
           });
-          setCurrentStep(7);
+          updateCurrentStep(7);
         }}
       >
         Fill in form
