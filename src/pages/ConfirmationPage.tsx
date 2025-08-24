@@ -69,11 +69,8 @@ export const ConfirmationPage = () => {
     // TODO: Submit form data to backend
     console.log("Final form submitted:", formData);
 
-    // Clear localStorage after successful submission
-    localStorage.removeItem(STORAGE_KEY);
-
-    // Navigate to success page or back to home
-    navigate("/");
+    // Navigate to thank you page
+    navigate("/thank-you");
   };
 
   if (!formData) {

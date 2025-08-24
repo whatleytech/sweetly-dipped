@@ -5,6 +5,7 @@ import './index.css'
 import { LandingPage } from "./pages/LandingPage";
 import { DesignPackagePage } from "./pages/DesignPackagePage";
 import { ConfirmationPage } from "./pages/ConfirmationPage";
+import { ThankYouPage } from "./pages/ThankYouPage";
 import { Layout } from "./components/Layout/Layout";
 
 createRoot(document.getElementById("root")!).render(
@@ -19,6 +20,7 @@ createRoot(document.getElementById("root")!).render(
           />
           <Route path="/design-package" element={<DesignPackagePage />} />
           <Route path="/confirmation" element={<ConfirmationPage />} />
+          <Route path="/thank-you" element={<ThankYouPage />} />
         </Routes>
       </Layout>
     </BrowserRouter>
