@@ -1,8 +1,7 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./ThankYouPage.module.css";
 import type { FormData } from "../types/formTypes";
-import { generateOrderNumber } from "../utils/orderUtils";
 import {
   generatePackageSummary,
   generateByDozenBreakdown,
@@ -14,7 +13,6 @@ const STORAGE_KEY = "sweetly-dipped-form-data";
 export const ThankYouPage = () => {
   const [formData, setFormData] = useState<FormData | null>(null);
   const [orderNumber, setOrderNumber] = useState<string>("");
-  const orderNumberGenerated = useRef(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,10 +21,13 @@ export const ThankYouPage = () => {
       try {
         const parsedData = JSON.parse(savedData);
         setFormData(parsedData.formData);
-        // Generate order number only once to avoid double incrementing
-        if (!orderNumberGenerated.current) {
-          setOrderNumber(generateOrderNumber());
-          orderNumberGenerated.current = true;
+        // Retrieve existing order number from localStorage
+        if (parsedData.orderNumber) {
+          setOrderNumber(parsedData.orderNumber);
+        } else {
+          // If no order number exists, redirect to home (shouldn't happen in normal flow)
+          console.error("No order number found in localStorage");
+          navigate("/");
         }
       } catch (error) {
         console.error("Error loading form data:", error);

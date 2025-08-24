@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./ConfirmationPage.module.css";
 import type { FormData } from "../types/formTypes";
+import { generateOrderNumber } from "../utils/orderUtils";
 import { PackageDetails } from "../components/PackageDetails/PackageDetails";
 import { ContactInformation } from "../components/ContactInformation/ContactInformation";
 import { DesignDetails } from "../components/DesignDetails/DesignDetails";
@@ -64,6 +65,27 @@ export const ConfirmationPage = () => {
     if (!formData?.termsAccepted) {
       alert("Please accept the terms and conditions to continue.");
       return;
+    }
+
+    // Generate order number and store it with the form data
+    const orderNumber = generateOrderNumber();
+
+    // Update localStorage with the order number
+    const savedData = localStorage.getItem(STORAGE_KEY);
+    if (savedData) {
+      try {
+        const parsedData = JSON.parse(savedData);
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify({
+            ...parsedData,
+            formData: formData,
+            orderNumber: orderNumber,
+          })
+        );
+      } catch (error) {
+        console.error("Error updating localStorage with order number:", error);
+      }
     }
 
     // TODO: Submit form data to backend

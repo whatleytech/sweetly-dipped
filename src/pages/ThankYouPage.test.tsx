@@ -60,9 +60,12 @@ describe("ThankYouPage", () => {
   });
 
   it("renders thank you message and order number", () => {
-    localStorageMock.getItem
-      .mockReturnValueOnce(JSON.stringify({ formData: mockFormData })) // Form data
-      .mockReturnValueOnce("0"); // Order count for 2025-01-15
+    localStorageMock.getItem.mockReturnValueOnce(
+      JSON.stringify({
+        formData: mockFormData,
+        orderNumber: "2025-01-15-001",
+      })
+    ); // Form data with order number
 
     render(
       <BrowserRouter>
@@ -75,9 +78,12 @@ describe("ThankYouPage", () => {
   });
 
   it("displays package summary correctly", () => {
-    localStorageMock.getItem
-      .mockReturnValueOnce(JSON.stringify({ formData: mockFormData })) // Form data
-      .mockReturnValueOnce("0"); // Order count for 2025-01-15
+    localStorageMock.getItem.mockReturnValueOnce(
+      JSON.stringify({
+        formData: mockFormData,
+        orderNumber: "2025-01-15-001",
+      })
+    ); // Form data with order number
 
     render(
       <BrowserRouter>
@@ -85,41 +91,59 @@ describe("ThankYouPage", () => {
       </BrowserRouter>
     );
 
-    expect(screen.getByText("Medium (5 dozen – 60 treats)")).toBeInTheDocument();
-    expect(screen.getByText("Pickup: January 15, 2025 at 8:30 AM")).toBeInTheDocument();
+    expect(
+      screen.getByText("Medium (5 dozen – 60 treats)")
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Pickup: January 15, 2025 at 8:30 AM")
+    ).toBeInTheDocument();
   });
 
     it("displays by-the-dozen summary correctly", () => {
-    const byDozenData = {
-      ...mockFormData,
-      packageType: "by-dozen" as const,
-      riceKrispies: 3,
-      oreos: 2,
-      pretzels: 1,
-      marshmallows: 1,
-    };
+      const byDozenData = {
+        ...mockFormData,
+        packageType: "by-dozen" as const,
+        riceKrispies: 3,
+        oreos: 2,
+        pretzels: 1,
+        marshmallows: 1,
+      };
 
-    localStorageMock.getItem
-      .mockReturnValueOnce(JSON.stringify({ formData: byDozenData })) // Form data
-      .mockReturnValueOnce("0"); // Order count for 2025-01-15
+      localStorageMock.getItem.mockReturnValueOnce(
+        JSON.stringify({
+          formData: byDozenData,
+          orderNumber: "2025-01-15-001",
+        })
+      ); // Form data with order number
 
-    render(
-      <BrowserRouter>
-        <ThankYouPage />
-      </BrowserRouter>
-    );
+      render(
+        <BrowserRouter>
+          <ThankYouPage />
+        </BrowserRouter>
+      );
 
-    expect(screen.getByText("Custom Order (7 dozen)")).toBeInTheDocument();
-    expect(screen.getByText("3 dozen Chocolate covered Rice Krispies")).toBeInTheDocument();
-    expect(screen.getByText("2 dozen Chocolate covered Oreos")).toBeInTheDocument();
-    expect(screen.getByText("1 dozen Chocolate dipped pretzels")).toBeInTheDocument();
-    expect(screen.getByText("1 dozen Chocolate covered marshmallow pops")).toBeInTheDocument();
-  });
+      expect(screen.getByText("Custom Order (7 dozen)")).toBeInTheDocument();
+      expect(
+        screen.getByText("3 dozen Chocolate covered Rice Krispies")
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText("2 dozen Chocolate covered Oreos")
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText("1 dozen Chocolate dipped pretzels")
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText("1 dozen Chocolate covered marshmallow pops")
+      ).toBeInTheDocument();
+    });
 
   it("displays Instagram message", () => {
-    localStorageMock.getItem
-      .mockReturnValueOnce(JSON.stringify({ formData: mockFormData })) // Form data
-      .mockReturnValueOnce("0"); // Order count for 2025-01-15
+    localStorageMock.getItem.mockReturnValueOnce(
+      JSON.stringify({
+        formData: mockFormData,
+        orderNumber: "2025-01-15-001",
+      })
+    ); // Form data with order number
 
     render(
       <BrowserRouter>
@@ -134,9 +158,12 @@ describe("ThankYouPage", () => {
   });
 
   it("navigates to home and clears localStorage when return button is clicked", async () => {
-    localStorageMock.getItem
-      .mockReturnValueOnce(JSON.stringify({ formData: mockFormData })) // Form data
-      .mockReturnValueOnce("0"); // Order count for 2025-01-15
+    localStorageMock.getItem.mockReturnValueOnce(
+      JSON.stringify({
+        formData: mockFormData,
+        orderNumber: "2025-01-15-001",
+      })
+    ); // Form data with order number
 
     render(
       <BrowserRouter>
@@ -144,15 +171,19 @@ describe("ThankYouPage", () => {
       </BrowserRouter>
     );
 
-    const returnButton = screen.getByRole("button", { name: /return to home/i });
+    const returnButton = screen.getByRole("button", {
+      name: /return to home/i,
+    });
     fireEvent.click(returnButton);
 
     // Use real timers for this async test
     vi.useRealTimers();
-    
+
     await waitFor(() => {
       expect(mockNavigate).toHaveBeenCalledWith("/");
-      expect(localStorageMock.removeItem).toHaveBeenCalledWith("sweetly-dipped-form-data");
+      expect(localStorageMock.removeItem).toHaveBeenCalledWith(
+        "sweetly-dipped-form-data"
+      );
     });
   });
 
@@ -180,11 +211,14 @@ describe("ThankYouPage", () => {
     expect(mockNavigate).toHaveBeenCalledWith("/");
   });
 
-  it("generates sequential order numbers for same date", () => {
+  it("displays different order numbers for different orders", () => {
     // First order
-    localStorageMock.getItem
-      .mockReturnValueOnce(JSON.stringify({ formData: mockFormData })) // Form data
-      .mockReturnValueOnce("0"); // Order count for 2025-01-15
+    localStorageMock.getItem.mockReturnValueOnce(
+      JSON.stringify({
+        formData: mockFormData,
+        orderNumber: "2025-01-15-001",
+      })
+    ); // Form data with order number
 
     const { unmount } = render(
       <BrowserRouter>
@@ -195,10 +229,13 @@ describe("ThankYouPage", () => {
     expect(screen.getByText(/Order #: 2025-01-15-001/)).toBeInTheDocument();
     unmount();
 
-    // Second order (same date, different time)
-    localStorageMock.getItem
-      .mockReturnValueOnce(JSON.stringify({ formData: mockFormData })) // Form data
-      .mockReturnValueOnce("1"); // Order count for 2025-01-15
+    // Second order (same date, different order number)
+    localStorageMock.getItem.mockReturnValueOnce(
+      JSON.stringify({
+        formData: mockFormData,
+        orderNumber: "2025-01-15-002",
+      })
+    ); // Form data with different order number
 
     render(
       <BrowserRouter>
@@ -215,9 +252,12 @@ describe("ThankYouPage", () => {
       rushOrder: true,
     };
 
-    localStorageMock.getItem
-      .mockReturnValueOnce(JSON.stringify({ formData: rushOrderData })) // Form data
-      .mockReturnValueOnce("0"); // Order count for 2025-01-15
+    localStorageMock.getItem.mockReturnValueOnce(
+      JSON.stringify({
+        formData: rushOrderData,
+        orderNumber: "2025-01-15-001",
+      })
+    ); // Form data with order number
 
     render(
       <BrowserRouter>
@@ -225,14 +265,21 @@ describe("ThankYouPage", () => {
       </BrowserRouter>
     );
 
-    expect(screen.getByText("Medium (5 dozen – 60 treats)")).toBeInTheDocument();
-    expect(screen.getByText("Pickup: January 15, 2025 at 8:30 AM")).toBeInTheDocument();
+    expect(
+      screen.getByText("Medium (5 dozen – 60 treats)")
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Pickup: January 15, 2025 at 8:30 AM")
+    ).toBeInTheDocument();
   });
 
   it("displays loading state initially", () => {
-    localStorageMock.getItem
-      .mockReturnValueOnce(JSON.stringify({ formData: mockFormData })) // Form data
-      .mockReturnValueOnce("0"); // Order count for 2025-01-15
+    localStorageMock.getItem.mockReturnValueOnce(
+      JSON.stringify({
+        formData: mockFormData,
+        orderNumber: "2025-01-15-001",
+      })
+    ); // Form data with order number
 
     render(
       <BrowserRouter>
@@ -244,36 +291,21 @@ describe("ThankYouPage", () => {
     expect(screen.queryByText("Loading...")).not.toBeInTheDocument();
   });
 
-  it("generates order number only once to prevent double incrementing", () => {
-    localStorageMock.getItem
-      .mockReturnValueOnce(JSON.stringify({ formData: mockFormData })) // Form data
-      .mockReturnValueOnce("0"); // Order count for 2025-01-15
+  it("redirects to home if no order number exists", () => {
+    localStorageMock.getItem.mockReturnValueOnce(
+      JSON.stringify({
+        formData: mockFormData,
+        // No orderNumber - should redirect to home
+      })
+    ); // Form data without order number
 
-    // Render the component
-    const { unmount } = render(
-      <BrowserRouter>
-        <ThankYouPage />
-      </BrowserRouter>
-    );
-
-    // Verify the order number was generated
-    expect(screen.getByText(/Order #: 2025-01-15-001/)).toBeInTheDocument();
-    
-    // Unmount and remount to simulate React StrictMode double rendering
-    unmount();
-    
-    // Mock the same data for the second render
-    localStorageMock.getItem
-      .mockReturnValueOnce(JSON.stringify({ formData: mockFormData })) // Form data
-      .mockReturnValueOnce("0"); // Order count should still be 0, not 1
-    
     render(
       <BrowserRouter>
         <ThankYouPage />
       </BrowserRouter>
     );
 
-    // Should still show 001, not 002, because the ref prevents double generation
-    expect(screen.getByText(/Order #: 2025-01-15-001/)).toBeInTheDocument();
+    // Should redirect to home if no order number exists
+    expect(mockNavigate).toHaveBeenCalledWith("/");
   });
 });
