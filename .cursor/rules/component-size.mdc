@@ -4,33 +4,34 @@ globs: ["src/**/*.{tsx,ts,jsx,js}"]
 alwaysApply: false
 ---
 
+## Component Size Guidelines
+
 - A React component should:
-  • Have ≤ 250 LOC (including types and styles).  
+  • Have ≤ 250 LOC (including types, styles, imports, and JSX).  
   • Receive **typed props** and export those props for reuse (`export type { FooProps }`).  
   • Contain no more than one `useEffect` (split into custom hooks when logic grows).  
   • Extract reusable logic into `src/hooks/` and pure helpers into `src/utils/`.
-  • **Component Modularization**: Break complex components into smaller, focused sub-components with single responsibilities
-  • **CSS Organization**: Create component-specific CSS modules instead of large shared stylesheets
+  • Break complex components into smaller, focused sub-components with single responsibilities
+  • Create component-specific CSS modules instead of large shared stylesheets
+
+## Function Guidelines
 
 - A function should do ONE thing; if it's > 40 LOC or has nested conditionals, break it up.
 
-- **Utility Extraction Patterns**:
+## Architecture Patterns
+
+- **Utility Extraction**:
   • Move business logic from components into reusable utility functions in `src/utils/`
   • Create focused utility files (e.g., `formStepUtils.ts`, `formSummaryUtils.ts`)
   • Ensure utilities are pure functions with comprehensive test coverage
 
-- **Component Architecture Guidelines**:
+- **Component Architecture**:
   • Prefer composition over prop drilling; use context sparingly and only for cross-cutting concerns (theme, auth, cart)
   • Split large components into logical sub-components (e.g., `StepItem`, `ProgressSection`)
   • Each component should have its own CSS module for better organization
   • Extract complex conditional logic into utility functions
 
-- **CSS Modularization**:
+- **CSS Organization**:
   • Create component-specific CSS modules (e.g., `ComponentName.module.css`)
   • Avoid large shared stylesheets that mix concerns
   • Keep CSS co-located with components for better maintainability
-  • Receive **typed props** and export those props for reuse (`export type { FooProps }`).  
-  • Contain no more than one `useEffect` (split into custom hooks when logic grows).  
-  • Extract reusable logic into `src/hooks/` and pure helpers into `src/utils/`.
-- A function should do ONE thing; if it’s > 40 LOC or has nested conditionals, break it up.
-- Prefer composition over prop drilling; use context sparingly and only for cross-cutting concerns (theme, auth, cart).
