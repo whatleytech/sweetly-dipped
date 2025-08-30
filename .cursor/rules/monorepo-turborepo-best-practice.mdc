@@ -1,0 +1,58 @@
+---
+# This rule is **Manual**—invoke it in chat or Cmd-K with
+#   @monorepo-turborepo-best-practice
+# whenever you’re adding or revising code in the monorepo.
+description: >
+  Manual rule that enforces monorepo & Turborepo best practices for this
+  project.  Follows guidance from https://monorepo.tools/ and
+  https://turborepo.com/docs.
+# Manual = only applied when explicitly referenced
+alwaysApply: false
+# No auto-attach globs; let the developer trigger it when needed.
+globs: []
+---
+
+## Monorepo / Turborepo Best-Practice Checklist
+
+When adding, moving, or editing code **always**:
+
+1. Consult  
+   • https://monorepo.tools/ for overarching monorepo patterns, dependency management, and code-sharing strategies.  
+   • https://turborepo.com/docs for pipeline design, remote caching, and affected-graph tasks.
+
+2. Create small, focused packages under `/packages`; **never** add “misc” or bulk folders.
+
+3. Register every package in:  
+   • `package.json` → `workspaces` (Yarn 4)  
+   • `turbo.json` pipelines (`dev`, `build`, `lint`, `test`, `type-check`, `format`).
+
+4. Reuse shared tooling:  
+   • `packages/config-ts` (tsconfig.base, path aliases)  
+   • `packages/config-eslint` (ESLint + Prettier).  
+   Do **not** duplicate config.
+
+5. Prefer absolute imports via path aliases (`@web/*`, `@api/*`, etc.) over
+   relative `../../` chains.
+
+6. Enforce strict TypeScript (`tsc --noEmit`) and add:  
+   • Unit tests (Vitest/Jest) colocated in `__tests__` or `*.test.ts[x]`.  
+   • Integration/e2e tests when a public interface or route is added.
+
+7. Use Turborepo for all tasks—**never** fall back to raw `concurrently`,
+   `npm-run-all`, or bash pipes.  
+   Scripts must be OS-agnostic (use `cross-env` where needed).
+
+8. Update docs: README or `migration-notes.md` must explain new packages,
+   scripts, and any breaking structural changes.
+
+9. Do **not** alter existing production logic unless explicitly requested;
+   structural and tooling improvements only.
+
+10. Verify that from repo root the following all succeed before finishing:  
+    `yarn install` · `yarn dev` · `yarn build` · `yarn lint` ·
+    `yarn test` · `yarn type-check`
+
+Reference files included for context:
+
+@packages/config-ts/tsconfig.base.json  
+@packages/config-eslint/index.js
