@@ -1,0 +1,97 @@
+---
+# ────────────  METADATA  ────────────
+name: Review existing Cursor rules
+description: >
+  When invoked, the agent must audit every project-scoped rule
+  (.cursor/rules/**) and all active User Rules.  
+  It should produce an organised report that:
+    1. Lists any rules that overlap or can be consolidated.
+    2. Points out vague language or missing details that reduce rule efficacy.
+    3. Flags rules that appear obsolete, redundant, or low-value.
+    4. Recommends brand-new rules that would improve pairing with the agent
+       (e.g. testing strategy, TypeScript conventions, monorepo structure,
+       shared ESLint config, etc.).
+globs: []           # leave empty; this is a manual utility rule
+alwaysApply: false  # run only when explicitly mentioned
+type: Manual
+---
+
+# HOW TO USE
+
+Type `@review existing rules` or open the rule via the context
+picker.  
+The agent must then perform the following **six steps**:
+
+1. **Inventory**  
+   • Gather every rule in `.cursor/rules/**` and all active User Rules.  
+   • For each rule capture: file name, rule type, description (or first line).
+
+2. **Consolidation analysis**  
+   • Detect duplicated guidance or rules that share >50 % topical overlap.  
+   • Propose merges, naming which files to combine and suggesting a single
+     concise replacement title.
+
+3. **Clarity & precision check**  
+   • Mark any rule that is:
+     – >500 lines or trying to cover multiple domains.  
+     – Lacking concrete examples / “DO / DON’T” lists.  
+   • Suggest specific edits (add example, split, re-phrase, etc.).
+
+4. **De-duplication / removal**  
+   • Identify rules that:
+     – Are fully superseded by newer ones.  
+     – Merely restate generic best-practices already enforced by tooling
+       (e.g. ESLint).  
+   • Output a short justification and “❌ REMOVE” recommendation.
+
+5. **Gap analysis & new-rule ideas**  
+   • Considering the tech stack (TypeScript, Vite, React, Express,
+     monorepo, ESLint, test pyramid), list high-impact rules that do **not**
+     exist yet, with a one-sentence benefit description each.
+
+6. **Create suggestion files**  
+   • Generate datetime using `date '+%Y%m%d%H%M'` command.  
+   • Create directory structure: `suggestions/rules/<datetime>/`  
+   • For each immediate action item, create a detailed suggestion file with:
+     – Complete problem context and current state analysis  
+     – Specific implementation steps with file paths and commands  
+     – Expected outcomes and validation criteria  
+     – Priority level and effort estimate  
+     – **Branch checkout instruction** as first step: `git checkout -b rules/<file-name-without-extension>`  
+   • Create a `README.md` index file with overview and implementation order  
+   • Ensure each suggestion file has sufficient context for independent implementation
+
+# OUTPUT FORMAT
+
+```
+## Cursor Rule Audit — <timestamp>
+
+### 1. Rules to Consolidate
+- RuleA.mdc + RuleB.mdc → **Proposed-Combined-Name.mdc**  
+  Rationale…
+
+### 2. Rules Needing Clarity
+| File | Issue | Suggested fix |
+| ---- | ----- | ------------- |
+| X.mdc | Vague wording | Replace… |
+
+### 3. Rules to Remove
+- ❌ **legacy-coding-style.mdc** — superseded by ESLint config
+
+### 4. Suggested New Rules
+1. **frontend-testing-strategy.mdc** — codifies RTL + Vitest pyramid
+2. **monorepo-workspace-structure.mdc** — paths, package boundaries …
+
+### 5. Suggestion Files Created
+- `suggestions/rules/<datetime>/` directory with individual action files
+- Each file contains complete context for independent implementation
+- README.md with overview and implementation order
+```
+
+# GUIDELINES
+
+- Keep the whole report under 300 lines.  
+- Do **not** rewrite rules in full; provide actionable summaries.  
+- Reference rule file names exactly so they are clickable in the UI.  
+- Prefer bullet points; avoid prose padding.  
+- Use respectful, constructive language.
