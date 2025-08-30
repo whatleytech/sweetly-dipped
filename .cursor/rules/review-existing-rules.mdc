@@ -61,6 +61,15 @@ The agent must then perform the following **six steps**:
    • Create a `README.md` index file with overview and implementation order  
    • Ensure each suggestion file has sufficient context for independent implementation
 
+7. **Mark suggestions as completed**  
+   • After implementing any suggestion, update the suggestion file with:
+     – **Status:** ✅ COMPLETED at the top of the file
+     – **Solution Implemented** section with details of what was done
+     – **Benefits Achieved** section with validation results
+     – Checkboxes (✅) for completed implementation steps
+   • Update the README.md to reflect completion status
+   • Commit the changes with appropriate commit message
+
 # OUTPUT FORMAT
 
 ```
@@ -86,6 +95,11 @@ The agent must then perform the following **six steps**:
 - `suggestions/rules/<datetime>/` directory with individual action files
 - Each file contains complete context for independent implementation
 - README.md with overview and implementation order
+
+### 6. Completion Tracking
+- Mark implemented suggestions with ✅ COMPLETED status
+- Update files with implementation details and validation results
+- Commit changes with descriptive commit messages
 ```
 
 # GUIDELINES
