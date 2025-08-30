@@ -1,0 +1,15 @@
+{
+  "extends": "@sweetly-dipped/config-ts/node.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "target": "ES2023",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@/controllers/*": ["src/controllers/*"]
+    }
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist", "coverage"]
+}

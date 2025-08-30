@@ -1,0 +1,25 @@
+import type { FormData } from '@sweetly-dipped/shared-types';
+
+export const createMockFormData = (overrides: Partial<FormData> = {}): FormData => ({
+  firstName: '',
+  lastName: '',
+  email: '',
+  phone: '',
+  communicationMethod: '',
+  packageType: '',
+  riceKrispies: 0,
+  oreos: 0,
+  pretzels: 0,
+  marshmallows: 0,
+  colorScheme: '',
+  eventType: '',
+  theme: '',
+  additionalDesigns: '',
+  pickupDate: '',
+  pickupTime: '',
+  rushOrder: false,
+  referralSource: '',
+  termsAccepted: false,
+  visitedSteps: new Set(['lead']),
+  ...overrides,
+});
