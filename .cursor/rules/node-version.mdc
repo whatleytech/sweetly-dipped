@@ -1,9 +1,0 @@
----
-description: Enforce Node.js version from .nvmrc
-globs: ["**/*.{ts,tsx,js,jsx,mjs,cjs}"]
-alwaysApply: true
----
-
-- Before generating, running or testing code, read the **project-root `.nvmrc`** file and adopt that exact Node.js version (major and minor).
-- Warn the user if the requested feature uses syntax or APIs that are not available in that Node release; suggest a polyfill or alternate implementation instead.
-- If `.nvmrc` is missing, ask the user which Node version to target **before** writing code.
