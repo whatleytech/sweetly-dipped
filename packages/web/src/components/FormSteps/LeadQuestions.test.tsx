@@ -1,324 +1,373 @@
-import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi } from "vitest";
-import { LeadQuestions } from "./LeadQuestions";
-import type { FormData } from '@sweetly-dipped/shared-types';
+import React from 'react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { LeadQuestions } from './LeadQuestions';
+import type { FormData } from '@/types/formTypes';
 
+// Mock the shared components
+vi.mock('@/components/shared', () => ({
+  FormButtons: ({
+    onNext,
+    isValid,
+  }: {
+    onNext: () => void;
+    isValid: boolean;
+  }) => (
+    <button onClick={onNext} disabled={!isValid} data-testid="next-button">
+      Next
+    </button>
+  ),
+  FormStepContainer: ({
+    children,
+    title,
+    description,
+  }: {
+    children: React.ReactNode;
+    title: string;
+    description: string;
+  }) => (
+    <div data-testid="form-step-container">
+      <h2>{title}</h2>
+      <p>{description}</p>
+      {children}
+    </div>
+  ),
+}));
 
-const mockFormData: FormData = {
-  firstName: "",
-  lastName: "",
-  email: "",
-  phone: "",
-  communicationMethod: "",
-  packageType: "",
-  riceKrispies: 0,
-  oreos: 0,
-  pretzels: 0,
-  marshmallows: 0,
-  colorScheme: "",
-  eventType: "",
-  theme: "",
-  additionalDesigns: "",
-  pickupDate: "",
-  pickupTime: "",
-  rushOrder: false,
-  referralSource: "",
-  termsAccepted: false,
-};
+describe('LeadQuestions', () => {
+  const mockFormData: FormData = {
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    communicationMethod: '',
+    packageType: '',
+    riceKrispies: 0,
+    oreos: 0,
+    pretzels: 0,
+    marshmallows: 0,
+    colorScheme: '',
+    eventType: '',
+    theme: '',
+    additionalDesigns: '',
+    pickupDate: '',
+    pickupTime: '',
+    rushOrder: false,
+    referralSource: '',
+    termsAccepted: false,
+    visitedSteps: new Set(),
+  };
 
-describe("LeadQuestions", () => {
-  const mockUpdateFormData = vi.fn();
+  const mockUpdateFormData = vi.fn((updates) => {
+    Object.assign(mockFormData, updates);
+  });
   const mockOnNext = vi.fn();
+  const mockOnPrev = vi.fn();
+  const mockOnSubmit = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
+    // Reset form data to initial state
+    Object.assign(mockFormData, {
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      communicationMethod: '',
+      packageType: '',
+      riceKrispies: 0,
+      oreos: 0,
+      pretzels: 0,
+      marshmallows: 0,
+      colorScheme: '',
+      eventType: '',
+      theme: '',
+      additionalDesigns: '',
+      pickupDate: '',
+      pickupTime: '',
+      rushOrder: false,
+      referralSource: '',
+      termsAccepted: false,
+      visitedSteps: new Set(),
+    });
   });
 
-  it("renders the question title and description", () => {
-    render(
+  const renderComponent = () => {
+    return render(
       <LeadQuestions
         formData={mockFormData}
         updateFormData={mockUpdateFormData}
         onNext={mockOnNext}
-        onPrev={vi.fn()}
-        onSubmit={vi.fn()}
+        onPrev={mockOnPrev}
+        onSubmit={mockOnSubmit}
         isFirstStep={true}
         isLastStep={false}
       />
     );
+  };
 
-    expect(
-      screen.getByText("Let's start with your contact information")
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        "We'll use this information to confirm your order and keep you updated on your treats!"
-      )
-    ).toBeInTheDocument();
+  it('renders all form fields with proper labels', () => {
+    renderComponent();
+
+    expect(screen.getByLabelText(/first name/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/last name/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/email address/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/phone number/i)).toBeInTheDocument();
   });
 
-  it("renders all required form fields", () => {
-    render(
-      <LeadQuestions
-        formData={mockFormData}
-        updateFormData={mockUpdateFormData}
-        onNext={mockOnNext}
-        onPrev={vi.fn()}
-        onSubmit={vi.fn()}
-        isFirstStep={true}
-        isLastStep={false}
-      />
-    );
+  it('shows error messages for required fields when form is submitted with empty values', async () => {
+    const user = userEvent.setup();
+    renderComponent();
 
-    expect(screen.getByLabelText("First Name *")).toBeInTheDocument();
-    expect(screen.getByLabelText("Last Name *")).toBeInTheDocument();
-    expect(screen.getByLabelText("Email Address *")).toBeInTheDocument();
-    expect(screen.getByLabelText("Phone Number *")).toBeInTheDocument();
+    // The Next button should be disabled when form is invalid
+    const nextButton = screen.getByTestId('next-button');
+    expect(nextButton).toBeDisabled();
+
+    // Test validation by interacting with fields and then blurring
+    const firstNameInput = screen.getByLabelText(/first name/i);
+    const lastNameInput = screen.getByLabelText(/last name/i);
+    const emailInput = screen.getByLabelText(/email address/i);
+    const phoneInput = screen.getByLabelText(/phone number/i);
+
+    // Focus and blur each field to trigger validation
+    await user.click(firstNameInput);
+    await user.tab();
+    await user.click(lastNameInput);
+    await user.tab();
+    await user.click(emailInput);
+    await user.tab();
+    await user.click(phoneInput);
+    await user.tab();
+
+    await waitFor(() => {
+      expect(screen.getByText('First name is required')).toBeInTheDocument();
+      expect(screen.getByText('Last name is required')).toBeInTheDocument();
+      expect(screen.getByText('Email address is required')).toBeInTheDocument();
+      expect(screen.getByText('Phone number is required')).toBeInTheDocument();
+    });
   });
 
-  it("calls updateFormData when input fields change", () => {
-    render(
-      <LeadQuestions
-        formData={mockFormData}
-        updateFormData={mockUpdateFormData}
-        onNext={mockOnNext}
-        onPrev={vi.fn()}
-        onSubmit={vi.fn()}
-        isFirstStep={true}
-        isLastStep={false}
-      />
-    );
+  it('validates email format correctly', async () => {
+    const user = userEvent.setup();
+    renderComponent();
 
-    const firstNameInput = screen.getByLabelText("First Name *");
-    fireEvent.change(firstNameInput, { target: { value: "John" } });
+    const emailInput = screen.getByLabelText(/email address/i);
 
-    expect(mockUpdateFormData).toHaveBeenCalledWith({ firstName: "John" });
+    // Test invalid email
+    await user.type(emailInput, 'invalid-email');
+    await user.tab(); // Trigger blur event
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('Please enter a valid email address')
+      ).toBeInTheDocument();
+    });
+
+    // Test valid email
+    await user.clear(emailInput);
+    await user.type(emailInput, 'test@example.com');
+    await user.tab();
+
+    await waitFor(() => {
+      expect(
+        screen.queryByText('Please enter a valid email address')
+      ).not.toBeInTheDocument();
+    });
   });
 
-  it("disables continue button when form is invalid", () => {
-    render(
-      <LeadQuestions
-        formData={mockFormData}
-        updateFormData={mockUpdateFormData}
-        onNext={mockOnNext}
-        onPrev={vi.fn()}
-        onSubmit={vi.fn()}
-        isFirstStep={true}
-        isLastStep={false}
-      />
-    );
+  it('validates phone number format correctly', async () => {
+    const user = userEvent.setup();
+    renderComponent();
 
-    const continueButton = screen.getByRole("button", { name: /continue/i });
-    expect(continueButton).toBeDisabled();
+    const phoneInput = screen.getByLabelText(/phone number/i);
+
+    // Test invalid phone
+    await user.type(phoneInput, '123');
+    await user.tab();
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('Please enter a valid phone number (123-456-7890)')
+      ).toBeInTheDocument();
+    });
+
+    // Test valid phone
+    await user.clear(phoneInput);
+    await user.type(phoneInput, '1234567890');
+    await user.tab();
+
+    await waitFor(() => {
+      expect(
+        screen.queryByText('Please enter a valid phone number (123-456-7890)')
+      ).not.toBeInTheDocument();
+    });
   });
 
-  it("enables continue button when all fields are filled", () => {
-    const filledFormData = {
-      ...mockFormData,
-      firstName: "John",
-      lastName: "Doe",
-      email: "john@example.com",
-      phone: "123-456-7890",
-    };
+  it('validates name fields correctly', async () => {
+    const user = userEvent.setup();
+    renderComponent();
 
-    render(
-      <LeadQuestions
-        formData={filledFormData}
-        updateFormData={mockUpdateFormData}
-        onNext={mockOnNext}
-        onPrev={vi.fn()}
-        onSubmit={vi.fn()}
-        isFirstStep={true}
-        isLastStep={false}
-      />
-    );
+    const firstNameInput = screen.getByLabelText(/first name/i);
 
-    const continueButton = screen.getByRole("button", { name: /continue/i });
-    expect(continueButton).not.toBeDisabled();
+    // Test single character
+    await user.type(firstNameInput, 'A');
+    await user.tab();
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('First name must be at least 2 characters')
+      ).toBeInTheDocument();
+    });
+
+    // Test valid name
+    await user.clear(firstNameInput);
+    await user.type(firstNameInput, 'John');
+    await user.tab();
+
+    await waitFor(() => {
+      expect(
+        screen.queryByText('First name must be at least 2 characters')
+      ).not.toBeInTheDocument();
+    });
   });
 
-  it("keeps continue disabled for invalid email", () => {
-    const invalidEmailData = {
-      ...mockFormData,
-      firstName: "John",
-      lastName: "Doe",
-      email: "john@invalid", // missing TLD
-      phone: "123-456-7890",
-    };
+  it('formats phone number automatically', async () => {
+    const user = userEvent.setup();
+    renderComponent();
 
-    render(
-      <LeadQuestions
-        formData={invalidEmailData}
-        updateFormData={mockUpdateFormData}
-        onNext={mockOnNext}
-        onPrev={vi.fn()}
-        onSubmit={vi.fn()}
-        isFirstStep={true}
-        isLastStep={false}
-      />
-    );
+    const phoneInput = screen.getByLabelText(/phone number/i);
 
-    const continueButton = screen.getByRole("button", { name: /continue/i });
-    expect(continueButton).toBeDisabled();
+    await user.type(phoneInput, '1234567890');
+
+    // Check that the last call was with the formatted phone number
+    expect(mockUpdateFormData).toHaveBeenLastCalledWith({
+      phone: '123-456-7890',
+    });
   });
 
-  it("keeps continue disabled for invalid phone format", () => {
-    const invalidPhoneData = {
-      ...mockFormData,
-      firstName: "John",
-      lastName: "Doe",
-      email: "john@example.com",
-      phone: "1234567890", // missing dashes
-    };
+  it('enables next button only when all fields are valid', async () => {
+    const user = userEvent.setup();
+    renderComponent();
 
-    render(
-      <LeadQuestions
-        formData={invalidPhoneData}
-        updateFormData={mockUpdateFormData}
-        onNext={mockOnNext}
-        onPrev={vi.fn()}
-        onSubmit={vi.fn()}
-        isFirstStep={true}
-        isLastStep={false}
-      />
+    const nextButton = screen.getByTestId('next-button');
+    expect(nextButton).toBeDisabled();
+
+    // Fill in all fields with valid data
+    await user.type(screen.getByLabelText(/first name/i), 'John');
+    await user.type(screen.getByLabelText(/last name/i), 'Doe');
+    await user.type(
+      screen.getByLabelText(/email address/i),
+      'john@example.com'
     );
+    await user.type(screen.getByLabelText(/phone number/i), '1234567890');
 
-    const continueButton = screen.getByRole("button", { name: /continue/i });
-    expect(continueButton).toBeDisabled();
+    await waitFor(() => {
+      expect(nextButton).not.toBeDisabled();
+    });
   });
 
-  it("calls onNext when continue button is clicked with valid form", () => {
-    const filledFormData = {
-      ...mockFormData,
-      firstName: "John",
-      lastName: "Doe",
-      email: "john@example.com",
-      phone: "123-456-7890",
-    };
+  it('calls onNext when form is valid and next button is clicked', async () => {
+    const user = userEvent.setup();
+    renderComponent();
 
-    render(
-      <LeadQuestions
-        formData={filledFormData}
-        updateFormData={mockUpdateFormData}
-        onNext={mockOnNext}
-        onPrev={vi.fn()}
-        onSubmit={vi.fn()}
-        isFirstStep={true}
-        isLastStep={false}
-      />
+    // Fill in all fields with valid data
+    await user.type(screen.getByLabelText(/first name/i), 'John');
+    await user.type(screen.getByLabelText(/last name/i), 'Doe');
+    await user.type(
+      screen.getByLabelText(/email address/i),
+      'john@example.com'
     );
+    await user.type(screen.getByLabelText(/phone number/i), '1234567890');
 
-    const continueButton = screen.getByRole("button", { name: /continue/i });
-    fireEvent.click(continueButton);
+    const nextButton = screen.getByTestId('next-button');
+    await user.click(nextButton);
 
     expect(mockOnNext).toHaveBeenCalled();
   });
 
-  it("does not call onNext when continue button is clicked with invalid form", () => {
-    render(
-      <LeadQuestions
-        formData={mockFormData}
-        updateFormData={mockUpdateFormData}
-        onNext={mockOnNext}
-        onPrev={vi.fn()}
-        onSubmit={vi.fn()}
-        isFirstStep={true}
-        isLastStep={false}
-      />
-    );
+  it('does not call onNext when form is invalid', async () => {
+    const user = userEvent.setup();
+    renderComponent();
 
-    const continueButton = screen.getByRole("button", { name: /continue/i });
-    fireEvent.click(continueButton);
+    const nextButton = screen.getByTestId('next-button');
+    await user.click(nextButton);
 
     expect(mockOnNext).not.toHaveBeenCalled();
   });
 
-  it("displays existing form data in input fields", () => {
-    const filledFormData = {
-      ...mockFormData,
-      firstName: "Jane",
-      lastName: "Smith",
-      email: "jane@example.com",
-      phone: "987-654-3210",
-    };
+  it('provides proper accessibility attributes for error states', async () => {
+    const user = userEvent.setup();
+    renderComponent();
 
-    render(
-      <LeadQuestions
-        formData={filledFormData}
-        updateFormData={mockUpdateFormData}
-        onNext={mockOnNext}
-        onPrev={vi.fn()}
-        onSubmit={vi.fn()}
-        isFirstStep={true}
-        isLastStep={false}
-      />
-    );
+    const emailInput = screen.getByLabelText(/email address/i);
 
-    expect(screen.getByDisplayValue("Jane")).toBeInTheDocument();
-    expect(screen.getByDisplayValue("Smith")).toBeInTheDocument();
-    expect(screen.getByDisplayValue("jane@example.com")).toBeInTheDocument();
-    expect(screen.getByDisplayValue("987-654-3210")).toBeInTheDocument();
+    // Trigger error state
+    await user.type(emailInput, 'invalid-email');
+    await user.tab();
+
+    await waitFor(() => {
+      expect(emailInput).toHaveAttribute('aria-invalid', 'true');
+      expect(emailInput).toHaveAttribute('aria-describedby', 'email-error');
+      expect(
+        screen.getByText('Please enter a valid email address')
+      ).toHaveAttribute('role', 'alert');
+      expect(
+        screen.getByText('Please enter a valid email address')
+      ).toHaveAttribute('aria-live', 'polite');
+    });
   });
 
-  it("validates that all fields are required", () => {
-    const partiallyFilledData = {
-      ...mockFormData,
-      firstName: "John",
-      lastName: "Doe",
-      // Missing email and phone
-    };
+  it('only shows errors for fields that have been touched', async () => {
+    const user = userEvent.setup();
+    renderComponent();
 
-    render(
-      <LeadQuestions
-        formData={partiallyFilledData}
-        updateFormData={mockUpdateFormData}
-        onNext={mockOnNext}
-        onPrev={vi.fn()}
-        onSubmit={vi.fn()}
-        isFirstStep={true}
-        isLastStep={false}
-      />
-    );
+    // Fill in email but don't blur (not touched)
+    await user.clear(screen.getByLabelText(/email address/i));
+    await user.type(screen.getByLabelText(/email address/i), 'invalid-email');
 
-    const continueButton = screen.getByRole("button", { name: /continue/i });
-    expect(continueButton).toBeDisabled();
+    // Should not show error yet
+    expect(
+      screen.queryByText('Please enter a valid email address')
+    ).not.toBeInTheDocument();
+
+    // Now blur to mark as touched
+    await user.tab();
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('Please enter a valid email address')
+      ).toBeInTheDocument();
+    });
   });
 
-  it("formats phone as the user types and strips non-digits", () => {
-    render(
-      <LeadQuestions
-        formData={mockFormData}
-        updateFormData={mockUpdateFormData}
-        onNext={mockOnNext}
-        onPrev={vi.fn()}
-        onSubmit={vi.fn()}
-        isFirstStep={true}
-        isLastStep={false}
-      />
-    );
+  it('handles special characters in names correctly', async () => {
+    const user = userEvent.setup();
+    renderComponent();
 
-    const phoneInput = screen.getByLabelText(
-      "Phone Number *"
-    ) as HTMLInputElement;
+    const firstNameInput = screen.getByLabelText(/first name/i);
 
-    // Type a messy string with letters and symbols
-    fireEvent.change(phoneInput, { target: { value: "1a2b3-4c5d6e7f8g9h0" } });
-    // Expect formatted to 123-456-7890
-    expect(mockUpdateFormData).toHaveBeenLastCalledWith({
-      phone: "123-456-7890",
+    // Test valid special characters
+    await user.type(firstNameInput, "O'Connor");
+    await user.tab();
+
+    await waitFor(() => {
+      expect(
+        screen.queryByText(/can only contain letters/i)
+      ).not.toBeInTheDocument();
     });
 
-    // Type partial digits to ensure partial formatting works
-    mockUpdateFormData.mockClear();
-    fireEvent.change(phoneInput, { target: { value: "12" } });
-    expect(mockUpdateFormData).toHaveBeenLastCalledWith({ phone: "12" });
+    // Test invalid characters
+    await user.clear(firstNameInput);
+    await user.type(firstNameInput, 'John123');
+    await user.tab();
 
-    mockUpdateFormData.mockClear();
-    fireEvent.change(phoneInput, { target: { value: "1234" } });
-    expect(mockUpdateFormData).toHaveBeenLastCalledWith({ phone: "123-4" });
-
-    mockUpdateFormData.mockClear();
-    fireEvent.change(phoneInput, { target: { value: "1234567" } });
-    expect(mockUpdateFormData).toHaveBeenLastCalledWith({ phone: "123-456-7" });
+    await waitFor(() => {
+      expect(
+        screen.getByText(
+          /can only contain letters, spaces, hyphens, and apostrophes/i
+        )
+      ).toBeInTheDocument();
+    });
   });
 });

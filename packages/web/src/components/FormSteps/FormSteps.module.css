@@ -72,6 +72,16 @@
   box-shadow: 0 0 0 3px rgba(255, 102, 160, 0.1);
 }
 
+.inputError {
+  border-color: #d32f2f !important;
+  box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.1);
+}
+
+.inputError:focus {
+  border-color: #d32f2f !important;
+  box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.2);
+}
+
 .input::placeholder {
   color: var(--sd-brown-light);
   opacity: 0.7;
