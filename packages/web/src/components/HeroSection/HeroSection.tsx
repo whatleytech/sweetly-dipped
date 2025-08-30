@@ -1,3 +1,4 @@
+import React from "react";
 import styles from "./HeroSection.module.css";
 import logo from "@/assets/images/logo.png";
 import pretzelVideo from "@/assets/videos/pretzel-design-fast-optimized.mp4";

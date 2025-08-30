@@ -1,3 +1,4 @@
+import React from "react";
 import styles from "./FormSteps.module.css";
 import type { FormStepProps, FormData } from "@/types/formTypes";
 import { FormButtons, FormStepContainer } from "@/components/shared";

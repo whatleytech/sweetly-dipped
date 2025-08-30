@@ -1,3 +1,4 @@
+import React from "react";
 import styles from "@/components/FormSteps/FormSteps.module.css";
 
 interface FormStepContainerProps {

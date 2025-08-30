@@ -12,7 +12,22 @@ export default [
     files: ["**/*.{ts,tsx}"],
     languageOptions: {
       ecmaVersion: 2020,
-      globals: globals.browser,
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+        ...globals.es2020,
+        // Test globals
+        describe: "readonly",
+        it: "readonly",
+        test: "readonly",
+        expect: "readonly",
+        beforeEach: "readonly",
+        afterEach: "readonly",
+        beforeAll: "readonly",
+        afterAll: "readonly",
+        vi: "readonly",
+        global: "readonly",
+      },
       parser: tseslintParser,
       parserOptions: {
         ecmaVersion: 2020,
