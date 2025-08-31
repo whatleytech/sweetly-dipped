@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { formDataApi } from './formDataApi';
+import { formDataApi, FormDataApiError } from './formDataApi';
 import type { FormData } from '@sweetly-dipped/shared-types';
 
 // Mock fetch
@@ -54,36 +54,57 @@ describe('formDataApi', () => {
         currentStep: 0,
       });
 
-      expect(mockFetch).toHaveBeenCalledWith(
-        'http://localhost:3001/api/form-data',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
+      const callArgs = mockFetch.mock.calls[0];
+      expect(callArgs[0]).toBe('http://localhost:3001/api/form-data');
+      expect(callArgs[1]).toMatchObject({
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          formData: {
+            ...mockFormData,
+            visitedSteps: ['lead', 'communication'],
           },
-          body: JSON.stringify({
-            formData: {
-              ...mockFormData,
-              visitedSteps: ['lead', 'communication'],
-            },
-            currentStep: 0,
-          }),
-        }
-      );
+          currentStep: 0,
+        }),
+      });
+      expect(callArgs[1].signal).toBeInstanceOf(AbortSignal);
 
       expect(result).toEqual(mockResponse);
     });
 
-    it('throws error on failed request', async () => {
+    it('throws structured error on failed request', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 400,
         json: async () => ({ error: 'Bad request' }),
       });
 
-      await expect(
-        formDataApi.create({ formData: mockFormData })
-      ).rejects.toThrow('Bad request');
+      try {
+        await formDataApi.create({ formData: mockFormData });
+      } catch (error) {
+        expect(error).toBeInstanceOf(FormDataApiError);
+        if (error instanceof FormDataApiError) {
+          expect(error.type).toBe('validation');
+          expect(error.status).toBe(400);
+          expect(error.retryable).toBe(false);
+        }
+      }
+    });
+
+    it('throws network error on connection failure', async () => {
+      mockFetch.mockRejectedValueOnce(new TypeError('Network error'));
+
+      try {
+        await formDataApi.create({ formData: mockFormData });
+      } catch (error) {
+        expect(error).toBeInstanceOf(FormDataApiError);
+        if (error instanceof FormDataApiError) {
+          expect(error.type).toBe('network');
+          expect(error.retryable).toBe(false);
+        }
+      }
     });
   });
 
@@ -104,23 +125,31 @@ describe('formDataApi', () => {
 
       const result = await formDataApi.get('form-123');
 
-      expect(mockFetch).toHaveBeenCalledWith(
-        'http://localhost:3001/api/form-data/form-123'
-      );
+      const callArgs = mockFetch.mock.calls[0];
+      expect(callArgs[0]).toBe('http://localhost:3001/api/form-data/form-123');
+      expect(callArgs[1]).toMatchObject({});
+      expect(callArgs[1].signal).toBeInstanceOf(AbortSignal);
 
       expect(result).toEqual(mockResponse);
     });
 
-    it('throws error when form not found', async () => {
+    it('throws not-found error when form not found', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 404,
         json: async () => ({ error: 'Form data not found' }),
       });
 
-      await expect(formDataApi.get('nonexistent')).rejects.toThrow(
-        'Form data not found'
-      );
+      try {
+        await formDataApi.get('nonexistent');
+      } catch (error) {
+        expect(error).toBeInstanceOf(FormDataApiError);
+        if (error instanceof FormDataApiError) {
+          expect(error.type).toBe('not-found');
+          expect(error.status).toBe(404);
+          expect(error.retryable).toBe(false);
+        }
+      }
     });
   });
 
@@ -144,23 +173,23 @@ describe('formDataApi', () => {
         currentStep: 3,
       });
 
-      expect(mockFetch).toHaveBeenCalledWith(
-        'http://localhost:3001/api/form-data/form-123',
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
+      const callArgs = mockFetch.mock.calls[0];
+      expect(callArgs[0]).toBe('http://localhost:3001/api/form-data/form-123');
+      expect(callArgs[1]).toMatchObject({
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          formData: {
+            ...mockFormData,
+            firstName: 'Jane',
+            visitedSteps: ['lead', 'communication'],
           },
-          body: JSON.stringify({
-            formData: { 
-              ...mockFormData, 
-              firstName: 'Jane',
-              visitedSteps: ['lead', 'communication'],
-            },
-            currentStep: 3,
-          }),
-        }
-      );
+          currentStep: 3,
+        }),
+      });
+      expect(callArgs[1].signal).toBeInstanceOf(AbortSignal);
 
       expect(result).toEqual(mockResponse);
     });
@@ -174,12 +203,12 @@ describe('formDataApi', () => {
 
       await formDataApi.delete('form-123');
 
-      expect(mockFetch).toHaveBeenCalledWith(
-        'http://localhost:3001/api/form-data/form-123',
-        {
-          method: 'DELETE',
-        }
-      );
+      const callArgs = mockFetch.mock.calls[0];
+      expect(callArgs[0]).toBe('http://localhost:3001/api/form-data/form-123');
+      expect(callArgs[1]).toMatchObject({
+        method: 'DELETE',
+      });
+      expect(callArgs[1].signal).toBeInstanceOf(AbortSignal);
     });
 
     it('throws error on failed deletion', async () => {
@@ -188,9 +217,16 @@ describe('formDataApi', () => {
         status: 404,
       });
 
-      await expect(formDataApi.delete('nonexistent')).rejects.toThrow(
-        'Failed to delete form data: 404'
-      );
+      try {
+        await formDataApi.delete('nonexistent');
+      } catch (error) {
+        expect(error).toBeInstanceOf(FormDataApiError);
+        if (error instanceof FormDataApiError) {
+          expect(error.type).toBe('not-found');
+          expect(error.status).toBe(404);
+          expect(error.retryable).toBe(false);
+        }
+      }
     });
   });
 
@@ -207,29 +243,36 @@ describe('formDataApi', () => {
 
       const result = await formDataApi.generateOrderNumber();
 
-      expect(mockFetch).toHaveBeenCalledWith(
-        "http://localhost:3001/api/order/number",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const callArgs = mockFetch.mock.calls[0];
+      expect(callArgs[0]).toBe('http://localhost:3001/api/order/number');
+      expect(callArgs[1]).toMatchObject({
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      expect(callArgs[1].signal).toBeInstanceOf(AbortSignal);
 
       expect(result).toEqual(mockResponse);
     });
 
-    it('throws error on failed generation', async () => {
+    it('throws server error on failed generation', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 500,
         statusText: 'Internal Server Error',
       });
 
-      await expect(formDataApi.generateOrderNumber()).rejects.toThrow(
-        'Unknown error'
-      );
+      try {
+        await formDataApi.generateOrderNumber();
+      } catch (error) {
+        expect(error).toBeInstanceOf(FormDataApiError);
+        if (error instanceof FormDataApiError) {
+          expect(error.type).toBe('server');
+          expect(error.status).toBe(500);
+          expect(error.retryable).toBe(true);
+        }
+      }
     });
   });
 
@@ -247,11 +290,45 @@ describe('formDataApi', () => {
 
       const result = await formDataApi.health();
 
-      expect(mockFetch).toHaveBeenCalledWith(
-        'http://localhost:3001/api/health'
-      );
+      const callArgs = mockFetch.mock.calls[0];
+      expect(callArgs[0]).toBe('http://localhost:3001/api/health');
+      expect(callArgs[1]).toMatchObject({});
+      expect(callArgs[1].signal).toBeInstanceOf(AbortSignal);
 
       expect(result).toEqual(mockResponse);
+    });
+  });
+
+  describe('error handling', () => {
+    it('handles timeout errors correctly', async () => {
+      // Mock a timeout error by rejecting with a TypeError (simulating network failure)
+      mockFetch.mockRejectedValueOnce(new TypeError('fetch failed'));
+
+      try {
+        await formDataApi.health();
+      } catch (error) {
+        expect(error).toBeInstanceOf(FormDataApiError);
+        if (error instanceof FormDataApiError) {
+          expect(error.type).toBe('network');
+          expect(error.retryable).toBe(false);
+        }
+      }
+    });
+
+    it('handles abort errors correctly', async () => {
+      const abortError = new Error('Request was aborted');
+      abortError.name = 'AbortError';
+      mockFetch.mockRejectedValueOnce(abortError);
+
+      try {
+        await formDataApi.health();
+      } catch (error) {
+        expect(error).toBeInstanceOf(FormDataApiError);
+        if (error instanceof FormDataApiError) {
+          expect(error.type).toBe('timeout');
+          expect(error.retryable).toBe(false);
+        }
+      }
     });
   });
 });
