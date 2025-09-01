@@ -1,0 +1,15 @@
+{
+  "extends": "@sweetly-dipped/config-ts/base.json",
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "types": ["node", "@playwright/test"]
+  },
+  "include": [
+    "tests/**/*",
+    "playwright.config.ts"
+  ]
+}

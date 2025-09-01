@@ -36,6 +36,7 @@ Sweetly Dipped is a multi-page web application that allows customers to:
 - **ESLint** - Code linting
 - **Prettier** - Code formatting
 - **Yarn** - Package manager with workspaces
+- **Playwright** - End-to-end testing framework
 
 ## Package Structure
 
@@ -63,6 +64,7 @@ packages/
 │   └── index.ts
 ├── config-eslint/          # Shared ESLint configuration
 ├── config-ts/             # Shared TypeScript configuration
+├── e2e/                   # End-to-end tests with Playwright
 └── root package.json      # Workspace configuration
 ```
 
@@ -142,6 +144,21 @@ yarn test:coverage
 yarn coverage:full
 ```
 
+**Run end-to-end tests**:
+```bash
+yarn test:e2e
+```
+
+**Run e2e tests with UI mode**:
+```bash
+yarn test:e2e:ui
+```
+
+**Run e2e tests in headed mode**:
+```bash
+yarn test:e2e:headed
+```
+
 ### Code Quality
 
 **Lint all packages**:
@@ -173,7 +190,7 @@ yarn format
 - **Component Architecture** - Modular, reusable components with CSS Modules
 - **Form Management** - Advanced form handling with React Hook Form
 - **State Management** - Efficient client and server state management
-- **Testing** - Comprehensive test coverage with Vitest and React Testing Library
+- **Testing** - Comprehensive test coverage with Vitest, React Testing Library, and Playwright E2E tests
 - **Performance** - Optimized builds with Vite and code splitting
 
 ### Available Pages

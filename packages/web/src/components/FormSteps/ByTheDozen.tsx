@@ -13,16 +13,13 @@ export const ByTheDozen = ({
   onSubmit,
 }: FormStepProps) => {
   const handleSelect = (
-    key: keyof Pick<
-      FormData,
-      "riceKrispies" | "oreos" | "pretzels" | "marshmallows"
-    >,
+    key: 'riceKrispies' | 'oreos' | 'pretzels' | 'marshmallows',
     value: number
   ) => {
     // If the same value is already selected, unselect it (set to 0)
     const currentValue = formData[key] ?? 0;
     const newValue = currentValue === value ? 0 : value;
-    updateFormData({ [key]: newValue } as Partial<FormData>);
+    updateFormData({ [key]: newValue });
   };
 
   const hasAnySelection =

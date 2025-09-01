@@ -369,10 +369,9 @@ const isValidPassword = (password: string) =>
 #### Quality Gates
 Before any commit, run this checklist:
 ```bash
-yarn lint        # ESLint passes
-yarn type-check  # TypeScript compiles
-yarn test        # All tests green
-yarn test:coverage  # Coverage thresholds met
+yarn lint           # ESLint passes
+yarn type-check     # TypeScript compiles
+yarn test           # All tests green and coverage threshold met
 ```
 
 #### Commit Standards

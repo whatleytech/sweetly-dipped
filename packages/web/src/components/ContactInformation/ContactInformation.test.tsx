@@ -1,28 +1,29 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { ContactInformation } from "./ContactInformation";
 import type { FormData } from '@sweetly-dipped/shared-types';
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const mockFormData: FormData = {
-  firstName: "John",
-  lastName: "Doe",
-  email: "john.doe@example.com",
-  phone: "123-456-7890",
-  communicationMethod: "email",
-  packageType: "medium",
+  firstName: 'John',
+  lastName: 'Doe',
+  email: 'john.doe@example.com',
+  phone: '123-456-7890',
+  communicationMethod: 'email',
+  packageType: 'medium',
   riceKrispies: 0,
   oreos: 0,
   pretzels: 0,
   marshmallows: 0,
-  colorScheme: "Pink and Gold",
-  eventType: "Birthday",
-  theme: "Princess",
-  additionalDesigns: "Add some sparkles",
-  pickupDate: "2024-02-15",
-  pickupTime: "8:30 AM",
+  colorScheme: 'Pink and Gold',
+  eventType: 'Birthday',
+  theme: 'Princess',
+  additionalDesigns: 'Add some sparkles',
+  pickupDate: '2024-02-15',
+  pickupTime: '8:30 AM',
   rushOrder: false,
-  referralSource: "",
+  referralSource: '',
   termsAccepted: false,
+  visitedSteps: new Set(),
 };
 
 const mockOnUpdate = vi.fn();

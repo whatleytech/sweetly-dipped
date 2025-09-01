@@ -1,29 +1,30 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { CommunicationPreference } from "./CommunicationPreference";
 import type { FormData } from '@sweetly-dipped/shared-types';
 
 
 const mockFormData: FormData = {
-  firstName: "John",
-  lastName: "Doe",
-  email: "john@example.com",
-  phone: "123-456-7890",
-  communicationMethod: "",
-  packageType: "",
+  firstName: 'John',
+  lastName: 'Doe',
+  email: 'john@example.com',
+  phone: '123-456-7890',
+  communicationMethod: '',
+  packageType: '',
   riceKrispies: 0,
   oreos: 0,
   pretzels: 0,
   marshmallows: 0,
-  colorScheme: "",
-  eventType: "",
-  theme: "",
-  additionalDesigns: "",
-  pickupDate: "",
-  pickupTime: "",
+  colorScheme: '',
+  eventType: '',
+  theme: '',
+  additionalDesigns: '',
+  pickupDate: '',
+  pickupTime: '',
   rushOrder: false,
-  referralSource: "",
+  referralSource: '',
   termsAccepted: false,
+  visitedSteps: new Set(),
 };
 
 describe("CommunicationPreference", () => {

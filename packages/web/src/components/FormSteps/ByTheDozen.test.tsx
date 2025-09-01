@@ -6,22 +6,26 @@ import type { FormData } from '@sweetly-dipped/shared-types';
 
 
 const baseData: FormData = {
-  firstName: "",
-  lastName: "",
-  email: "",
-  phone: "",
-  communicationMethod: "",
-  packageType: "by-dozen",
+  firstName: '',
+  lastName: '',
+  email: '',
+  phone: '',
+  communicationMethod: '',
+  packageType: 'by-dozen',
   riceKrispies: 0,
   oreos: 0,
   pretzels: 0,
   marshmallows: 0,
-  colorScheme: "",
-  eventType: "",
-  theme: "",
-  additionalDesigns: "",
-  pickupDate: "",
-  pickupTime: "",
+  colorScheme: '',
+  eventType: '',
+  theme: '',
+  additionalDesigns: '',
+  pickupDate: '',
+  pickupTime: '',
+  rushOrder: false,
+  referralSource: '',
+  termsAccepted: false,
+  visitedSteps: new Set(),
 };
 
 describe('ByTheDozen', () => {
@@ -123,9 +127,11 @@ describe('ByTheDozen', () => {
 
     // Verify the correct radio is selected
     const oreosInput = screen
-      .getAllByDisplayValue("2")
-      .find((input) => input.getAttribute("name") === "oreos");
-    expect(oreosInput.checked).toBe(true);
+      .getAllByDisplayValue('2')
+      .find(
+        (input) => input.getAttribute('name') === 'oreos'
+      ) as HTMLInputElement;
+    expect(oreosInput?.checked).toBe(true);
 
     // Verify continue button is enabled with selection
     expect(
@@ -149,13 +155,15 @@ describe('ByTheDozen', () => {
 
     // Find the checked oreos radio input and click it
     const oreosInput = screen
-      .getAllByDisplayValue("2")
-      .find((input) => input.getAttribute("name") === "oreos");
+      .getAllByDisplayValue('2')
+      .find(
+        (input) => input.getAttribute('name') === 'oreos'
+      ) as HTMLInputElement;
 
-    expect(oreosInput.checked).toBe(true);
+    expect(oreosInput?.checked).toBe(true);
 
     // Click on the already selected option to unselect it
-    fireEvent.click(oreosInput);
+    fireEvent.click(oreosInput!);
 
     // Should call updateFormData with value 0 (unselected)
     expect(updateFormData).toHaveBeenCalledWith({ oreos: 0 });

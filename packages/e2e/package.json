@@ -1,0 +1,29 @@
+{
+  "name": "@sweetly-dipped/e2e",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "test:api": "playwright test --config=playwright.api-only.config.ts",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "test:codegen": "playwright codegen",
+    "test:install": "playwright install",
+    "test:install-deps": "playwright install-deps",
+    "test:show-report": "playwright show-report",
+    "build": "echo 'No build step needed for e2e tests'",
+    "dev": "echo 'No dev server needed for e2e tests'",
+    "lint": "echo 'No linting needed for e2e tests'",
+    "type-check": "tsc --noEmit",
+    "format": "echo 'No formatting needed for e2e tests'",
+    "clean": "rm -rf test-results playwright-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "@sweetly-dipped/config-ts": "workspace:*",
+    "@types/node": "^22.10.2",
+    "typescript": "~5.8.3"
+  }
+}
