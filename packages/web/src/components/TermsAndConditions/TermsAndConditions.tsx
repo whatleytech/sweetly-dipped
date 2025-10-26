@@ -14,14 +14,14 @@ export const TermsAndConditions = ({ formData, onUpdate }: TermsAndConditionsPro
       <div className={styles.infoBox}>
         <p>
           After you complete this order form, we will contact you to go over
-          details, availability, and to provide payment information.{" "}
+          details, availability, and to provide payment information.{' '}
           <strong>
             Completion of this form does NOT mean that your order is confirmed.
-          </strong>{" "}
+          </strong>{' '}
           You should hear from us within 48 hours.
         </p>
         <p>
-          If you have any questions or concerns, feel free to contact us at{" "}
+          If you have any questions or concerns, feel free to contact us at{' '}
           <a href="mailto:sweetlydippedbyjas@gmail.com">
             sweetlydippedbyjas@gmail.com
           </a>
@@ -55,9 +55,10 @@ export const TermsAndConditions = ({ formData, onUpdate }: TermsAndConditionsPro
       </div>
 
       <div className={styles.termsCheckbox}>
-        <label>
+        <label htmlFor="terms-accepted">
           <input
             type="checkbox"
+            id="terms-accepted"
             checked={formData.termsAccepted}
             onChange={(e) => onUpdate({ termsAccepted: e.target.checked })}
           />

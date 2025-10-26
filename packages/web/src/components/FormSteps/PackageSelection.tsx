@@ -1,7 +1,7 @@
-import styles from "./FormSteps.module.css";
-import type { FormStepProps, FormData } from "@/types/formTypes";
-import { FormButtons, FormStepContainer } from "@/components/shared";
-import { PACKAGE_OPTIONS } from "@/constants/formData";
+import styles from './FormSteps.module.css';
+import type { FormStepProps, FormData } from '@/types/formTypes';
+import { FormButtons, FormStepContainer } from '@/components/shared';
+import { PACKAGE_OPTIONS } from '@/constants/formData';
 
 export const PackageSelection = ({
   formData,
@@ -12,11 +12,11 @@ export const PackageSelection = ({
   isLastStep,
   onSubmit,
 }: FormStepProps) => {
-  const handleSelect = (id: FormData["packageType"]) => {
+  const handleSelect = (id: FormData['packageType']) => {
     updateFormData({ packageType: id });
   };
 
-  const isValid = formData.packageType !== "";
+  const isValid = formData.packageType !== '';
 
   return (
     <FormStepContainer
@@ -31,13 +31,14 @@ export const PackageSelection = ({
               <div
                 key={opt.id}
                 className={`${styles.radioOption} ${
-                  selected ? styles.selected : ""
+                  selected ? styles.selected : ''
                 }`}
                 onClick={() => handleSelect(opt.id)}
                 role="radio"
                 aria-checked={selected}
               >
                 <input
+                  id={opt.id}
                   type="radio"
                   name="packageType"
                   value={opt.id}
@@ -46,8 +47,8 @@ export const PackageSelection = ({
                   className={styles.radioInput}
                 />
                 <div>
-                  <label className={styles.radioLabel}>
-                    {opt.label} {opt.price ? `— $${opt.price}` : ""}
+                  <label htmlFor={opt.id} className={styles.radioLabel}>
+                    {opt.label} {opt.price ? `— $${opt.price}` : ''}
                   </label>
                   {opt.description && (
                     <div className={styles.radioDescription}>

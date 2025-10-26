@@ -25,11 +25,11 @@ export const ColorScheme = ({
     >
       <div className={styles.formFields}>
         <div className={styles.fieldGroup}>
-          <label htmlFor="colorScheme" className={styles.label}>
+          <label htmlFor="color-scheme" className={styles.label}>
             Color Scheme *
           </label>
           <input
-            id="colorScheme"
+            id="color-scheme"
             type="text"
             value={formData.colorScheme}
             onChange={handleChange}

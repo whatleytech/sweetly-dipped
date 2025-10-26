@@ -36,6 +36,7 @@ export const FormButtons = ({
       {!isFirstStep && onPrev && (
         <button
           type="button"
+          id="back-button"
           onClick={onPrev}
           className={`${styles.button} ${styles.secondaryButton}`}
         >
@@ -44,10 +45,11 @@ export const FormButtons = ({
       )}
       <button
         type="button"
+        id="primary-form-button"
         onClick={handlePrimaryAction}
         disabled={!isValid}
         className={`${styles.button} ${styles.primaryButton} ${
-          !isValid ? styles.disabled : ""
+          !isValid ? styles.disabled : ''
         }`}
       >
         {isLastStep ? submitLabel : nextLabel}

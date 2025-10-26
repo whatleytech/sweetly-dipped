@@ -3,6 +3,75 @@ import styles from './FormSteps.module.css';
 import type { FormStepProps, FormData } from '@/types/formTypes';
 import { FormButtons, FormStepContainer } from '@/components/shared';
 
+interface LeadQuestionInputProps {
+  id: string;
+  label: string;
+  type?: string;
+  inputMode?:
+    | 'text'
+    | 'email'
+    | 'search'
+    | 'tel'
+    | 'url'
+    | 'none'
+    | 'numeric'
+    | 'decimal';
+  placeholder: string;
+  pattern?: string;
+  maxLength?: number;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onBlur: () => void;
+  error?: string;
+  touched: boolean;
+}
+
+const LeadQuestionInput = ({
+  id,
+  label,
+  type = 'text',
+  inputMode,
+  placeholder,
+  pattern,
+  maxLength,
+  value,
+  onChange,
+  onBlur,
+  error,
+  touched,
+}: LeadQuestionInputProps) => (
+  <div className={styles.fieldGroup}>
+    <label htmlFor={id} className={styles.label}>
+      {label}
+    </label>
+    <input
+      id={id}
+      type={type}
+      inputMode={inputMode}
+      pattern={pattern}
+      maxLength={maxLength}
+      value={value}
+      onChange={onChange}
+      onBlur={onBlur}
+      className={`${styles.input} ${error && touched ? styles.inputError : ''}`}
+      placeholder={placeholder}
+      aria-invalid={!!error && touched}
+      aria-describedby={error && touched ? `${id}-error` : undefined}
+      required
+    />
+    {error && touched && (
+      <div
+        id={`${id}-error`}
+        className={styles.errorMessage}
+        role="alert"
+        aria-live="polite"
+      >
+        {error}
+      </div>
+    )}
+  </div>
+);
+
 export const LeadQuestions = ({
   formData,
   updateFormData,
@@ -168,131 +237,55 @@ export const LeadQuestions = ({
       description="We'll use this information to confirm your order and keep you updated on your treats!"
     >
       <div className={styles.formFields}>
-        <div className={styles.fieldGroup}>
-          <label htmlFor="firstName" className={styles.label}>
-            First Name *
-          </label>
-          <input
-            id="firstName"
-            type="text"
-            value={formData.firstName}
-            onChange={handleInputChange('firstName')}
-            onBlur={handleInputBlur('firstName')}
-            className={`${styles.input} ${errors.firstName && touched.firstName ? styles.inputError : ''}`}
-            placeholder="Enter your first name"
-            aria-invalid={!!errors.firstName && touched.firstName}
-            aria-describedby={
-              errors.firstName && touched.firstName
-                ? 'firstName-error'
-                : undefined
-            }
-            required
-          />
-          {errors.firstName && touched.firstName && (
-            <div
-              id="firstName-error"
-              className={styles.errorMessage}
-              role="alert"
-              aria-live="polite"
-            >
-              {errors.firstName}
-            </div>
-          )}
-        </div>
+        <LeadQuestionInput
+          id="first-name"
+          label="First Name *"
+          placeholder="Enter your first name"
+          value={formData.firstName}
+          onChange={handleInputChange('firstName')}
+          onBlur={handleInputBlur('firstName')}
+          error={errors.firstName}
+          touched={touched.firstName}
+        />
 
-        <div className={styles.fieldGroup}>
-          <label htmlFor="lastName" className={styles.label}>
-            Last Name *
-          </label>
-          <input
-            id="lastName"
-            type="text"
-            value={formData.lastName}
-            onChange={handleInputChange('lastName')}
-            onBlur={handleInputBlur('lastName')}
-            className={`${styles.input} ${errors.lastName && touched.lastName ? styles.inputError : ''}`}
-            placeholder="Enter your last name"
-            aria-invalid={!!errors.lastName && touched.lastName}
-            aria-describedby={
-              errors.lastName && touched.lastName ? 'lastName-error' : undefined
-            }
-            required
-          />
-          {errors.lastName && touched.lastName && (
-            <div
-              id="lastName-error"
-              className={styles.errorMessage}
-              role="alert"
-              aria-live="polite"
-            >
-              {errors.lastName}
-            </div>
-          )}
-        </div>
+        <LeadQuestionInput
+          id="last-name"
+          label="Last Name *"
+          placeholder="Enter your last name"
+          value={formData.lastName}
+          onChange={handleInputChange('lastName')}
+          onBlur={handleInputBlur('lastName')}
+          error={errors.lastName}
+          touched={touched.lastName}
+        />
 
-        <div className={styles.fieldGroup}>
-          <label htmlFor="email" className={styles.label}>
-            Email Address *
-          </label>
-          <input
-            id="email"
-            type="email"
-            inputMode="email"
-            value={formData.email}
-            onChange={handleInputChange('email')}
-            onBlur={handleInputBlur('email')}
-            className={`${styles.input} ${errors.email && touched.email ? styles.inputError : ''}`}
-            placeholder="Enter your email address"
-            aria-invalid={!!errors.email && touched.email}
-            aria-describedby={
-              errors.email && touched.email ? 'email-error' : undefined
-            }
-            required
-          />
-          {errors.email && touched.email && (
-            <div
-              id="email-error"
-              className={styles.errorMessage}
-              role="alert"
-              aria-live="polite"
-            >
-              {errors.email}
-            </div>
-          )}
-        </div>
+        <LeadQuestionInput
+          id="email"
+          label="Email Address *"
+          type="email"
+          inputMode="email"
+          placeholder="Enter your email address"
+          value={formData.email}
+          onChange={handleInputChange('email')}
+          onBlur={handleInputBlur('email')}
+          error={errors.email}
+          touched={touched.email}
+        />
 
-        <div className={styles.fieldGroup}>
-          <label htmlFor="phone" className={styles.label}>
-            Phone Number *
-          </label>
-          <input
-            id="phone"
-            type="tel"
-            inputMode="tel"
-            pattern="\\d{3}-\\d{3}-\\d{4}"
-            maxLength={12}
-            value={formData.phone}
-            onChange={handleInputChange('phone')}
-            onBlur={handleInputBlur('phone')}
-            className={`${styles.input} ${errors.phone && touched.phone ? styles.inputError : ''}`}
-            placeholder="123-456-7890"
-            aria-invalid={!!errors.phone && touched.phone}
-            aria-describedby={
-              errors.phone && touched.phone ? 'phone-error' : undefined
-            }
-            required
-          />
-          {errors.phone && touched.phone && (
-            <div
-              id="phone-error"
-              className={styles.errorMessage}
-              role="alert"
-              aria-live="polite"
-            >
-              {errors.phone}
-            </div>
-          )}
-        </div>
+        <LeadQuestionInput
+          id="phone"
+          label="Phone Number *"
+          type="tel"
+          inputMode="tel"
+          pattern="\\d{3}-\\d{3}-\\d{4}"
+          maxLength={12}
+          placeholder="123-456-7890"
+          value={formData.phone}
+          onChange={handleInputChange('phone')}
+          onBlur={handleInputBlur('phone')}
+          error={errors.phone}
+          touched={touched.phone}
+        />
       </div>
 
       <FormButtons

@@ -2,6 +2,45 @@ import styles from "./FormSteps.module.css";
 import type { FormStepProps } from "@/types/formTypes";
 import { FormButtons, FormStepContainer } from "@/components/shared";
 
+interface CommunicationPreferenceRadioOptionProps {
+  id: string;
+  value: 'email' | 'text';
+  label: string;
+  description: string;
+  selected: boolean;
+  onChange: (value: 'email' | 'text') => void;
+}
+
+const CommunicationPreferenceRadioOption = ({
+  id,
+  value,
+  label,
+  description,
+  selected,
+  onChange,
+}: CommunicationPreferenceRadioOptionProps) => (
+  <div
+    className={`${styles.radioOption} ${selected ? styles.selected : ''}`}
+    onClick={() => onChange(value)}
+  >
+    <input
+      id={id}
+      type="radio"
+      name="communicationMethod"
+      value={value}
+      checked={selected}
+      onChange={() => onChange(value)}
+      className={styles.radioInput}
+    />
+    <div>
+      <label htmlFor={id} className={styles.radioLabel}>
+        {label}
+      </label>
+      <div className={styles.radioDescription}>{description}</div>
+    </div>
+  </div>
+);
+
 export const CommunicationPreference = ({
   formData,
   updateFormData,
@@ -11,12 +50,12 @@ export const CommunicationPreference = ({
   isLastStep,
   onSubmit,
 }: FormStepProps) => {
-  const handleRadioChange = (value: "email" | "text") => {
+  const handleRadioChange = (value: 'email' | 'text') => {
     updateFormData({ communicationMethod: value });
   };
 
   const isFormValid = () => {
-    return formData.communicationMethod !== "";
+    return formData.communicationMethod !== '';
   };
 
   return (
@@ -26,49 +65,23 @@ export const CommunicationPreference = ({
     >
       <div className={styles.formFields}>
         <div className={styles.radioGroup}>
-          <div
-            className={`${styles.radioOption} ${
-              formData.communicationMethod === "email" ? styles.selected : ""
-            }`}
-            onClick={() => handleRadioChange("email")}
-          >
-            <input
-              type="radio"
-              name="communicationMethod"
-              value="email"
-              checked={formData.communicationMethod === "email"}
-              onChange={() => handleRadioChange("email")}
-              className={styles.radioInput}
-            />
-            <div>
-              <label className={styles.radioLabel}>Email</label>
-              <div className={styles.radioDescription}>
-                We'll send order confirmations and updates to your email address
-              </div>
-            </div>
-          </div>
+          <CommunicationPreferenceRadioOption
+            id="email"
+            value="email"
+            label="Email"
+            description="We'll send order confirmations and updates to your email address"
+            selected={formData.communicationMethod === 'email'}
+            onChange={handleRadioChange}
+          />
 
-          <div
-            className={`${styles.radioOption} ${
-              formData.communicationMethod === "text" ? styles.selected : ""
-            }`}
-            onClick={() => handleRadioChange("text")}
-          >
-            <input
-              type="radio"
-              name="communicationMethod"
-              value="text"
-              checked={formData.communicationMethod === "text"}
-              onChange={() => handleRadioChange("text")}
-              className={styles.radioInput}
-            />
-            <div>
-              <label className={styles.radioLabel}>Text Message</label>
-              <div className={styles.radioDescription}>
-                We'll send order confirmations and updates via text message
-              </div>
-            </div>
-          </div>
+          <CommunicationPreferenceRadioOption
+            id="text"
+            value="text"
+            label="Text Message"
+            description="We'll send order confirmations and updates via text message"
+            selected={formData.communicationMethod === 'text'}
+            onChange={handleRadioChange}
+          />
         </div>
       </div>
 

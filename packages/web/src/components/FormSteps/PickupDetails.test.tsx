@@ -29,19 +29,27 @@ const baseData: FormData = {
 
 // Helper functions for test dates - using specific available dates
 const getAvailableDate = (): string => {
-  // Use a date that's definitely not in the unavailable periods
-  // Available periods: before 2025-08-28, between 2025-09-04 and 2025-10-08, etc.
-  return "2025-09-15"; // Monday, September 15, 2025
+  // Use a date that's definitely not in the unavailable periods and in the future
+  // Add 30 days from today to ensure it's in the future
+  const date = new Date();
+  date.setDate(date.getDate() + 30);
+  return date.toISOString().split("T")[0];
 };
 
 const getAvailableFriday = (): string => {
-  // Use a Friday that's definitely available
-  return "2025-09-19"; // Friday, September 19, 2025
+  // Use a Friday that's definitely available and in the future
+  const date = new Date();
+  // Find next Friday
+  const daysUntilFriday = (5 - date.getDay() + 7) % 7 || 7;
+  date.setDate(date.getDate() + daysUntilFriday + 7); // Add extra week to be safe
+  return date.toISOString().split("T")[0];
 };
 
 const getRushOrderDate = (): string => {
   // Use a date that's within 2 weeks but not in unavailable periods
-  return "2025-09-05"; // Friday, September 5, 2025 (within 2 weeks)
+  const date = new Date();
+  date.setDate(date.getDate() + 10); // 10 days from today (within 2 weeks)
+  return date.toISOString().split("T")[0];
 };
 
 const getPastDate = (daysAgo: number = 1): string => {

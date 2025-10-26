@@ -10,6 +10,7 @@ import {
   formatDateForDisplay,
   isRushOrder,
 } from "@/utils/timeUtils";
+import { kebabCase } from 'lodash';
 
 function getDayOfWeek(dateStr: string): DayOfWeek | null {
   if (!dateStr) return null;
@@ -84,11 +85,11 @@ export const PickupDetails = ({
     >
       <div className={styles.formFields}>
         <div className={styles.fieldGroup}>
-          <label htmlFor="pickupDate" className={styles.label}>
+          <label htmlFor="pickup-date" className={styles.label}>
             Date *
           </label>
           <input
-            id="pickupDate"
+            id="pickup-date"
             type="date"
             value={formData.pickupDate}
             onChange={handleDateChange}
@@ -96,7 +97,7 @@ export const PickupDetails = ({
             min={
               new Date(Date.now() + 24 * 60 * 60 * 1000)
                 .toISOString()
-                .split("T")[0]
+                .split('T')[0]
             }
             required
           />
@@ -114,14 +115,14 @@ export const PickupDetails = ({
               <div className={styles.errorMessage} role="alert">
                 {unavailablePeriod.endDate ? (
                   <>
-                    I am unavailable for pickup between{" "}
-                    {formatDateForDisplay(unavailablePeriod.startDate)} -{" "}
+                    I am unavailable for pickup between{' '}
+                    {formatDateForDisplay(unavailablePeriod.startDate)} -{' '}
                     {formatDateForDisplay(unavailablePeriod.endDate)}. Sorry for
                     the inconvenience. Please select another date.
                   </>
                 ) : (
                   <>
-                    I am unavailable for pickup on{" "}
+                    I am unavailable for pickup on{' '}
                     {formatDateForDisplay(unavailablePeriod.startDate)}. Sorry
                     for the inconvenience. Please select another date.
                   </>
@@ -151,11 +152,12 @@ export const PickupDetails = ({
                             {slots.map((time) => (
                               <button
                                 key={time}
+                                id={kebabCase(time)}
                                 type="button"
                                 className={`${styles.timeSlot} ${
                                   formData.pickupTime === time
                                     ? styles.timeSlotSelected
-                                    : ""
+                                    : ''
                                 }`}
                                 onClick={() => handleTimeSlotClick(time)}
                               >

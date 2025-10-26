@@ -3,6 +3,36 @@ import styles from "./FormSteps.module.css";
 import type { FormStepProps, FormData } from "@/types/formTypes";
 import { FormButtons, FormStepContainer } from "@/components/shared";
 
+interface EventDetailsInputProps {
+  id: string;
+  label: string;
+  placeholder: string;
+  value: string;
+  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+}
+
+const EventDetailsInput = ({
+  id,
+  label,
+  placeholder,
+  value,
+  onChange,
+}: EventDetailsInputProps) => (
+  <div className={styles.fieldGroup}>
+    <label htmlFor={id} className={styles.label}>
+      {label}
+    </label>
+    <input
+      id={id}
+      type="text"
+      value={value}
+      onChange={onChange}
+      className={styles.input}
+      placeholder={placeholder}
+    />
+  </div>
+);
+
 export const EventDetails = ({
   formData,
   updateFormData,
@@ -23,33 +53,21 @@ export const EventDetails = ({
       description="If these treats are for an event, tell us the type and any theme you have in mind."
     >
       <div className={styles.formFields}>
-        <div className={styles.fieldGroup}>
-          <label htmlFor="eventType" className={styles.label}>
-            Type of event
-          </label>
-          <input
-            id="eventType"
-            type="text"
-            value={formData.eventType}
-            onChange={handleChange("eventType")}
-            className={styles.input}
-            placeholder="e.g., Wedding, Birthday Party, Corporate"
-          />
-        </div>
+        <EventDetailsInput
+          id="event-type"
+          label="Type of event"
+          placeholder="e.g., Wedding, Birthday Party, Corporate"
+          value={formData.eventType}
+          onChange={handleChange('eventType')}
+        />
 
-        <div className={styles.fieldGroup}>
-          <label htmlFor="theme" className={styles.label}>
-            Theme
-          </label>
-          <input
-            id="theme"
-            type="text"
-            value={formData.theme}
-            onChange={handleChange("theme")}
-            className={styles.input}
-            placeholder="e.g., Garden party, Princess, Minimalist gold"
-          />
-        </div>
+        <EventDetailsInput
+          id="theme"
+          label="Theme"
+          placeholder="e.g., Garden party, Princess, Minimalist gold"
+          value={formData.theme}
+          onChange={handleChange('theme')}
+        />
       </div>
 
       <FormButtons

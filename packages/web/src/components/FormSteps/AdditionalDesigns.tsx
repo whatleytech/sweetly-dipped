@@ -23,11 +23,11 @@ export const AdditionalDesigns = ({
     >
       <div className={styles.formFields}>
         <div className={styles.fieldGroup}>
-          <label htmlFor="additionalDesigns" className={styles.label}>
+          <label htmlFor="additional-designs" className={styles.label}>
             Design notes (optional)
           </label>
           <textarea
-            id="additionalDesigns"
+            id="additional-designs"
             value={formData.additionalDesigns}
             onChange={handleChange}
             className={styles.input}

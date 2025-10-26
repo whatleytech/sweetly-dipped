@@ -104,6 +104,7 @@ export const ConfirmationPage = () => {
         <TermsAndConditions formData={formData} onUpdate={updateFormData} />
         <div className={styles.submitSection}>
           <button
+            id="submit-order"
             onClick={handleSubmit}
             disabled={!formData.termsAccepted}
             className={styles.submitButton}
