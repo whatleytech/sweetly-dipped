@@ -229,7 +229,7 @@ export const formDataApi = {
   // Create new form data
   async create(data: CreateFormDataRequest): Promise<StoredFormData> {
     const serializedData = serializeApiRequest(data);
-    const response = await fetchWithRetry(`${API_BASE_URL}/form-data`, {
+    const response = await fetchWithRetry(`${API_BASE_URL}/forms`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -242,7 +242,7 @@ export const formDataApi = {
 
   // Get form data by ID
   async get(id: string): Promise<StoredFormData> {
-    const response = await fetchWithRetry(`${API_BASE_URL}/form-data/${id}`);
+    const response = await fetchWithRetry(`${API_BASE_URL}/forms/${id}`);
     return handleResponse<StoredFormData>(response);
   },
 
@@ -252,7 +252,7 @@ export const formDataApi = {
     data: UpdateFormDataRequest
   ): Promise<StoredFormData> {
     const serializedData = serializeApiRequest(data);
-    const response = await fetchWithRetry(`${API_BASE_URL}/form-data/${id}`, {
+    const response = await fetchWithRetry(`${API_BASE_URL}/forms/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -265,7 +265,7 @@ export const formDataApi = {
 
   // Delete form data
   async delete(id: string): Promise<void> {
-    const response = await fetchWithRetry(`${API_BASE_URL}/form-data/${id}`, {
+    const response = await fetchWithRetry(`${API_BASE_URL}/forms/${id}`, {
       method: 'DELETE',
     });
 
@@ -292,7 +292,7 @@ export const formDataApi = {
 
   // List all form data (for debugging)
   async list(): Promise<StoredFormData[]> {
-    const response = await fetchWithRetry(`${API_BASE_URL}/form-data`);
+    const response = await fetchWithRetry(`${API_BASE_URL}/forms`);
     return handleResponse<StoredFormData[]>(response);
   },
 

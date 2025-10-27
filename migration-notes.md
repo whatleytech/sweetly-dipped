@@ -34,7 +34,7 @@ All imports in `/packages/web/src/` now use `@/` alias:
 
 ### API Package
 All imports in `/packages/api/src/` now use `@/` alias:
-- `./controllers/form-data-controller` → `@/controllers/form-data-controller`
+- `./controllers/forms-controller` → `@/controllers/forms-controller`
 - etc.
 
 ## Bootstrap Commands

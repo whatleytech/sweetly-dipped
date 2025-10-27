@@ -55,7 +55,7 @@ describe('formDataApi', () => {
       });
 
       const callArgs = mockFetch.mock.calls[0];
-      expect(callArgs[0]).toBe('http://localhost:3001/api/form-data');
+      expect(callArgs[0]).toBe('http://localhost:3001/api/forms');
       expect(callArgs[1]).toMatchObject({
         method: 'POST',
         headers: {
@@ -126,7 +126,7 @@ describe('formDataApi', () => {
       const result = await formDataApi.get('form-123');
 
       const callArgs = mockFetch.mock.calls[0];
-      expect(callArgs[0]).toBe('http://localhost:3001/api/form-data/form-123');
+      expect(callArgs[0]).toBe('http://localhost:3001/api/forms/form-123');
       expect(callArgs[1]).toMatchObject({});
       expect(callArgs[1].signal).toBeInstanceOf(AbortSignal);
 
@@ -174,7 +174,7 @@ describe('formDataApi', () => {
       });
 
       const callArgs = mockFetch.mock.calls[0];
-      expect(callArgs[0]).toBe('http://localhost:3001/api/form-data/form-123');
+      expect(callArgs[0]).toBe('http://localhost:3001/api/forms/form-123');
       expect(callArgs[1]).toMatchObject({
         method: 'PUT',
         headers: {
@@ -204,7 +204,7 @@ describe('formDataApi', () => {
       await formDataApi.delete('form-123');
 
       const callArgs = mockFetch.mock.calls[0];
-      expect(callArgs[0]).toBe('http://localhost:3001/api/form-data/form-123');
+      expect(callArgs[0]).toBe('http://localhost:3001/api/forms/form-123');
       expect(callArgs[1]).toMatchObject({
         method: 'DELETE',
       });

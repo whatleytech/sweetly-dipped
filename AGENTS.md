@@ -372,6 +372,7 @@ Before any commit, run this checklist:
 yarn lint           # ESLint passes
 yarn type-check     # TypeScript compiles
 yarn test           # All tests green and coverage threshold met
+yarn test:e2e       # E2E tests pass across all browsers
 ```
 
 #### Commit Standards

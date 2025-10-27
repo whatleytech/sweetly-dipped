@@ -11,7 +11,7 @@ test.describe('API Server', () => {
   });
 
   test('should have working form data endpoint', async ({ request }) => {
-    const response = await request.get('http://localhost:3001/api/form-data');
+    const response = await request.get("http://localhost:3001/api/forms");
     expect(response.ok()).toBeTruthy();
   });
 });

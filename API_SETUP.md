@@ -25,11 +25,11 @@ The application has been migrated from localStorage to a backend API for form da
 |--------|----------|-------------|
 | GET | `/health` | Health check endpoint |
 | POST | `/order/number` | Generate a new order number |
-| POST | `/form-data` | Create new form data |
-| GET | `/form-data/:id` | Get form data by ID |
-| PUT | `/form-data/:id` | Update form data |
-| DELETE | `/form-data/:id` | Delete form data |
-| GET | `/form-data` | List all form data (debug) |
+| POST | `/forms` | Create new form data |
+| GET | `/forms/:id` | Get form data by ID |
+| PUT | `/forms/:id` | Update form data |
+| DELETE | `/forms/:id` | Delete form data |
+| GET | `/forms` | List all form data (debug) |
 
 ## Running the Application
 
@@ -67,8 +67,8 @@ Expected response:
 
 ## Data Flow
 
-1. **Form Initialization**: When a user starts the form, a new form entry is created via POST `/form-data`
-2. **Form Updates**: As users fill out the form, data is updated via PUT `/form-data/:id`
+1. **Form Initialization**: When a user starts the form, a new form entry is created via POST `/forms`
+2. **Form Updates**: As users fill out the form, data is updated via PUT `/forms/:id`
 3. **Step Navigation**: Current step is tracked and persisted with each update
 4. **Order Submission**: Order number is generated and stored when form is submitted
 5. **Data Cleanup**: Form data is deleted when user returns to home from thank you page

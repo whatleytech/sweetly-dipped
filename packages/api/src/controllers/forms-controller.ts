@@ -60,7 +60,7 @@ const deserializeFormData = (data: {
 
 const router = Router();
 
-// GET /api/form-data/:id - Get form data by ID
+// GET /api/forms/:id - Get form data by ID
 router.get('/:id', (req, res) => {
   const { id } = req.params;
   const data = formDataStore.get(id);
@@ -72,7 +72,7 @@ router.get('/:id', (req, res) => {
   res.json(serializeFormData(data));
 });
 
-// POST /api/form-data - Create new form data
+// POST /api/forms - Create new form data
 router.post('/', (req, res) => {
   try {
     const { formData, currentStep = 0 } = req.body;
@@ -104,7 +104,7 @@ router.post('/', (req, res) => {
   }
 });
 
-// PUT /api/form-data/:id - Update existing form data
+// PUT /api/forms/:id - Update existing form data
 router.put('/:id', (req, res) => {
   try {
     const { id } = req.params;
@@ -132,7 +132,7 @@ router.put('/:id', (req, res) => {
   }
 });
 
-// DELETE /api/form-data/:id - Delete form data
+// DELETE /api/forms/:id - Delete form data
 router.delete('/:id', (req, res) => {
   const { id } = req.params;
   
@@ -144,10 +144,10 @@ router.delete('/:id', (req, res) => {
   res.status(204).send();
 });
 
-// GET /api/form-data - List all form data (for debugging)
+// GET /api/forms - List all form data (for debugging)
 router.get('/', (req, res) => {
   const allData = Array.from(formDataStore.values()).map(serializeFormData);
   res.json(allData);
 });
 
-export { router as formDataRouter, formDataStore };
+export { router as formsRouter, formDataStore };
