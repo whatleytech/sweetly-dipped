@@ -1,10 +1,23 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalDependencies": ["**/.env.*local"],
+  "globalDependencies": ["**/.env.*local", "**/.env"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
+    },
+    "db:generate": {
+      "cache": false,
+      "outputs": ["node_modules/.prisma/**"]
+    },
+    "db:push": {
+      "cache": false
+    },
+    "db:migrate": {
+      "cache": false
+    },
+    "db:seed": {
+      "cache": false
     },
     "lint": {
       "dependsOn": ["^lint"]
@@ -12,7 +25,8 @@
     "test": {
       "dependsOn": ["^build"],
       "outputs": ["coverage/**", "coverage/lcov.info"],
-      "persistent": false
+      "persistent": false,
+      "env": ["DATABASE_URL", "DATABASE_URL_TEST", "NODE_ENV"]
     },
     "test:ui": {
       "dependsOn": ["^build"],

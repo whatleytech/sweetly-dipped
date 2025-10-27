@@ -1,0 +1,18 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: sweetly-dipped-db
+    environment:
+      POSTGRES_USER: sweetly_dipped
+      POSTGRES_PASSWORD: dev_password
+      POSTGRES_DB: sweetly_dipped
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    # Create test database on initialization
+    command: >
+      postgres -c "max_connections=100"
+volumes:
+  postgres_data:
