@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { app, PORT } from './api.js';
 
 app.listen(PORT, () => {

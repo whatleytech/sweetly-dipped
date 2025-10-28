@@ -1,2 +1,15 @@
 import config from "@sweetly-dipped/config-eslint/library.js";
-export default config;
+import globals from 'globals';
+
+export default [
+  ...config,
+  {
+    files: ['**/*.{ts,tsx}'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+        ...globals.es2020,
+      },
+    },
+  },
+];
