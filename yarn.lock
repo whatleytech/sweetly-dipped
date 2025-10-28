@@ -1208,6 +1208,7 @@ __metadata:
     "@types/supertest": "npm:^6.0.3"
     "@vitest/coverage-v8": "npm:^3.2.4"
     cors: "npm:^2.8.5"
+    dotenv: "npm:^17.2.3"
     dotenv-cli: "npm:^10.0.0"
     eslint: "npm:^9.30.1"
     express: "npm:^5.1.0"
@@ -2877,7 +2878,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dotenv@npm:^17.1.0":
+"dotenv@npm:^17.1.0, dotenv@npm:^17.2.3":
   version: 17.2.3
   resolution: "dotenv@npm:17.2.3"
   checksum: 10c0/c884403209f713214a1b64d4d1defa4934c2aa5b0002f5a670ae298a51e3c3ad3ba79dfee2f8df49f01ae74290fcd9acdb1ab1d09c7bfb42b539036108bb2ba0
