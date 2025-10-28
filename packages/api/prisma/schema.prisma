@@ -13,3 +13,128 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Customer {
+  id        String   @id @default(uuid())
+  firstName String   @map("first_name")
+  lastName  String   @map("last_name")
+  email     String   @unique
+  phone     String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+  forms     Form[]
+  orders    Order[]
+  
+  @@map("customers")
+}
+
+model Form {
+  id         String   @id @default(uuid())
+  customerId String   @map("customer_id")
+  
+  // Communication preference (for filtering/bulk actions)
+  communicationMethod String?  @map("communication_method")  // "email" | "text"
+  
+  // Pickup details (for admin dashboard queries)
+  pickupDate    String?  @map("pickup_date")  // For filtering/sorting orders by date
+  pickupTime    String?  @map("pickup_time")  // For sorting orders within a day
+  rushOrder     Boolean  @default(false) @map("rush_order")  // For filtering urgent orders
+  
+  // Package selection (for inventory/shopping list queries)
+  packageType   String?  @map("package_type")  // "small" | "medium" | "large" | "xl" | "by-dozen"
+  riceKrispies  Int      @default(0) @map("rice_krispies")
+  oreos         Int      @default(0)
+  pretzels      Int      @default(0)
+  marshmallows  Int      @default(0)
+  
+  // Marketing analytics
+  referralSource String?  @map("referral_source")  // For tracking marketing effectiveness
+  
+  // Everything else stored as JSONB for flexibility
+  data      Json     // colorScheme, eventType, theme, additionalDesigns, termsAccepted, visitedSteps
+  
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+  customer  Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  order     Order?
+  
+  @@map("forms")
+  @@index([pickupDate, pickupTime])  // For dashboard date/time queries
+  @@index([rushOrder])                // For filtering rush orders
+  @@index([referralSource])           // For marketing analytics
+}
+
+model Order {
+  id          String   @id @default(uuid())
+  orderNumber String   @unique @map("order_number")
+  formId      String   @unique @map("form_id")
+  customerId  String   @map("customer_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  form        Form     @relation(fields: [formId], references: [id], onDelete: Cascade)
+  customer    Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  
+  @@map("orders")
+}
+
+// Configuration models for admin management
+
+model PackageOption {
+  id          String  @id @default(uuid())
+  packageId   String  @unique @map("package_id")  // "small" | "medium" | "large" | "xl" | "by-dozen"
+  label       String
+  description String?
+  price       Int?    // Price in dollars (null for by-dozen)
+  isActive    Boolean @default(true) @map("is_active")
+  sortOrder   Int     @default(0) @map("sort_order")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  @@map("package_options")
+}
+
+model TreatOption {
+  id        String  @id @default(uuid())
+  treatKey  String  @unique @map("treat_key")  // "riceKrispies" | "oreos" | "pretzels" | "marshmallows"
+  label     String
+  price     Int     // Price per dozen
+  isActive  Boolean @default(true) @map("is_active")
+  sortOrder Int     @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+  @@map("treat_options")
+}
+
+model TimeSlot {
+  id            String @id @default(uuid())
+  dayOfWeek     String @map("day_of_week")  // "Monday" | "Tuesday" | etc.
+  startHour     Int    @map("start_hour")
+  startMinute   Int    @map("start_minute")
+  startTimeOfDay String @map("start_time_of_day")  // "morning" | "evening"
+  endHour       Int    @map("end_hour")
+  endMinute     Int    @map("end_minute")
+  endTimeOfDay  String @map("end_time_of_day")  // "morning" | "evening"
+  isActive      Boolean @default(true) @map("is_active")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+  
+  @@map("time_slots")
+  @@index([dayOfWeek, isActive])
+}
+
+model UnavailablePeriod {
+  id        String   @id @default(uuid())
+  startDate String   @map("start_date")  // ISO date string (YYYY-MM-DD)
+  endDate   String?  @map("end_date")    // ISO date string (YYYY-MM-DD) - optional for single day
+  reason    String?
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+  @@map("unavailable_periods")
+  @@index([startDate, endDate, isActive])
+}
