@@ -1,5 +1,5 @@
 import type { FormData } from '@sweetly-dipped/shared-types';
-import type { Customer, Form } from '.prisma/client';
+import type { Customer, Form } from '../generated/client';
 
 export interface StoredFormData {
   id: string;

@@ -3,12 +3,22 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   test: {
     globals: true,
-    environment: "node",
+    environment: 'node',
     coverage: {
-      provider: "v8",
+      provider: 'v8',
       enabled: true,
-      reporter: ["text", "lcov"],
+      reporter: ['text', 'lcov'],
       thresholds: { lines: 0 },
     },
   },
+  ssr: {
+    noExternal: ['@prisma/client'],
+  },
+  build: {
+    sourcemap: false,
+  },
+  esbuild: {
+    sourcemap: false,
+  },
+  logLevel: 'error',
 });
