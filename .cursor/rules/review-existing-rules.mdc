@@ -45,7 +45,7 @@ The agent must then perform the following **six steps**:
    • Output a short justification and “❌ REMOVE” recommendation.
 
 5. **Gap analysis & new-rule ideas**  
-   • Considering the tech stack (TypeScript, Vite, React, Express,
+   • Considering the tech stack (TypeScript, Vite, React, NestJS,
      monorepo, ESLint, test pyramid), list high-impact rules that do **not**
      exist yet, with a one-sentence benefit description each.
 

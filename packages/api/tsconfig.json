@@ -5,9 +5,10 @@
     "rootDir": "./src",
     "target": "ES2023",
     "baseUrl": ".",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "paths": {
-      "@/*": ["src/*"],
-      "@/controllers/*": ["src/controllers/*"]
+      "@/*": ["src/*"]
     }
   },
   "include": ["src/**/*", "prisma/**/*", "src/generated/**/*"],

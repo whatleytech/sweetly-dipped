@@ -4,7 +4,7 @@ description: >
   When explicitly invoked, analyse the entire repository for code-smells,
   bugs, refactor opportunities, inconsistent style, missing or weak tests,
   and risky architecture decisions.  
-  Technologies expected: TypeScript, React, Vite, Express, monorepo
+  Technologies expected: TypeScript, React, Vite, NestJS, monorepo
   layouts, ESLint.  Use official docs and broadly-accepted industry
   guidelines as the quality baseline.
 globs:
@@ -28,11 +28,11 @@ alwaysApply: false
    • Long or deeply-nested functions / components  
    • Inconsistent naming / formatting / project structure  
    • Duplicated code or dead code  
-   • Non-idiomatic use of Vite, Express routing, React hooks, etc.
+   • Non-idiomatic use of Vite, NestJS modules/controllers, React hooks, etc.
 
 2. Assign an **overall health score** between **0 (horrible) – 10 (perfect)**.  
    Base this solely on the evidence you find and what the official docs
-   recommend (TypeScript, React, Vite, Express, ESLint, monorepo tooling).
+   recommend (TypeScript, React, Vite, NestJS, ESLint, monorepo tooling).
 
 3. Build a **“Suggestions” table**.  
    For **each** issue you report include:
@@ -146,7 +146,7 @@ When deciding whether something is a problem or what score to give, consult
    • TypeScript Handbook & 5.0+ release notes  
    • React 18+ docs (functional components & hooks)  
    • Vite guide (vite.dev/guide)  
-   • Express routing guide (expressjs.com/guide/routing.html)  
+   • NestJS documentation (docs.nestjs.com)  
    • ESLint “latest” rule docs  
 2. Accepted community-wide best practices (e.g. Twelve-Factor, test pyramid,
    SOLID, composable React components, small modules, fully typed code).  

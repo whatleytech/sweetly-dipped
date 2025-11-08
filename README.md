@@ -26,7 +26,7 @@ Sweetly Dipped is a multi-page web application that allows customers to:
 
 ### Backend (API Package)
 - **Node.js** - JavaScript runtime
-- **Express.js** - Web framework
+- **NestJS** - Opinionated framework atop Express/Fastify
 - **TypeScript** - Type-safe server code
 - **CORS** - Cross-origin resource sharing
 - **Vitest** - API testing
@@ -54,10 +54,13 @@ packages/
 │   │   ├── assets/        # Static assets (images, CSS)
 │   │   └── api/           # API client functions
 │   └── package.json
-├── api/                    # Backend Express.js server
+├── api/                    # Backend NestJS server
 │   ├── src/
-│   │   ├── controllers/   # API route handlers
-│   │   └── index.ts       # Server entry point
+│   │   ├── app.module.ts  # Root Nest module
+│   │   ├── main.ts        # Bootstrap entry point
+│   │   ├── forms/         # Feature module for order form APIs
+│   │   ├── orders/        # Feature module for order numbers
+│   │   └── health/        # Feature module for health checks
 │   └── package.json
 ├── shared-types/           # Shared TypeScript types
 │   ├── formTypes.ts       # Form data interfaces
@@ -113,7 +116,7 @@ yarn dev:api
 ```
 
 The web application will be available at `http://localhost:5173`
-The API server will be available at `http://localhost:3000`
+The API server will be available at `http://localhost:3001`
 
 ### Building for Production
 

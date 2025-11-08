@@ -18,7 +18,7 @@ This is a **Turborepo monorepo** with the following structure:
 /
 ├── packages/
 │   ├── web/          # React + Vite frontend
-│   ├── api/          # Express.js backend
+│   ├── api/          # NestJS backend
 │   ├── shared-types/ # Shared TypeScript types
 │   ├── config-eslint/ # Shared ESLint configuration
 │   └── config-ts/    # Shared TypeScript configuration
@@ -71,17 +71,24 @@ src/
 #### Structure
 ```
 src/
-├── controllers/     # Express route handlers
-├── middleware/      # Express middleware
-├── services/        # Business logic
-├── types/          # TypeScript definitions
-└── index.ts        # Entry point
+├── app.module.ts   # Root application module
+├── main.ts         # Nest bootstrap entry point
+├── forms/          # Feature module for form APIs
+│   ├── forms.controller.ts
+│   ├── forms.module.ts
+│   └── forms.service.ts
+├── orders/         # Feature module for order number API
+├── health/         # Feature module for health checks
+└── common/         # Shared providers, interceptors, pipes (create as needed)
 ```
 
 #### Patterns
-- **Controllers**: Handle HTTP requests/responses
-- **Services**: Contain business logic
-- **Middleware**: Cross-cutting concerns (auth, validation, etc.)
+- **Modules**: Group feature domains; register controllers and providers
+- **Controllers**: Surface HTTP routes via Nest decorators
+- **Services**: Encapsulate business logic and state management
+- **Providers**: Injected dependencies (services, repositories, pipes, guards)
+- **Bootstrap**: Configure global middleware, filters, and prefixes in `main.ts`
+- **Scaffolding**: Prefer the Nest CLI (`nest generate ...`) for creating new modules, controllers, and services to ensure consistent file structure and metadata ([docs.nestjs.com](https://docs.nestjs.com/cli/usages#nest-generate))
 
 ### TypeScript Configuration
 
