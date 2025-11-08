@@ -19,32 +19,32 @@ export class FormsController {
   constructor(private readonly formsService: FormsService) {}
 
   @Get()
-  findAll(): StoredFormDto[] {
+  findAll(): Promise<StoredFormDto[]> {
     return this.formsService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): StoredFormDto {
+  findOne(@Param('id') id: string): Promise<StoredFormDto> {
     return this.formsService.findOne(id);
   }
 
   @Post()
-  create(@Body() createFormDto: CreateFormDto): StoredFormDto {
+  create(@Body() createFormDto: CreateFormDto): Promise<StoredFormDto> {
     return this.formsService.create(createFormDto);
   }
 
   @Put(':id')
   update(
     @Param('id') id: string,
-    @Body() updateFormDto: UpdateFormDto,
-  ): StoredFormDto {
+    @Body() updateFormDto: UpdateFormDto
+  ): Promise<StoredFormDto> {
     return this.formsService.update(id, updateFormDto);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id') id: string): void {
-    this.formsService.remove(id);
+  async remove(@Param('id') id: string): Promise<void> {
+    await this.formsService.remove(id);
   }
 }
 

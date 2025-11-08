@@ -6,6 +6,7 @@
     "noEmit": false,
     "outDir": "./dist"
   },
-  "exclude": ["src/**/*.spec.ts", "src/**/*.test.ts", "src/**/*.spec.tsx", "src/**/*.test.tsx", "dist", "coverage"]
+  "include": ["src", "generated"],
+  "exclude": ["node_modules", "test", "dist", "**/*spec.ts"]
 }
 

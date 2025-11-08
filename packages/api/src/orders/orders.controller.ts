@@ -7,7 +7,7 @@ export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Post('number')
-  generateOrderNumber(): OrderNumberDto {
+  generateOrderNumber(): Promise<OrderNumberDto> {
     return this.ordersService.generateOrderNumber();
   }
 }

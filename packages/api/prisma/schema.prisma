@@ -6,7 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/client"
+  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -31,7 +31,7 @@ model Customer {
 
 model Form {
   id         String   @id @default(uuid())
-  customerId String   @map("customer_id")
+  customerId String?  @map("customer_id")
   
   // Communication preference (for filtering/bulk actions)
   communicationMethod String?  @map("communication_method")  // "email" | "text"
@@ -57,7 +57,7 @@ model Form {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
   
-  customer  Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customer  Customer? @relation(fields: [customerId], references: [id], onDelete: Cascade)
   order     Order?
   
   @@map("forms")
@@ -78,6 +78,16 @@ model Order {
   customer    Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
   
   @@map("orders")
+}
+
+model OrderCounter {
+  id        String   @id @default(uuid())
+  date      String   @unique
+  count     Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("order_counters")
 }
 
 // Configuration models for admin management

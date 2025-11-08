@@ -1,20 +1,29 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service.js';
 import type { OrderNumberDto } from './dto/order-number.dto.js';
 
 @Injectable()
 export class OrdersService {
-  private readonly orderCountStore = new Map<string, number>();
+  constructor(private readonly prisma: PrismaService) {}
 
-  generateOrderNumber(dateInput?: Date): OrderNumberDto {
+  async generateOrderNumber(dateInput?: Date): Promise<OrderNumberDto> {
     const today = dateInput ?? new Date();
     const dateString = today.toISOString().split('T')[0];
 
-    const currentCount = this.orderCountStore.get(dateString) ?? 0;
-    const nextCount = currentCount + 1;
+    const counter = await this.prisma.orderCounter.upsert({
+      where: { date: dateString },
+      update: {
+        count: {
+          increment: 1,
+        },
+      },
+      create: {
+        date: dateString,
+        count: 1,
+      },
+    });
 
-    this.orderCountStore.set(dateString, nextCount);
-
-    const sequentialNumber = nextCount.toString().padStart(3, '0');
+    const sequentialNumber = counter.count.toString().padStart(3, '0');
 
     return { orderNumber: `${dateString}-${sequentialNumber}` };
   }

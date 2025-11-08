@@ -4,114 +4,374 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import type { FormData } from '@sweetly-dipped/shared-types';
+import { PrismaService } from '../prisma/prisma.service.js';
+import { Prisma } from '../../generated/prisma/index.js';
 import type { CreateFormDto } from './dto/create-form.dto.js';
 import type { UpdateFormDto } from './dto/update-form.dto.js';
 import type { StoredFormDto } from './dto/stored-form.dto.js';
 
-export interface StoredFormData {
-  id: string;
-  formData: FormData;
-  currentStep: number;
-  orderNumber?: string;
-  createdAt: string;
-  updatedAt: string;
-}
+const DEFAULT_VISITED_STEP = 'lead';
+const COMMUNICATION_METHODS: ReadonlyArray<FormData['communicationMethod']> = [
+  '',
+  'email',
+  'text',
+] as const;
+const PACKAGE_TYPES: ReadonlyArray<FormData['packageType']> = [
+  '',
+  'small',
+  'medium',
+  'large',
+  'xl',
+  'by-dozen',
+] as const;
 
-const serializeFormData = (data: StoredFormData): StoredFormDto => ({
-  ...data,
-  formData: {
-    ...data.formData,
-    visitedSteps: Array.from(data.formData.visitedSteps),
-  },
-});
+type FormWithRelations = Prisma.FormGetPayload<{
+  include: { customer: true; order: true };
+}>;
 
-const deserializeFormData = (data: FormData): FormData => {
-  const visitedStepsInput = data.visitedSteps;
-  let visitedStepsArray: string[] = ['lead'];
-
-  if (Array.isArray(visitedStepsInput)) {
-    visitedStepsArray = visitedStepsInput;
-  } else if (visitedStepsInput instanceof Set) {
-    visitedStepsArray = Array.from(visitedStepsInput);
+const ensureVisitedStepsSet = (
+  input: FormData['visitedSteps'] | string[] | undefined
+): Set<string> => {
+  if (input instanceof Set) {
+    const steps = input.size > 0 ? input : new Set<string>();
+    if (steps.size === 0) {
+      steps.add(DEFAULT_VISITED_STEP);
+    }
+    return steps;
   }
 
+  const steps = new Set<string>();
+  if (Array.isArray(input)) {
+    for (const step of input) {
+      if (typeof step === 'string' && step.trim()) {
+        steps.add(step);
+      }
+    }
+  }
+  if (steps.size === 0) {
+    steps.add(DEFAULT_VISITED_STEP);
+  }
+  return steps;
+};
+
+const normalizeFormDataInput = (data: FormData): FormData => ({
+  ...data,
+  visitedSteps: ensureVisitedStepsSet(data.visitedSteps),
+});
+
+const toNullableString = (value: string): string | null => {
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+};
+
+const isJsonObject = (value: Prisma.JsonValue): value is Prisma.JsonObject =>
+  value !== null && typeof value === 'object' && !Array.isArray(value);
+
+interface FormMetadata {
+  colorScheme: string;
+  eventType: string;
+  theme: string;
+  additionalDesigns: string;
+  termsAccepted: boolean;
+  visitedSteps: string[];
+  currentStep: number;
+}
+
+const getFormMetadata = (form: FormWithRelations): FormMetadata => {
+  const json = isJsonObject(form.data) ? form.data : {};
+
+  const toStringField = (value: Prisma.JsonValue | undefined): string =>
+    typeof value === 'string' ? value : '';
+
+  const toBooleanField = (value: Prisma.JsonValue | undefined): boolean =>
+    typeof value === 'boolean' ? value : false;
+
+  const toVisitedSteps = (value: Prisma.JsonValue | undefined): string[] => {
+    if (Array.isArray(value)) {
+      const steps = value.filter(
+        (step): step is string =>
+          typeof step === 'string' && step.trim().length > 0
+      );
+      return steps.length > 0
+        ? Array.from(new Set(steps))
+        : [DEFAULT_VISITED_STEP];
+    }
+    return [DEFAULT_VISITED_STEP];
+  };
+
+  const toCurrentStep = (value: Prisma.JsonValue | undefined): number =>
+    typeof value === 'number' && Number.isFinite(value) ? value : 0;
+
   return {
-    ...data,
-    visitedSteps: new Set(visitedStepsArray),
+    colorScheme: toStringField(json.colorScheme),
+    eventType: toStringField(json.eventType),
+    theme: toStringField(json.theme),
+    additionalDesigns: toStringField(json.additionalDesigns),
+    termsAccepted: toBooleanField(json.termsAccepted),
+    visitedSteps: toVisitedSteps(json.visitedSteps),
+    currentStep: toCurrentStep(json.currentStep),
+  };
+};
+
+const buildJsonData = (
+  formData: FormData,
+  currentStep: number
+): Prisma.InputJsonObject => ({
+  colorScheme: formData.colorScheme,
+  eventType: formData.eventType,
+  theme: formData.theme,
+  additionalDesigns: formData.additionalDesigns,
+  termsAccepted: formData.termsAccepted,
+  visitedSteps: Array.from(formData.visitedSteps),
+  currentStep,
+});
+
+const sanitizeCommunicationMethod = (
+  value: string | null | undefined
+): FormData['communicationMethod'] =>
+  COMMUNICATION_METHODS.includes(value as FormData['communicationMethod'])
+    ? (value as FormData['communicationMethod'])
+    : '';
+
+const sanitizePackageType = (
+  value: string | null | undefined
+): FormData['packageType'] =>
+  PACKAGE_TYPES.includes(value as FormData['packageType'])
+    ? (value as FormData['packageType'])
+    : '';
+
+const mapSharedFormFields = (formData: FormData, currentStep: number) => ({
+  communicationMethod: toNullableString(formData.communicationMethod),
+  pickupDate: toNullableString(formData.pickupDate),
+  pickupTime: toNullableString(formData.pickupTime),
+  rushOrder: formData.rushOrder,
+  packageType: toNullableString(formData.packageType),
+  riceKrispies: formData.riceKrispies,
+  oreos: formData.oreos,
+  pretzels: formData.pretzels,
+  marshmallows: formData.marshmallows,
+  referralSource: toNullableString(formData.referralSource),
+  data: buildJsonData(formData, currentStep),
+});
+
+const toFormDataFromRecord = (form: FormWithRelations): FormData => {
+  const metadata = getFormMetadata(form);
+  const visitedSteps = ensureVisitedStepsSet(metadata.visitedSteps);
+
+  return {
+    firstName: form.customer?.firstName ?? '',
+    lastName: form.customer?.lastName ?? '',
+    email: form.customer?.email ?? '',
+    phone: form.customer?.phone ?? '',
+    communicationMethod: sanitizeCommunicationMethod(form.communicationMethod),
+    packageType: sanitizePackageType(form.packageType),
+    riceKrispies: form.riceKrispies,
+    oreos: form.oreos,
+    pretzels: form.pretzels,
+    marshmallows: form.marshmallows,
+    colorScheme: metadata.colorScheme,
+    eventType: metadata.eventType,
+    theme: metadata.theme,
+    additionalDesigns: metadata.additionalDesigns,
+    pickupDate: form.pickupDate ?? '',
+    pickupTime: form.pickupTime ?? '',
+    rushOrder: form.rushOrder,
+    referralSource: form.referralSource ?? '',
+    termsAccepted: metadata.termsAccepted,
+    visitedSteps,
+  };
+};
+
+const mapFormToStoredDto = (form: FormWithRelations): StoredFormDto => {
+  const formData = toFormDataFromRecord(form);
+  const metadata = getFormMetadata(form);
+  const { visitedSteps, ...formDataRest } = formData;
+
+  return {
+    id: form.id,
+    formData: {
+      ...formDataRest,
+      visitedSteps: Array.from(visitedSteps),
+    },
+    currentStep: metadata.currentStep,
+    orderNumber: form.order?.orderNumber ?? undefined,
+    createdAt: form.createdAt.toISOString(),
+    updatedAt: form.updatedAt.toISOString(),
   };
 };
 
 @Injectable()
 export class FormsService {
-  private readonly formDataStore = new Map<string, StoredFormData>();
+  private readonly formInclude = { customer: true, order: true } as const;
 
-  create(dto: CreateFormDto): StoredFormDto {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async create(dto: CreateFormDto): Promise<StoredFormDto> {
     if (!dto.formData) {
       throw new BadRequestException('Form data is required');
     }
 
-    const id = `form-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
-    const now = new Date().toISOString();
     const currentStep = dto.currentStep ?? 0;
+    const normalizedFormData = normalizeFormDataInput(dto.formData);
+    const trimmedEmail = normalizedFormData.email.trim();
 
-    const storedData: StoredFormData = {
-      id,
-      formData: deserializeFormData(dto.formData),
-      currentStep,
-      createdAt: now,
-      updatedAt: now,
-    };
+    const customer = trimmedEmail
+      ? await this.prisma.customer.upsert({
+          where: { email: trimmedEmail },
+          update: {
+            firstName: normalizedFormData.firstName,
+            lastName: normalizedFormData.lastName,
+            phone: normalizedFormData.phone,
+          },
+          create: {
+            firstName: normalizedFormData.firstName,
+            lastName: normalizedFormData.lastName,
+            email: trimmedEmail,
+            phone: normalizedFormData.phone,
+          },
+        })
+      : null;
 
-    this.formDataStore.set(id, storedData);
+    const form = await this.prisma.form.create({
+      data: {
+        ...mapSharedFormFields(normalizedFormData, currentStep),
+        customer: customer
+          ? {
+              connect: { id: customer.id },
+            }
+          : undefined,
+      },
+      include: this.formInclude,
+    });
 
-    return serializeFormData(storedData);
+    return mapFormToStoredDto(form);
   }
 
-  findAll(): StoredFormDto[] {
-    return Array.from(this.formDataStore.values()).map(serializeFormData);
+  async findAll(): Promise<StoredFormDto[]> {
+    const forms = await this.prisma.form.findMany({
+      include: this.formInclude,
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return forms.map(mapFormToStoredDto);
   }
 
-  findOne(id: string): StoredFormDto {
-    const data = this.formDataStore.get(id);
+  async findOne(id: string): Promise<StoredFormDto> {
+    const form = await this.prisma.form.findUnique({
+      where: { id },
+      include: this.formInclude,
+    });
 
-    if (!data) {
+    if (!form) {
       throw new NotFoundException('Form data not found');
     }
 
-    return serializeFormData(data);
+    return mapFormToStoredDto(form);
   }
 
-  update(id: string, dto: UpdateFormDto): StoredFormDto {
-    const existingData = this.formDataStore.get(id);
+  async update(id: string, dto: UpdateFormDto): Promise<StoredFormDto> {
+    const existingForm = await this.prisma.form.findUnique({
+      where: { id },
+      include: this.formInclude,
+    });
 
-    if (!existingData) {
+    if (!existingForm) {
       throw new NotFoundException('Form data not found');
     }
 
-    const now = new Date().toISOString();
+    const existingFormData = toFormDataFromRecord(existingForm);
+    const targetFormData = dto.formData
+      ? normalizeFormDataInput(dto.formData)
+      : existingFormData;
+    const targetStep =
+      dto.currentStep ?? getFormMetadata(existingForm).currentStep;
 
-    const updatedData: StoredFormData = {
-      ...existingData,
-      formData: dto.formData
-        ? deserializeFormData(dto.formData)
-        : existingData.formData,
-      currentStep:
-        dto.currentStep !== undefined ? dto.currentStep : existingData.currentStep,
-      orderNumber:
-        dto.orderNumber !== undefined ? dto.orderNumber : existingData.orderNumber,
-      updatedAt: now,
-    };
+    const trimmedEmail = targetFormData.email.trim();
+    let customer = existingForm.customer;
 
-    this.formDataStore.set(id, updatedData);
+    if (dto.formData) {
+      customer = trimmedEmail
+        ? await this.prisma.customer.upsert({
+            where: { email: trimmedEmail },
+            update: {
+              firstName: targetFormData.firstName,
+              lastName: targetFormData.lastName,
+              phone: targetFormData.phone,
+            },
+            create: {
+              firstName: targetFormData.firstName,
+              lastName: targetFormData.lastName,
+              email: trimmedEmail,
+              phone: targetFormData.phone,
+            },
+          })
+        : null;
+    }
 
-    return serializeFormData(updatedData);
+    const formUpdateData: Prisma.FormUpdateInput = dto.formData
+      ? {
+          ...mapSharedFormFields(targetFormData, targetStep),
+          ...(customer
+            ? { customer: { connect: { id: customer.id } } }
+            : existingForm.customer
+              ? { customer: { disconnect: true } }
+              : {}),
+        }
+      : {
+          data: buildJsonData(targetFormData, targetStep),
+        };
+
+    await this.prisma.form.update({
+      where: { id },
+      data: formUpdateData,
+    });
+
+    if (dto.orderNumber !== undefined) {
+      if (dto.orderNumber && customer) {
+        await this.prisma.order.upsert({
+          where: { formId: id },
+          update: {
+            orderNumber: dto.orderNumber,
+            customerId: customer.id,
+          },
+          create: {
+            orderNumber: dto.orderNumber,
+            formId: id,
+            customerId: customer.id,
+          },
+        });
+      } else {
+        await this.prisma.order.deleteMany({
+          where: { formId: id },
+        });
+      }
+    }
+
+    const updatedForm = await this.prisma.form.findUnique({
+      where: { id },
+      include: this.formInclude,
+    });
+
+    if (!updatedForm) {
+      throw new NotFoundException('Form data not found');
+    }
+
+    return mapFormToStoredDto(updatedForm);
   }
 
-  remove(id: string): void {
-    const deleted = this.formDataStore.delete(id);
-
-    if (!deleted) {
-      throw new NotFoundException('Form data not found');
+  async remove(id: string): Promise<void> {
+    try {
+      await this.prisma.form.delete({
+        where: { id },
+      });
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException('Form data not found');
+      }
+      throw error;
     }
   }
 }

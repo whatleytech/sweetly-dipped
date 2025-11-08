@@ -30,6 +30,9 @@ coverage/
 # Local files
 local/
 
+# Prisma generated client
+packages/api/generated/
+
 # Turborepo
 .turbo
 
