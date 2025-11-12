@@ -3,7 +3,7 @@ import globals from 'globals';
 
 export default [
   {
-    ignores: ['src/generated/**/*'],
+    ignores: ['generated/**/*'],
   },
   ...config,
   {

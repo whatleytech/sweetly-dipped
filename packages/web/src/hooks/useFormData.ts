@@ -14,7 +14,6 @@ export const useFormData = () => {
   // Get or create form ID from localStorage
   useEffect(() => {
     const savedFormId = localStorage.getItem(STORAGE_KEY);
-    console.log('useFormData: Loading formId from localStorage:', savedFormId);
     if (savedFormId) {
       setFormId(savedFormId);
     }
@@ -181,14 +180,6 @@ export const useFormData = () => {
   const formData = storedData?.formData || null;
   const currentStep = storedData?.currentStep || 0;
   const orderNumber = storedData?.orderNumber;
-
-  console.log('useFormData: Current state:', {
-    formId,
-    isLoadingFormId,
-    isLoading,
-    formData: !!formData,
-    storedData: !!storedData,
-  });
 
   return {
     // Data

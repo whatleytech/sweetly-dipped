@@ -22,13 +22,6 @@ export const ThankYouPage = () => {
 
   // Redirect to home if no data or order number exists
   useEffect(() => {
-    console.log("ThankYouPage useEffect:", {
-      formData,
-      orderNumber,
-      isLoading,
-      isLoadingFormId,
-      error,
-    });
     // Only redirect if we're not loading formId AND not loading data AND we have no form data or order number AND no error
     if (
       !isLoadingFormId &&
@@ -36,8 +29,8 @@ export const ThankYouPage = () => {
       (!formData || !orderNumber) &&
       !error
     ) {
-      console.error("No form data or order number found");
-      navigate("/");
+      console.error('No form data or order number found');
+      navigate('/');
     }
   }, [formData, orderNumber, isLoading, isLoadingFormId, error, navigate]);
 

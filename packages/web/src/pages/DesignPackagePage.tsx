@@ -319,7 +319,6 @@ export const DesignPackagePage = () => {
   const CurrentStepComponent = currentStepDefinition?.component;
 
   const handleSubmit = useCallback(() => {
-    console.log('Submit button clicked - navigating to confirmation page');
     if (localFormData) {
       void persistFormProgress({
         formData: localFormData,

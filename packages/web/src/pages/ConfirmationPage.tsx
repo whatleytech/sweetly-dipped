@@ -26,16 +26,10 @@ export const ConfirmationPage = () => {
 
   // Redirect to form if no data exists
   useEffect(() => {
-    console.log("ConfirmationPage useEffect:", {
-      formData,
-      isLoading,
-      isLoadingFormId,
-      error,
-    });
     // Only redirect if we're not loading formId AND not loading data AND we have no form data AND no error
     if (!isLoadingFormId && !isLoading && !formData && !error) {
-      console.log("Redirecting to design-package - no form data found");
-      navigate("/design-package");
+      console.log('Redirecting to design-package - no form data found');
+      navigate('/design-package');
     }
   }, [formData, isLoading, isLoadingFormId, error, navigate]);
 
@@ -49,8 +43,6 @@ export const ConfirmationPage = () => {
       // Generate order number from server and store it with the form data
       const { orderNumber } = await formDataApi.generateOrderNumber();
       await updateOrderNumber(orderNumber);
-
-      console.log("Final form submitted:", formData);
 
       // Navigate to thank you page
       navigate("/thank-you");
