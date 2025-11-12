@@ -15,21 +15,21 @@ interface FormSidebarProps {
   formData: FormData;
   formSteps: Array<{ id: string; title: string }>;
   currentVisibleIndex?: number;
-  setCurrentStep: (step: number) => void;
+  onNavigateToStep: (step: number) => void;
 }
 
 export const FormSidebar = ({
   formData,
   formSteps,
   currentVisibleIndex,
-  setCurrentStep,
+  onNavigateToStep,
 }: FormSidebarProps) => {
   const handleStepClick = (stepIndex: number) => {
     if (
       isStepAccessible(stepIndex, formSteps, currentVisibleIndex!, formData)
     ) {
       const fullStepIndex = getFullStepIndex(stepIndex, formSteps);
-      setCurrentStep(fullStepIndex);
+      onNavigateToStep(fullStepIndex);
     }
   };
 

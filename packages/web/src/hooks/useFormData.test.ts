@@ -1,12 +1,11 @@
-import React from 'react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, waitFor } from '@testing-library/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useFormData } from './useFormData';
-import { formDataApi } from '@/api/formDataApi';
-import type { FormData } from '@sweetly-dipped/shared-types';
+import React from "react";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { renderHook, waitFor } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useFormData } from "./useFormData";
+import { formDataApi } from "@/api/formDataApi";
+import type { FormData } from "@sweetly-dipped/shared-types";
 
-// Mock the API
 vi.mock("@/api/formDataApi", () => ({
   formDataApi: {
     create: vi.fn(),
@@ -19,18 +18,18 @@ vi.mock("@/api/formDataApi", () => ({
   },
 }));
 
-// Mock localStorage
 const localStorageMock = {
   getItem: vi.fn(),
   setItem: vi.fn(),
   removeItem: vi.fn(),
   clear: vi.fn(),
 };
+
 Object.defineProperty(window, "localStorage", {
   value: localStorageMock,
 });
 
-const mockFormData: FormData = {
+const createMockFormData = (overrides: Partial<FormData> = {}): FormData => ({
   firstName: "John",
   lastName: "Doe",
   email: "john@example.com",
@@ -51,40 +50,44 @@ const mockFormData: FormData = {
   referralSource: "Social Media",
   termsAccepted: true,
   visitedSteps: new Set(["lead", "communication"]),
-};
+  ...overrides,
+});
 
-const mockStoredFormData = {
+const createMockStoredFormData = (
+  overrides: Partial<{
+    formData: FormData;
+    currentStep: number;
+    orderNumber?: string;
+  }> = {},
+) => ({
   id: "form-123",
-  formData: mockFormData,
-  currentStep: 0,
+  formData: overrides.formData ?? createMockFormData(),
+  currentStep: overrides.currentStep ?? 0,
+  orderNumber: overrides.orderNumber,
   createdAt: "2025-01-15T10:00:00Z",
   updatedAt: "2025-01-15T10:00:00Z",
-};
+});
 
-const createWrapper = () => {
+const createTestEnvironment = () => {
   const queryClient = new QueryClient({
     defaultOptions: {
-      queries: {
-        retry: false,
-      },
-      mutations: {
-        retry: false,
-      },
+      queries: { retry: false },
+      mutations: { retry: false },
     },
   });
 
-  return ({ children }: { children: React.ReactNode }) => {
-    return React.createElement(
-      QueryClientProvider,
-      { client: queryClient },
-      children
-    );
-  };
+  const wrapper = ({ children }: { children: React.ReactNode }) =>
+    React.createElement(QueryClientProvider, { client: queryClient }, children);
+
+  return { queryClient, wrapper };
 };
 
 describe("useFormData", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    localStorageMock.getItem.mockReset();
+    localStorageMock.setItem.mockReset();
+    localStorageMock.removeItem.mockReset();
     localStorageMock.getItem.mockReturnValue(null);
   });
 
@@ -92,23 +95,25 @@ describe("useFormData", () => {
     it("initializes without form ID when none exists in localStorage", () => {
       localStorageMock.getItem.mockReturnValue(null);
 
-      const { result } = renderHook(() => useFormData(), {
-        wrapper: createWrapper(),
-      });
+      const { wrapper } = createTestEnvironment();
+
+      const { result } = renderHook(() => useFormData(), { wrapper });
 
       expect(result.current.formId).toBeNull();
       expect(result.current.formData).toBeNull();
       expect(result.current.isLoading).toBe(false);
     });
 
-    it("loads existing form ID from localStorage", () => {
+    it("loads existing form ID from localStorage", async () => {
       localStorageMock.getItem.mockReturnValue("form-123");
 
-      const { result } = renderHook(() => useFormData(), {
-        wrapper: createWrapper(),
-      });
+      const { wrapper } = createTestEnvironment();
 
-      expect(result.current.formId).toBe("form-123");
+      const { result } = renderHook(() => useFormData(), { wrapper });
+
+      await waitFor(() => {
+        expect(result.current.formId).toBe("form-123");
+      });
     });
   });
 
@@ -116,7 +121,7 @@ describe("useFormData", () => {
     it("creates new form data when initialized", async () => {
       const mockCreatedForm = {
         id: "form-123",
-        formData: mockFormData,
+        formData: createMockFormData(),
         currentStep: 0,
         createdAt: "2025-01-15T10:00:00Z",
         updatedAt: "2025-01-15T10:00:00Z",
@@ -124,139 +129,240 @@ describe("useFormData", () => {
 
       vi.mocked(formDataApi.create).mockResolvedValue(mockCreatedForm);
 
-      const { result } = renderHook(() => useFormData(), {
-        wrapper: createWrapper(),
-      });
+      const { wrapper } = createTestEnvironment();
 
-      await result.current.initializeForm(mockFormData, 0);
+      const { result } = renderHook(() => useFormData(), { wrapper });
+
+      await result.current.initializeForm(createMockFormData(), 0);
 
       expect(formDataApi.create).toHaveBeenCalledWith({
-        formData: mockFormData,
+        formData: createMockFormData(),
         currentStep: 0,
       });
       expect(localStorageMock.setItem).toHaveBeenCalledWith(
         "sweetly-dipped-form-id",
-        "form-123"
+        "form-123",
       );
     });
   });
 
-  describe("form data updates", () => {
-    it("updates form data successfully", async () => {
-      const mockUpdatedForm = {
-        id: "form-123",
-        formData: { ...mockFormData, firstName: "Jane" },
-        currentStep: 2,
-        createdAt: "2025-01-15T10:00:00Z",
-        updatedAt: "2025-01-15T11:00:00Z",
-      };
-
-      vi.mocked(formDataApi.update).mockResolvedValue(mockUpdatedForm);
-
-      // Set form ID in localStorage before rendering hook
+  describe("persistFormProgress", () => {
+    it("persists form data and current step together", async () => {
       localStorageMock.getItem.mockReturnValue("form-123");
 
-      // Create a wrapper with pre-populated query cache
-      const queryClient = new QueryClient({
-        defaultOptions: {
-          queries: { retry: false },
-          mutations: { retry: false },
-        },
-      });
-      queryClient.setQueryData(["formData", "form-123"], mockStoredFormData);
+      const { queryClient, wrapper } = createTestEnvironment();
+      const storedForm = createMockStoredFormData();
+      queryClient.setQueryData(["formData", "form-123"], storedForm);
 
-      const wrapper = ({ children }: { children: React.ReactNode }) => {
-        return React.createElement(
-          QueryClientProvider,
-          { client: queryClient },
-          children
-        );
-      };
+      const updatedFormData = createMockFormData({ firstName: "Jane" });
+
+      vi.mocked(formDataApi.update).mockResolvedValue({
+        ...storedForm,
+        formData: updatedFormData,
+        currentStep: 2,
+      });
 
       const { result } = renderHook(() => useFormData(), { wrapper });
 
-      // Wait for the hook to load the form ID
       await waitFor(() => {
         expect(result.current.formId).toBe("form-123");
       });
 
-      await result.current.updateFormData({ firstName: "Jane" });
-
-      expect(formDataApi.update).toHaveBeenCalledWith("form-123", {
-        formData: { ...mockFormData, firstName: "Jane" },
+      await result.current.persistFormProgress({
+        formData: updatedFormData,
+        currentStep: 2,
       });
+
+      expect(formDataApi.update).toHaveBeenCalledWith(
+        "form-123",
+        expect.objectContaining({
+          formData: updatedFormData,
+          currentStep: 2,
+        }),
+      );
     });
 
-    it("throws error when trying to update without form ID", async () => {
-      const { result } = renderHook(() => useFormData(), {
-        wrapper: createWrapper(),
+    it("uses cached form data when only step is provided", async () => {
+      localStorageMock.getItem.mockReturnValue("form-123");
+
+      const { queryClient, wrapper } = createTestEnvironment();
+      const storedForm = createMockStoredFormData();
+      queryClient.setQueryData(["formData", "form-123"], storedForm);
+
+      vi.mocked(formDataApi.update).mockResolvedValue({
+        ...storedForm,
+        currentStep: 3,
       });
 
+      const { result } = renderHook(() => useFormData(), { wrapper });
+
+      await waitFor(() => {
+        expect(result.current.formId).toBe("form-123");
+      });
+
+      await result.current.persistFormProgress({ currentStep: 3 });
+
+      expect(formDataApi.update).toHaveBeenCalledWith(
+        "form-123",
+        expect.objectContaining({
+          formData: storedForm.formData,
+          currentStep: 3,
+        }),
+      );
+    });
+
+    it("persists order number independently", async () => {
+      localStorageMock.getItem.mockReturnValue("form-123");
+
+      const { queryClient, wrapper } = createTestEnvironment();
+      const storedForm = createMockStoredFormData();
+      queryClient.setQueryData(["formData", "form-123"], storedForm);
+
+      vi.mocked(formDataApi.update).mockResolvedValue({
+        ...storedForm,
+        orderNumber: "SD-0001",
+      });
+
+      const { result } = renderHook(() => useFormData(), { wrapper });
+
+      await waitFor(() => {
+        expect(result.current.formId).toBe("form-123");
+      });
+
+      await result.current.persistFormProgress({ orderNumber: "SD-0001" });
+
+      expect(formDataApi.update).toHaveBeenCalledWith(
+        "form-123",
+        expect.objectContaining({
+          formData: storedForm.formData,
+          currentStep: storedForm.currentStep,
+          orderNumber: "SD-0001",
+        }),
+      );
+    });
+
+    it("throws when attempting to persist without an initialized form", async () => {
+      const { wrapper } = createTestEnvironment();
+
+      const { result } = renderHook(() => useFormData(), { wrapper });
+
       await expect(
-        result.current.updateFormData({ firstName: "Jane" })
+        result.current.persistFormProgress({ currentStep: 1 }),
       ).rejects.toThrow("Form not initialized");
     });
   });
 
-  describe("step updates", () => {
-    it("updates current step successfully", async () => {
-      const mockUpdatedForm = {
-        id: "form-123",
-        formData: mockFormData,
-        currentStep: 3,
-        createdAt: "2025-01-15T10:00:00Z",
-        updatedAt: "2025-01-15T11:00:00Z",
-      };
-
-      vi.mocked(formDataApi.update).mockResolvedValue(mockUpdatedForm);
-
-      // Set form ID in localStorage before rendering hook
+  describe("legacy helpers", () => {
+    it("updateFormData delegates to persistFormProgress", async () => {
       localStorageMock.getItem.mockReturnValue("form-123");
 
-      const { result } = renderHook(() => useFormData(), {
-        wrapper: createWrapper(),
+      const { queryClient, wrapper } = createTestEnvironment();
+      const storedForm = createMockStoredFormData();
+      queryClient.setQueryData(["formData", "form-123"], storedForm);
+
+      const updatedFormData = createMockFormData({ firstName: "Alex" });
+
+      vi.mocked(formDataApi.update).mockResolvedValue({
+        ...storedForm,
+        formData: updatedFormData,
       });
 
-      // Wait for the hook to load the form ID and set up query cache
+      const { result } = renderHook(() => useFormData(), { wrapper });
+
       await waitFor(() => {
         expect(result.current.formId).toBe("form-123");
       });
 
-      // Manually set the query data in the cache
-      const queryClient = new QueryClient();
-      queryClient.setQueryData(["formData", "form-123"], mockStoredFormData);
+      await result.current.updateFormData({ firstName: "Alex" });
 
-      await result.current.updateCurrentStep(3);
+      expect(formDataApi.update).toHaveBeenCalledWith(
+        "form-123",
+        expect.objectContaining({
+          formData: updatedFormData,
+          currentStep: storedForm.currentStep,
+        }),
+      );
+    });
 
-      expect(formDataApi.update).toHaveBeenCalledWith("form-123", {
-        currentStep: 3,
+    it("updateCurrentStep delegates to persistFormProgress", async () => {
+      localStorageMock.getItem.mockReturnValue("form-123");
+
+      const { queryClient, wrapper } = createTestEnvironment();
+      const storedForm = createMockStoredFormData();
+      queryClient.setQueryData(["formData", "form-123"], storedForm);
+
+      vi.mocked(formDataApi.update).mockResolvedValue({
+        ...storedForm,
+        currentStep: 4,
       });
+
+      const { result } = renderHook(() => useFormData(), { wrapper });
+
+      await waitFor(() => {
+        expect(result.current.formId).toBe("form-123");
+      });
+
+      await result.current.updateCurrentStep(4);
+
+      expect(formDataApi.update).toHaveBeenCalledWith(
+        "form-123",
+        expect.objectContaining({
+          formData: storedForm.formData,
+          currentStep: 4,
+        }),
+      );
+    });
+
+    it("updateOrderNumber delegates to persistFormProgress", async () => {
+      localStorageMock.getItem.mockReturnValue("form-123");
+
+      const { queryClient, wrapper } = createTestEnvironment();
+      const storedForm = createMockStoredFormData();
+      queryClient.setQueryData(["formData", "form-123"], storedForm);
+
+      vi.mocked(formDataApi.update).mockResolvedValue({
+        ...storedForm,
+        orderNumber: "SD-1001",
+      });
+
+      const { result } = renderHook(() => useFormData(), { wrapper });
+
+      await waitFor(() => {
+        expect(result.current.formId).toBe("form-123");
+      });
+
+      await result.current.updateOrderNumber("SD-1001");
+
+      expect(formDataApi.update).toHaveBeenCalledWith(
+        "form-123",
+        expect.objectContaining({
+          formData: storedForm.formData,
+          currentStep: storedForm.currentStep,
+          orderNumber: "SD-1001",
+        }),
+      );
     });
   });
 
   describe("form deletion", () => {
-    it("clears localStorage only (does not delete from server)", async () => {
-      // Set form ID in localStorage before rendering hook
+    it("clears localStorage without deleting server data", async () => {
       localStorageMock.getItem.mockReturnValue("form-123");
 
-      const { result } = renderHook(() => useFormData(), {
-        wrapper: createWrapper(),
-      });
+      const { wrapper } = createTestEnvironment();
 
-      // Wait for the hook to load the form ID
+      const { result } = renderHook(() => useFormData(), { wrapper });
+
       await waitFor(() => {
         expect(result.current.formId).toBe("form-123");
       });
 
       await result.current.clearFormData();
 
-      // Should only clear localStorage, not call API delete
       expect(formDataApi.delete).not.toHaveBeenCalled();
       expect(localStorageMock.removeItem).toHaveBeenCalledWith(
-        "sweetly-dipped-form-id"
+        "sweetly-dipped-form-id",
       );
 
-      // Wait for the form ID to be cleared
       await waitFor(() => {
         expect(result.current.formId).toBeNull();
       });
@@ -267,12 +373,12 @@ describe("useFormData", () => {
     it("shows loading state when fetching form data", async () => {
       localStorageMock.getItem.mockReturnValue("form-123");
       vi.mocked(formDataApi.get).mockImplementation(
-        () => new Promise(() => {}) // Never resolves
+        () => new Promise(() => {}),
       );
 
-      const { result } = renderHook(() => useFormData(), {
-        wrapper: createWrapper(),
-      });
+      const { wrapper } = createTestEnvironment();
+
+      const { result } = renderHook(() => useFormData(), { wrapper });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(true);

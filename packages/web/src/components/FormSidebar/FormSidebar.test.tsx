@@ -51,10 +51,10 @@ const mockFormSteps = [
 ];
 
 describe("FormSidebar", () => {
-  const mockSetCurrentStep = vi.fn();
+  const mockOnNavigateToStep = vi.fn();
 
   beforeEach(() => {
-    mockSetCurrentStep.mockClear();
+    mockOnNavigateToStep.mockClear();
   });
 
   it("renders the sidebar title", () => {
@@ -63,7 +63,7 @@ describe("FormSidebar", () => {
         formData={mockFormData}
         formSteps={mockFormSteps}
         currentVisibleIndex={2}
-        setCurrentStep={mockSetCurrentStep}
+        onNavigateToStep={mockOnNavigateToStep}
       />
     );
 
@@ -76,7 +76,7 @@ describe("FormSidebar", () => {
         formData={mockFormData}
         formSteps={mockFormSteps}
         currentVisibleIndex={2}
-        setCurrentStep={mockSetCurrentStep}
+        onNavigateToStep={mockOnNavigateToStep}
       />
     );
 
@@ -96,7 +96,7 @@ describe("FormSidebar", () => {
         formData={mockFormData}
         formSteps={mockFormSteps}
         currentVisibleIndex={2}
-        setCurrentStep={mockSetCurrentStep}
+        onNavigateToStep={mockOnNavigateToStep}
       />
     );
 
@@ -121,7 +121,7 @@ describe("FormSidebar", () => {
         formData={byDozenFormData}
         formSteps={mockFormSteps}
         currentVisibleIndex={4}
-        setCurrentStep={mockSetCurrentStep}
+        onNavigateToStep={mockOnNavigateToStep}
       />
     );
 
@@ -134,7 +134,7 @@ describe("FormSidebar", () => {
         formData={mockFormData}
         formSteps={mockFormSteps}
         currentVisibleIndex={5}
-        setCurrentStep={mockSetCurrentStep}
+        onNavigateToStep={mockOnNavigateToStep}
       />
     );
 
@@ -147,7 +147,7 @@ describe("FormSidebar", () => {
         formData={mockFormData}
         formSteps={mockFormSteps}
         currentVisibleIndex={6}
-        setCurrentStep={mockSetCurrentStep}
+        onNavigateToStep={mockOnNavigateToStep}
       />
     );
 
@@ -160,7 +160,7 @@ describe("FormSidebar", () => {
         formData={mockFormData}
         formSteps={mockFormSteps}
         currentVisibleIndex={7}
-        setCurrentStep={mockSetCurrentStep}
+        onNavigateToStep={mockOnNavigateToStep}
       />
     );
 
@@ -173,7 +173,7 @@ describe("FormSidebar", () => {
         formData={mockFormData}
         formSteps={mockFormSteps}
         currentVisibleIndex={2}
-        setCurrentStep={mockSetCurrentStep}
+        onNavigateToStep={mockOnNavigateToStep}
       />
     );
 
@@ -210,7 +210,7 @@ describe("FormSidebar", () => {
         formData={emptyFormData}
         formSteps={mockFormSteps}
         currentVisibleIndex={0}
-        setCurrentStep={mockSetCurrentStep}
+        onNavigateToStep={mockOnNavigateToStep}
       />
     );
 
@@ -235,7 +235,7 @@ describe("FormSidebar", () => {
         formData={formDataWithoutByDozen}
         formSteps={visibleStepsWithoutByDozen}
         currentVisibleIndex={3}
-        setCurrentStep={mockSetCurrentStep}
+        onNavigateToStep={mockOnNavigateToStep}
       />
     );
 
@@ -263,7 +263,7 @@ describe("FormSidebar", () => {
         formData={partialFormData}
         formSteps={mockFormSteps}
         currentVisibleIndex={2}
-        setCurrentStep={mockSetCurrentStep}
+        onNavigateToStep={mockOnNavigateToStep}
       />
     );
 
@@ -292,7 +292,7 @@ describe("FormSidebar", () => {
         formData={formDataWithVisitedSteps}
         formSteps={mockFormSteps}
         currentVisibleIndex={7}
-        setCurrentStep={mockSetCurrentStep}
+        onNavigateToStep={mockOnNavigateToStep}
       />
     );
 
@@ -321,7 +321,7 @@ describe("FormSidebar", () => {
         formData={formDataWithVisitedSteps}
         formSteps={mockFormSteps}
         currentVisibleIndex={7}
-        setCurrentStep={mockSetCurrentStep}
+        onNavigateToStep={mockOnNavigateToStep}
       />
     );
 
@@ -333,13 +333,13 @@ describe("FormSidebar", () => {
   });
 
   describe("clickable steps functionality", () => {
-    it("calls setCurrentStep when clicking on a completed step", () => {
+    it("calls onNavigateToStep when clicking on a completed step", () => {
       render(
         <FormSidebar
           formData={mockFormData}
           formSteps={mockFormSteps}
           currentVisibleIndex={3}
-          setCurrentStep={mockSetCurrentStep}
+          onNavigateToStep={mockOnNavigateToStep}
         />
       );
 
@@ -349,16 +349,16 @@ describe("FormSidebar", () => {
         .closest('[class*="stepItem"]');
       fireEvent.click(firstStep!);
 
-      expect(mockSetCurrentStep).toHaveBeenCalledWith(0);
+      expect(mockOnNavigateToStep).toHaveBeenCalledWith(0);
     });
 
-    it("calls setCurrentStep when clicking on the current step", () => {
+    it("calls onNavigateToStep when clicking on the current step", () => {
       render(
         <FormSidebar
           formData={mockFormData}
           formSteps={mockFormSteps}
           currentVisibleIndex={2}
-          setCurrentStep={mockSetCurrentStep}
+          onNavigateToStep={mockOnNavigateToStep}
         />
       );
 
@@ -368,16 +368,16 @@ describe("FormSidebar", () => {
         .closest('[class*="stepItem"]');
       fireEvent.click(currentStep!);
 
-      expect(mockSetCurrentStep).toHaveBeenCalledWith(2);
+      expect(mockOnNavigateToStep).toHaveBeenCalledWith(2);
     });
 
-    it("calls setCurrentStep when clicking on the immediate next step", () => {
+    it("calls onNavigateToStep when clicking on the immediate next step", () => {
       render(
         <FormSidebar
           formData={mockFormData}
           formSteps={mockFormSteps}
           currentVisibleIndex={2}
-          setCurrentStep={mockSetCurrentStep}
+          onNavigateToStep={mockOnNavigateToStep}
         />
       );
 
@@ -387,16 +387,16 @@ describe("FormSidebar", () => {
         .closest('[class*="stepItem"]');
       fireEvent.click(nextStep!);
 
-      expect(mockSetCurrentStep).toHaveBeenCalledWith(3);
+      expect(mockOnNavigateToStep).toHaveBeenCalledWith(3);
     });
 
-    it("calls setCurrentStep when clicking on a future step that has data", () => {
+    it("calls onNavigateToStep when clicking on a future step that has data", () => {
       render(
         <FormSidebar
           formData={mockFormData}
           formSteps={mockFormSteps}
           currentVisibleIndex={1}
-          setCurrentStep={mockSetCurrentStep}
+          onNavigateToStep={mockOnNavigateToStep}
         />
       );
 
@@ -406,16 +406,16 @@ describe("FormSidebar", () => {
         .closest('[class*="stepItem"]');
       fireEvent.click(futureStep!);
 
-      expect(mockSetCurrentStep).toHaveBeenCalledWith(4);
+      expect(mockOnNavigateToStep).toHaveBeenCalledWith(4);
     });
 
-    it("calls setCurrentStep when clicking on a future step if any intermediate step has data", () => {
+    it("calls onNavigateToStep when clicking on a future step if any intermediate step has data", () => {
       render(
         <FormSidebar
           formData={mockFormData}
           formSteps={mockFormSteps}
           currentVisibleIndex={1}
-          setCurrentStep={mockSetCurrentStep}
+          onNavigateToStep={mockOnNavigateToStep}
         />
       );
 
@@ -425,10 +425,10 @@ describe("FormSidebar", () => {
         .closest('[class*="stepItem"]');
       fireEvent.click(futureStep!);
 
-      expect(mockSetCurrentStep).toHaveBeenCalledWith(5);
+      expect(mockOnNavigateToStep).toHaveBeenCalledWith(5);
     });
 
-    it("does not call setCurrentStep when clicking on a future step with no data path", () => {
+    it("does not call onNavigateToStep when clicking on a future step with no data path", () => {
       const emptyFormData: FormData = {
         ...mockFormData,
         packageType: "", // No package selected
@@ -443,7 +443,7 @@ describe("FormSidebar", () => {
           formData={emptyFormData}
           formSteps={mockFormSteps}
           currentVisibleIndex={2}
-          setCurrentStep={mockSetCurrentStep}
+          onNavigateToStep={mockOnNavigateToStep}
         />
       );
 
@@ -453,7 +453,7 @@ describe("FormSidebar", () => {
         .closest('[class*="stepItem"]');
       fireEvent.click(futureStep!);
 
-      expect(mockSetCurrentStep).not.toHaveBeenCalled();
+      expect(mockOnNavigateToStep).not.toHaveBeenCalled();
     });
 
     it("does not allow jumping to future steps when current step is not completed", () => {
@@ -468,7 +468,7 @@ describe("FormSidebar", () => {
           formData={formDataWithIncompleteCurrentStep}
           formSteps={mockFormSteps}
           currentVisibleIndex={2}
-          setCurrentStep={mockSetCurrentStep}
+          onNavigateToStep={mockOnNavigateToStep}
         />
       );
 
@@ -478,7 +478,7 @@ describe("FormSidebar", () => {
         .closest('[class*="stepItem"]');
       fireEvent.click(futureStep!);
 
-      expect(mockSetCurrentStep).not.toHaveBeenCalled();
+      expect(mockOnNavigateToStep).not.toHaveBeenCalled();
     });
 
     it("allows jumping back to any completed step from a later step", () => {
@@ -487,7 +487,7 @@ describe("FormSidebar", () => {
           formData={mockFormData}
           formSteps={mockFormSteps}
           currentVisibleIndex={4}
-          setCurrentStep={mockSetCurrentStep}
+          onNavigateToStep={mockOnNavigateToStep}
         />
       );
 
@@ -496,21 +496,21 @@ describe("FormSidebar", () => {
         .getByText("Contact Information")
         .closest('[class*="stepItem"]');
       fireEvent.click(step1!);
-      expect(mockSetCurrentStep).toHaveBeenCalledWith(0);
+      expect(mockOnNavigateToStep).toHaveBeenCalledWith(0);
 
       // Should be able to jump back to step 2 (Communication Preference)
       const step2 = screen
         .getByText("Communication Preference")
         .closest('[class*="stepItem"]');
       fireEvent.click(step2!);
-      expect(mockSetCurrentStep).toHaveBeenCalledWith(1);
+      expect(mockOnNavigateToStep).toHaveBeenCalledWith(1);
 
       // Should be able to jump back to step 3 (Package Selection)
       const step3 = screen
         .getByText("Package Selection")
         .closest('[class*="stepItem"]');
       fireEvent.click(step3!);
-      expect(mockSetCurrentStep).toHaveBeenCalledWith(2);
+      expect(mockOnNavigateToStep).toHaveBeenCalledWith(2);
     });
 
     it("handles conditional by-dozen step correctly when package type is not by-dozen", () => {
@@ -528,7 +528,7 @@ describe("FormSidebar", () => {
           formData={formDataWithoutByDozen}
           formSteps={visibleStepsWithoutByDozen}
           currentVisibleIndex={3}
-          setCurrentStep={mockSetCurrentStep}
+          onNavigateToStep={mockOnNavigateToStep}
         />
       );
 
@@ -538,7 +538,7 @@ describe("FormSidebar", () => {
         .closest('[class*="stepItem"]');
       fireEvent.click(colorStep!);
 
-      expect(mockSetCurrentStep).toHaveBeenCalledWith(4); // Should call with full step index
+      expect(mockOnNavigateToStep).toHaveBeenCalledWith(4); // Should call with full step index
     });
 
     it("handles conditional by-dozen step correctly when package type is by-dozen", () => {
@@ -552,7 +552,7 @@ describe("FormSidebar", () => {
           formData={formDataWithByDozen}
           formSteps={mockFormSteps}
           currentVisibleIndex={3}
-          setCurrentStep={mockSetCurrentStep}
+          onNavigateToStep={mockOnNavigateToStep}
         />
       );
 
@@ -563,7 +563,7 @@ describe("FormSidebar", () => {
       );
       fireEvent.click(byDozenStepItem!);
 
-      expect(mockSetCurrentStep).toHaveBeenCalledWith(2); // Should call with full step index
+      expect(mockOnNavigateToStep).toHaveBeenCalledWith(2); // Should call with full step index
     });
 
     it("applies clickable class to accessible steps", () => {
@@ -572,7 +572,7 @@ describe("FormSidebar", () => {
           formData={mockFormData}
           formSteps={mockFormSteps}
           currentVisibleIndex={2}
-          setCurrentStep={mockSetCurrentStep}
+          onNavigateToStep={mockOnNavigateToStep}
         />
       );
 
@@ -616,7 +616,7 @@ describe("FormSidebar", () => {
           formData={emptyFormData}
           formSteps={mockFormSteps}
           currentVisibleIndex={2}
-          setCurrentStep={mockSetCurrentStep}
+          onNavigateToStep={mockOnNavigateToStep}
         />
       );
 
@@ -633,7 +633,7 @@ describe("FormSidebar", () => {
           formData={mockFormData}
           formSteps={mockFormSteps}
           currentVisibleIndex={2}
-          setCurrentStep={mockSetCurrentStep}
+          onNavigateToStep={mockOnNavigateToStep}
         />
       );
 
@@ -663,7 +663,7 @@ describe("FormSidebar", () => {
           formData={emptyFormData}
           formSteps={mockFormSteps}
           currentVisibleIndex={2}
-          setCurrentStep={mockSetCurrentStep}
+          onNavigateToStep={mockOnNavigateToStep}
         />
       );
 
@@ -680,7 +680,7 @@ describe("FormSidebar", () => {
           formData={mockFormData}
           formSteps={mockFormSteps}
           currentVisibleIndex={3}
-          setCurrentStep={mockSetCurrentStep}
+          onNavigateToStep={mockOnNavigateToStep}
         />
       );
 
@@ -707,7 +707,7 @@ describe("FormSidebar", () => {
           formData={emptyFormData}
           formSteps={mockFormSteps}
           currentVisibleIndex={2}
-          setCurrentStep={mockSetCurrentStep}
+          onNavigateToStep={mockOnNavigateToStep}
         />
       );
 

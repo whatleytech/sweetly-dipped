@@ -14,7 +14,7 @@ export const useFormData = () => {
   // Get or create form ID from localStorage
   useEffect(() => {
     const savedFormId = localStorage.getItem(STORAGE_KEY);
-    console.log("useFormData: Loading formId from localStorage:", savedFormId);
+    console.log('useFormData: Loading formId from localStorage:', savedFormId);
     if (savedFormId) {
       setFormId(savedFormId);
     }
@@ -52,7 +52,11 @@ export const useFormData = () => {
 
   // Update form data mutation
   const updateMutation = useMutation({
-    mutationFn: ({ formData, currentStep, orderNumber }: {
+    mutationFn: ({
+      formData,
+      currentStep,
+      orderNumber,
+    }: {
       formData?: FormData;
       currentStep?: number;
       orderNumber?: string;
@@ -73,53 +77,98 @@ export const useFormData = () => {
   });
 
   // Initialize form data if no ID exists
-  const initializeForm = useCallback(async (initialData: FormData, currentStep = 0) => {
-    if (!formId && !isInitializing) {
-      setIsInitializing(true);
-      try {
-        await createMutation.mutateAsync({ formData: initialData, currentStep });
-      } finally {
-        setIsInitializing(false);
+  const initializeForm = useCallback(
+    async (initialData: FormData, currentStep = 0) => {
+      if (!formId && !isInitializing) {
+        setIsInitializing(true);
+        try {
+          await createMutation.mutateAsync({
+            formData: initialData,
+            currentStep,
+          });
+        } finally {
+          setIsInitializing(false);
+        }
       }
-    }
-  }, [formId, isInitializing, createMutation]);
+    },
+    [formId, isInitializing, createMutation]
+  );
 
-  // Update form data
-  const updateFormData = useCallback(async (updates: Partial<FormData>) => {
-    if (!formId) {
-      throw new Error('Form not initialized');
-    }
+  // Persist form progress (form data, step, or order number) in a single call
+  const persistFormProgress = useCallback(
+    async ({
+      formData: nextFormData,
+      currentStep: nextStep,
+      orderNumber,
+    }: {
+      formData?: FormData;
+      currentStep?: number;
+      orderNumber?: string;
+    }) => {
+      if (!formId) {
+        throw new Error('Form not initialized');
+      }
 
-    const currentData = queryClient.getQueryData<StoredFormData>(['formData', formId]);
-    if (!currentData) {
-      throw new Error('Form data not found');
-    }
+      const currentData = queryClient.getQueryData<StoredFormData>([
+        'formData',
+        formId,
+      ]);
+      if (!currentData) {
+        throw new Error('Form data not found');
+      }
 
-    const updatedFormData = {
-      ...currentData.formData,
-      ...updates,
-    };
+      const payloadFormData = nextFormData ?? currentData.formData;
+      const payloadStep = nextStep ?? currentData.currentStep;
 
-    await updateMutation.mutateAsync({ formData: updatedFormData });
-  }, [formId, updateMutation, queryClient]);
+      await updateMutation.mutateAsync({
+        formData: payloadFormData,
+        currentStep: payloadStep,
+        orderNumber,
+      });
+    },
+    [formId, queryClient, updateMutation]
+  );
 
-  // Update current step
-  const updateCurrentStep = useCallback(async (step: number) => {
-    if (!formId) {
-      throw new Error('Form not initialized');
-    }
+  // Update form data (deprecated: prefer persistFormProgress)
+  const updateFormData = useCallback(
+    async (updates: Partial<FormData>) => {
+      if (!formId) {
+        throw new Error('Form not initialized');
+      }
 
-    await updateMutation.mutateAsync({ currentStep: step });
-  }, [formId, updateMutation]);
+      const currentData = queryClient.getQueryData<StoredFormData>([
+        'formData',
+        formId,
+      ]);
+      if (!currentData) {
+        throw new Error('Form data not found');
+      }
+
+      const updatedFormData = {
+        ...currentData.formData,
+        ...updates,
+      };
+
+      await persistFormProgress({ formData: updatedFormData });
+    },
+    [formId, persistFormProgress, queryClient]
+  );
+
+  // Update current step (deprecated: prefer persistFormProgress)
+  const updateCurrentStep = useCallback(
+    async (step: number) => {
+      await persistFormProgress({ currentStep: step });
+    },
+    [persistFormProgress]
+  );
 
   // Update order number
-  const updateOrderNumber = useCallback(async (orderNumber: string) => {
-    if (!formId) {
-      throw new Error('Form not initialized');
-    }
-
-    await updateMutation.mutateAsync({ orderNumber });
-  }, [formId, updateMutation]);
+  const updateOrderNumber = useCallback(
+    async (orderNumber: string) => {
+      await persistFormProgress({ orderNumber });
+    },
+    [persistFormProgress]
+  );
 
   // Clear form data
   const clearFormData = useCallback(async () => {
@@ -132,13 +181,13 @@ export const useFormData = () => {
   const formData = storedData?.formData || null;
   const currentStep = storedData?.currentStep || 0;
   const orderNumber = storedData?.orderNumber;
-  
-  console.log("useFormData: Current state:", { 
-    formId, 
-    isLoadingFormId, 
-    isLoading, 
-    formData: !!formData, 
-    storedData: !!storedData 
+
+  console.log('useFormData: Current state:', {
+    formId,
+    isLoadingFormId,
+    isLoading,
+    formData: !!formData,
+    storedData: !!storedData,
   });
 
   return {
@@ -147,7 +196,7 @@ export const useFormData = () => {
     currentStep,
     orderNumber,
     formId,
-    
+
     // Loading states
     isLoading,
     isCreating: createMutation.isPending,
@@ -155,15 +204,16 @@ export const useFormData = () => {
     isDeleting: deleteMutation.isPending,
     isInitializing,
     isLoadingFormId,
-    
+
     // Error states
     error,
     createError: createMutation.error,
     updateError: updateMutation.error,
     deleteError: deleteMutation.error,
-    
+
     // Actions
     initializeForm,
+    persistFormProgress,
     updateFormData,
     updateCurrentStep,
     updateOrderNumber,
