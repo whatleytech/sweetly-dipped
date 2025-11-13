@@ -9,6 +9,8 @@ export interface StoredFormDto {
   formData: FormDataWithVisitedStepsArray;
   currentStep: number;
   orderNumber?: string;
+  status?: string;
+  submittedAt?: string;
   createdAt: string;
   updatedAt: string;
 }

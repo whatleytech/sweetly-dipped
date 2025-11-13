@@ -79,9 +79,12 @@ vi.mock("../api/formDataApi", () => {
       delete: vi.fn().mockResolvedValue(undefined),
       list: vi.fn().mockResolvedValue([]),
       health: vi.fn().mockResolvedValue({ status: "ok" }),
-      generateOrderNumber: vi
+      submitForm: vi
         .fn()
-        .mockResolvedValue({ orderNumber: "2025-01-15-001" }),
+        .mockResolvedValue({
+          orderNumber: "20250115-ABC123XYZ456",
+          submittedAt: "2025-01-15T10:00:00Z",
+        }),
     },
   };
 });

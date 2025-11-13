@@ -2,17 +2,16 @@ import { useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./ConfirmationPage.module.css";
 
-import { formDataApi } from "@/api/formDataApi";
-import { PackageDetails } from "@/components/PackageDetails/PackageDetails";
-import { ContactInformation } from "@/components/ContactInformation/ContactInformation";
-import { DesignDetails } from "@/components/DesignDetails/DesignDetails";
-import { PickupDetails } from "@/components/PickupDetails/PickupDetails";
-import { ReferralSource } from "@/components/ReferralSource/ReferralSource";
-import { TermsAndConditions } from "@/components/TermsAndConditions/TermsAndConditions";
-import { PaymentNotice } from "@/components/PaymentNotice/PaymentNotice";
-import { RushOrderNotice } from "@/components/RushOrderNotice/RushOrderNotice";
-import { useFormData } from "@/hooks/useFormData";
-import type { FormData } from "@/types/formTypes";
+import { PackageDetails } from '@/components/PackageDetails/PackageDetails';
+import { ContactInformation } from '@/components/ContactInformation/ContactInformation';
+import { DesignDetails } from '@/components/DesignDetails/DesignDetails';
+import { PickupDetails } from '@/components/PickupDetails/PickupDetails';
+import { ReferralSource } from '@/components/ReferralSource/ReferralSource';
+import { TermsAndConditions } from '@/components/TermsAndConditions/TermsAndConditions';
+import { PaymentNotice } from '@/components/PaymentNotice/PaymentNotice';
+import { RushOrderNotice } from '@/components/RushOrderNotice/RushOrderNotice';
+import { useFormData } from '@/hooks/useFormData';
+import type { FormData } from '@/types/formTypes';
 
 export const ConfirmationPage = () => {
   const navigate = useNavigate();
@@ -22,7 +21,7 @@ export const ConfirmationPage = () => {
     isLoadingFormId,
     error,
     persistFormProgress,
-    updateOrderNumber,
+    submitForm,
   } = useFormData();
 
   const handleUpdate = useCallback(
@@ -52,20 +51,17 @@ export const ConfirmationPage = () => {
 
   const handleSubmit = async () => {
     if (!formData?.termsAccepted) {
-      alert("Please accept the terms and conditions to continue.");
+      alert('Please accept the terms and conditions to continue.');
       return;
     }
 
     try {
-      // Generate order number from server and store it with the form data
-      const { orderNumber } = await formDataApi.generateOrderNumber();
-      await updateOrderNumber(orderNumber);
-
-      // Navigate to thank you page
-      navigate("/thank-you");
+      const { orderNumber } = await submitForm(); // Capture the returned orderNumber
+      navigate('/thank-you', { state: { orderNumber } }); // Pass it via navigation state
     } catch (error) {
-      console.error("Error submitting form:", error);
-      alert("There was an error submitting your order. Please try again.");
+      console.error('Error submitting form:', error);
+      console.dir(error, { depth: null });
+      alert('There was an error submitting your order. Please try again.');
     }
   };
 
@@ -84,7 +80,7 @@ export const ConfirmationPage = () => {
       <div className={styles.container}>
         <div className={styles.error}>
           <p>Error loading order details: {error.message}</p>
-          <button onClick={() => navigate("/design-package")}>
+          <button onClick={() => navigate('/design-package')}>
             Return to Form
           </button>
         </div>

@@ -296,15 +296,20 @@ export const formDataApi = {
     return handleResponse<StoredFormData[]>(response);
   },
 
-  // Generate order number
-  async generateOrderNumber(): Promise<{ orderNumber: string }> {
-    const response = await fetchWithRetry(`${API_BASE_URL}/order/number`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    return handleResponse<{ orderNumber: string }>(response);
+  // Submit form
+  async submitForm(
+    formId: string
+  ): Promise<{ orderNumber: string; submittedAt: string }> {
+    const response = await fetchWithRetry(
+      `${API_BASE_URL}/forms/${formId}/submit`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
+    return handleResponse<{ orderNumber: string; submittedAt: string }>(
+      response
+    );
   },
 
   // Health check

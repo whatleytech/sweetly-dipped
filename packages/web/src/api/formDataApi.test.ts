@@ -230,10 +230,11 @@ describe('formDataApi', () => {
     });
   });
 
-  describe('generateOrderNumber', () => {
-    it('generates order number successfully', async () => {
+  describe('submitForm', () => {
+    it('submits form successfully', async () => {
       const mockResponse = {
-        orderNumber: '2025-01-15-001',
+        orderNumber: '20250115-ABC123XYZ456',
+        submittedAt: '2025-01-15T10:00:00Z',
       };
 
       mockFetch.mockResolvedValueOnce({
@@ -241,10 +242,10 @@ describe('formDataApi', () => {
         json: async () => mockResponse,
       });
 
-      const result = await formDataApi.generateOrderNumber();
+      const result = await formDataApi.submitForm('form-123');
 
       const callArgs = mockFetch.mock.calls[0];
-      expect(callArgs[0]).toBe('http://localhost:3001/api/order/number');
+      expect(callArgs[0]).toBe('http://localhost:3001/api/forms/form-123/submit');
       expect(callArgs[1]).toMatchObject({
         method: 'POST',
         headers: {
@@ -256,7 +257,7 @@ describe('formDataApi', () => {
       expect(result).toEqual(mockResponse);
     });
 
-    it('throws server error on failed generation', async () => {
+    it('throws server error on failed submission', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 500,
@@ -264,13 +265,32 @@ describe('formDataApi', () => {
       });
 
       try {
-        await formDataApi.generateOrderNumber();
+        await formDataApi.submitForm('form-123');
       } catch (error) {
         expect(error).toBeInstanceOf(FormDataApiError);
         if (error instanceof FormDataApiError) {
           expect(error.type).toBe('server');
           expect(error.status).toBe(500);
           expect(error.retryable).toBe(true);
+        }
+      }
+    });
+
+    it('throws bad request error when form is already submitted', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 400,
+        json: async () => ({ error: 'Form is already submitted' }),
+      });
+
+      try {
+        await formDataApi.submitForm('form-123');
+      } catch (error) {
+        expect(error).toBeInstanceOf(FormDataApiError);
+        if (error instanceof FormDataApiError) {
+          expect(error.type).toBe('validation');
+          expect(error.status).toBe(400);
+          expect(error.retryable).toBe(false);
         }
       }
     });

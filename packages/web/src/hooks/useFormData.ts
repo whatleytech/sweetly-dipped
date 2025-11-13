@@ -128,13 +128,16 @@ export const useFormData = () => {
     [formId, queryClient, updateMutation]
   );
 
-  // Update order number
-  const updateOrderNumber = useCallback(
-    async (orderNumber: string) => {
-      await persistFormProgress({ orderNumber });
-    },
-    [persistFormProgress]
-  );
+  // Submit form
+  const submitForm = useCallback(async (): Promise<{
+    orderNumber: string;
+    submittedAt: string;
+  }> => {
+    if (!formId) {
+      throw new Error('No form ID available');
+    }
+    return await formDataApi.submitForm(formId);
+  }, [formId]);
 
   // Clear form data
   const clearFormData = useCallback(async () => {
@@ -172,7 +175,7 @@ export const useFormData = () => {
     // Actions
     initializeForm,
     persistFormProgress,
-    updateOrderNumber,
+    submitForm,
     clearFormData,
     refetch,
   };

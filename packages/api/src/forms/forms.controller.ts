@@ -12,6 +12,7 @@ import {
 import type { CreateFormDto } from './dto/create-form.dto.js';
 import type { UpdateFormDto } from './dto/update-form.dto.js';
 import type { StoredFormDto } from './dto/stored-form.dto.js';
+import type { SubmitFormDto } from './dto/submit-form.dto.js';
 import { FormsService } from './forms.service.js';
 
 @Controller('forms')
@@ -45,6 +46,11 @@ export class FormsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(@Param('id') id: string): Promise<void> {
     await this.formsService.remove(id);
+  }
+
+  @Post(':id/submit')
+  submit(@Param('id') id: string): Promise<SubmitFormDto> {
+    return this.formsService.submit(id);
   }
 }
 

@@ -6,6 +6,7 @@ import { vi, describe, it, expect, beforeEach } from "vitest";
 import React from "react";
 import { configApi } from "../api/configApi";
 import { setupConfigMocks } from "../utils/testUtils";
+import { formDataApi } from '../api/formDataApi';
 
 // Mock react-router-dom
 const mockNavigate = vi.fn();
@@ -72,8 +73,8 @@ vi.mock("../api/formDataApi", () => {
               lastName?: string;
               email?: string;
               phone?: string;
-              communicationMethod?: "email" | "text";
-              packageType?: "small" | "medium" | "large" | "by-dozen";
+              communicationMethod?: 'email' | 'text';
+              packageType?: 'small' | 'medium' | 'large' | 'by-dozen';
               riceKrispies?: number;
               oreos?: number;
               pretzels?: number;
@@ -107,10 +108,11 @@ vi.mock("../api/formDataApi", () => {
       ),
       delete: vi.fn().mockResolvedValue(undefined),
       list: vi.fn().mockResolvedValue([]),
-      health: vi.fn().mockResolvedValue({ status: "ok" }),
-      generateOrderNumber: vi
-        .fn()
-        .mockResolvedValue({ orderNumber: "2025-01-15-001" }),
+      health: vi.fn().mockResolvedValue({ status: 'ok' }),
+      submitForm: vi.fn().mockResolvedValue({
+        orderNumber: '20250115-ABC123XYZ456',
+        submittedAt: '2025-01-15T10:00:00Z',
+      }),
     },
   };
 });
@@ -399,6 +401,8 @@ describe("ConfirmationPage", () => {
 
   it("submits form and navigates to thank you page when terms are accepted", async () => {
     const alertMock = vi.spyOn(window, "alert").mockImplementation(() => {});
+    vi.mocked(formDataApi.submitForm).mockClear();
+    mockNavigate.mockClear();
 
     renderConfirmationPage();
 
@@ -421,10 +425,15 @@ describe("ConfirmationPage", () => {
     // Wait for the async operations to complete
     await waitFor(
       () => {
-        expect(mockNavigate).toHaveBeenCalledWith("/thank-you");
+        expect(formDataApi.submitForm).toHaveBeenCalledWith('form-123');
       },
       { timeout: 5000 }
     );
+
+    // Check that navigation was called with the orderNumber in state
+    expect(mockNavigate).toHaveBeenCalledWith('/thank-you', {
+      state: { orderNumber: '20250115-ABC123XYZ456' },
+    });
 
     alertMock.mockRestore();
   });

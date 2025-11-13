@@ -51,6 +51,10 @@ model Form {
   // Marketing analytics
   referralSource String?  @map("referral_source")  // For tracking marketing effectiveness
   
+  // Form submission status
+  status      String    @default("draft")  // "draft" | "submitted"
+  submittedAt DateTime? @map("submitted_at")
+  
   // Everything else stored as JSONB for flexibility
   data      Json     // colorScheme, eventType, theme, additionalDesigns, termsAccepted, visitedSteps
   
@@ -78,16 +82,6 @@ model Order {
   customer    Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
   
   @@map("orders")
-}
-
-model OrderCounter {
-  id        String   @id @default(uuid())
-  date      String   @unique
-  count     Int      @default(0)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@map("order_counters")
 }
 
 // Configuration models for admin management

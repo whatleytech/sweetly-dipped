@@ -1,6 +1,6 @@
 import type { ChangeEvent } from "react";
 import styles from "./FormSteps.module.css";
-import type { FormStepProps, DayOfWeek } from "@/types/formTypes";
+import type { FormData, FormStepProps, DayOfWeek } from "@/types/formTypes";
 import { FormButtons, FormStepContainer } from "@/components/shared";
 import { useTimeSlots, useUnavailablePeriods } from "@/hooks/useConfigQuery";
 import {

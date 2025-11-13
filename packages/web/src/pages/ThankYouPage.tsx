@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from 'react-router-dom';
 import styles from "./ThankYouPage.module.css";
 
 import {
@@ -12,9 +12,10 @@ import { usePackageOptions } from "@/hooks/useConfigQuery";
 
 export const ThankYouPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const {
     formData,
-    orderNumber,
+    orderNumber: storedOrderNumber,
     isLoading,
     isLoadingFormId,
     error,
@@ -22,19 +23,25 @@ export const ThankYouPage = () => {
   } = useFormData();
   const { data: packageOptions = [] } = usePackageOptions();
 
-  // Redirect to home if no data or order number exists
+  // Prefer orderNumber from navigation state, fallback to stored
+  // Type-safe extraction of orderNumber from navigation state
+  const orderNumberFromState =
+    location.state &&
+    typeof location.state === 'object' &&
+    'orderNumber' in location.state
+      ? (location.state as { orderNumber?: string }).orderNumber
+      : undefined;
+  const orderNumber = orderNumberFromState || storedOrderNumber;
+
+  // Redirect to home if no order number exists (after loading completes)
   useEffect(() => {
-    // Only redirect if we're not loading formId AND not loading data AND we have no form data or order number AND no error
-    if (
-      !isLoadingFormId &&
-      !isLoading &&
-      (!formData || !orderNumber) &&
-      !error
-    ) {
-      console.error('No form data or order number found');
+    // Only redirect if we're not loading AND we have no order number AND no error
+    // If we have orderNumber from navigation state, wait for formData to load
+    if (!isLoadingFormId && !isLoading && !orderNumber && !error) {
+      console.error('No order number found');
       navigate('/');
     }
-  }, [formData, orderNumber, isLoading, isLoadingFormId, error, navigate]);
+  }, [orderNumber, isLoading, isLoadingFormId, error, navigate]);
 
   const handleReturnHome = async () => {
     try {

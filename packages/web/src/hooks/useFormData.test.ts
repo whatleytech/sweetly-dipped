@@ -14,7 +14,7 @@ vi.mock("@/api/formDataApi", () => ({
     delete: vi.fn(),
     list: vi.fn(),
     health: vi.fn(),
-    generateOrderNumber: vi.fn(),
+    submitForm: vi.fn(),
   },
 }));
 
@@ -211,35 +211,6 @@ describe("useFormData", () => {
       );
     });
 
-    it("persists order number independently", async () => {
-      localStorageMock.getItem.mockReturnValue("form-123");
-
-      const { queryClient, wrapper } = createTestEnvironment();
-      const storedForm = createMockStoredFormData();
-      queryClient.setQueryData(["formData", "form-123"], storedForm);
-
-      vi.mocked(formDataApi.update).mockResolvedValue({
-        ...storedForm,
-        orderNumber: "SD-0001",
-      });
-
-      const { result } = renderHook(() => useFormData(), { wrapper });
-
-      await waitFor(() => {
-        expect(result.current.formId).toBe("form-123");
-      });
-
-      await result.current.persistFormProgress({ orderNumber: "SD-0001" });
-
-      expect(formDataApi.update).toHaveBeenCalledWith(
-        "form-123",
-        expect.objectContaining({
-          formData: storedForm.formData,
-          currentStep: storedForm.currentStep,
-          orderNumber: "SD-0001",
-        }),
-      );
-    });
 
     it("throws when attempting to persist without an initialized form", async () => {
       const { wrapper } = createTestEnvironment();
@@ -252,18 +223,18 @@ describe("useFormData", () => {
     });
   });
 
-  describe("legacy helpers", () => {
-    it("updateOrderNumber delegates to persistFormProgress", async () => {
+  describe("submitForm", () => {
+    it("submits form successfully", async () => {
       localStorageMock.getItem.mockReturnValue("form-123");
 
-      const { queryClient, wrapper } = createTestEnvironment();
-      const storedForm = createMockStoredFormData();
-      queryClient.setQueryData(["formData", "form-123"], storedForm);
+      const { wrapper } = createTestEnvironment();
 
-      vi.mocked(formDataApi.update).mockResolvedValue({
-        ...storedForm,
-        orderNumber: "SD-1001",
-      });
+      const mockSubmitResponse = {
+        orderNumber: "20250115-ABC123XYZ456",
+        submittedAt: "2025-01-15T10:00:00Z",
+      };
+
+      vi.mocked(formDataApi.submitForm).mockResolvedValue(mockSubmitResponse);
 
       const { result } = renderHook(() => useFormData(), { wrapper });
 
@@ -271,15 +242,19 @@ describe("useFormData", () => {
         expect(result.current.formId).toBe("form-123");
       });
 
-      await result.current.updateOrderNumber("SD-1001");
+      const response = await result.current.submitForm();
 
-      expect(formDataApi.update).toHaveBeenCalledWith(
-        "form-123",
-        expect.objectContaining({
-          formData: storedForm.formData,
-          currentStep: storedForm.currentStep,
-          orderNumber: "SD-1001",
-        }),
+      expect(formDataApi.submitForm).toHaveBeenCalledWith("form-123");
+      expect(response).toEqual(mockSubmitResponse);
+    });
+
+    it("throws error when form ID is not available", async () => {
+      const { wrapper } = createTestEnvironment();
+
+      const { result } = renderHook(() => useFormData(), { wrapper });
+
+      await expect(result.current.submitForm()).rejects.toThrow(
+        "No form ID available"
       );
     });
   });

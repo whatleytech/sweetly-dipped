@@ -9,6 +9,7 @@ import { Prisma } from '../../generated/prisma/index.js';
 import type { CreateFormDto } from './dto/create-form.dto.js';
 import type { UpdateFormDto } from './dto/update-form.dto.js';
 import type { StoredFormDto } from './dto/stored-form.dto.js';
+import type { SubmitFormDto } from './dto/submit-form.dto.js';
 
 const DEFAULT_VISITED_STEP = 'lead';
 const COMMUNICATION_METHODS: ReadonlyArray<FormData['communicationMethod']> = [
@@ -182,6 +183,16 @@ const toFormDataFromRecord = (form: FormWithRelations): FormData => {
   };
 };
 
+const generateOrderNumber = (): string => {
+  const today = new Date();
+  const dateString = today.toISOString().split('T')[0].replace(/-/g, '');
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const hash = Array.from({ length: 12 }, () =>
+    chars.charAt(Math.floor(Math.random() * chars.length))
+  ).join('');
+  return `${dateString}-${hash}`;
+};
+
 const mapFormToStoredDto = (form: FormWithRelations): StoredFormDto => {
   const formData = toFormDataFromRecord(form);
   const metadata = getFormMetadata(form);
@@ -195,6 +206,8 @@ const mapFormToStoredDto = (form: FormWithRelations): StoredFormDto => {
     },
     currentStep: metadata.currentStep,
     orderNumber: form.order?.orderNumber ?? undefined,
+    status: form.status,
+    submittedAt: form.submittedAt?.toISOString(),
     createdAt: form.createdAt.toISOString(),
     updatedAt: form.updatedAt.toISOString(),
   };
@@ -373,6 +386,60 @@ export class FormsService {
       }
       throw error;
     }
+  }
+
+  async submit(id: string): Promise<SubmitFormDto> {
+    // 1. Fetch form with customer/order relations
+    const form = await this.prisma.form.findUnique({
+      where: { id },
+      include: this.formInclude,
+    });
+
+    if (!form) {
+      throw new NotFoundException('Form data not found');
+    }
+
+    // 2. Validate form is in draft status
+    if (form.status !== 'draft') {
+      throw new BadRequestException(
+        `Form is already submitted. Current status: ${form.status}`
+      );
+    }
+
+    // 3. Validate customer exists (throw BadRequestException if not)
+    if (!form.customer) {
+      throw new BadRequestException(
+        'Cannot submit form without customer information'
+      );
+    }
+
+    // 4. Generate order number with random hash
+    const orderNumber = generateOrderNumber();
+    const submittedAt = new Date();
+
+    // 5. Create order record
+    await this.prisma.order.create({
+      data: {
+        orderNumber,
+        formId: id,
+        customerId: form.customer.id,
+      },
+    });
+
+    // 6. Update form status to "submitted" with submittedAt timestamp
+    await this.prisma.form.update({
+      where: { id },
+      data: {
+        status: 'submitted',
+        submittedAt,
+      },
+    });
+
+    // 7. Return order details
+    return {
+      orderNumber,
+      submittedAt: submittedAt.toISOString(),
+    };
   }
 }
 
