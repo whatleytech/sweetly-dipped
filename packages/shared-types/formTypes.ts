@@ -9,7 +9,7 @@ export interface FormData {
   communicationMethod: "email" | "text" | "";
 
   // Package Selection
-  packageType: "small" | "medium" | "large" | "xl" | "by-dozen" | "";
+  packageType: "small" | "medium" | "large" | "xl" | "by-dozen" | ""; // Empty string for unselected state
 
   // By The Dozen
   riceKrispies: number;

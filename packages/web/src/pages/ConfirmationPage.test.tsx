@@ -4,6 +4,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ConfirmationPage } from "./ConfirmationPage";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import React from "react";
+import { configApi } from "../api/configApi";
+import { setupConfigMocks } from "../utils/testUtils";
 
 // Mock react-router-dom
 const mockNavigate = vi.fn();
@@ -14,6 +16,14 @@ vi.mock("react-router-dom", async () => {
     useNavigate: () => mockNavigate,
   };
 });
+
+// Mock config API
+vi.mock("../api/configApi", () => ({
+  configApi: {
+    getPackageOptions: vi.fn(),
+    getTreatOptions: vi.fn(),
+  },
+}));
 
 // Mock the API with proper return values
 vi.mock("../api/formDataApi", () => {
@@ -197,6 +207,7 @@ describe("ConfirmationPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorageMock.getItem.mockReturnValue("form-123");
+    setupConfigMocks(configApi);
   });
 
   it("renders loading state initially", () => {

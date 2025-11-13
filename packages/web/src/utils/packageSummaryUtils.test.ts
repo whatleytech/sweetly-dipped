@@ -4,7 +4,15 @@ import {
   generateByDozenBreakdown, 
   generatePickupSummary 
 } from "./packageSummaryUtils";
-import type { FormData } from '@sweetly-dipped/shared-types';
+import type { FormData, PackageOptionDto } from '@sweetly-dipped/shared-types';
+
+const mockPackageOptions: PackageOptionDto[] = [
+  { id: 'small', label: 'Small (3 dozen – 36 treats)', price: 110 },
+  { id: 'medium', label: 'Medium (5 dozen – 60 treats)', price: 180 },
+  { id: 'large', label: 'Large (8 dozen – 96 treats)', price: 280 },
+  { id: 'xl', label: 'XL (12 dozen – 144 treats)', price: 420, description: 'Requires at least one month notice' },
+  { id: 'by-dozen', label: 'No package — order by the dozen' },
+];
 
 describe("packageSummaryUtils", () => {
   describe("generatePackageSummary", () => {
@@ -13,7 +21,7 @@ describe("packageSummaryUtils", () => {
         packageType: "medium",
       } as FormData;
       
-      const summary = generatePackageSummary(formData as FormData);
+      const summary = generatePackageSummary(formData as FormData, mockPackageOptions);
       
       expect(summary).toBe("Medium (5 dozen – 60 treats)");
     });
@@ -27,7 +35,7 @@ describe("packageSummaryUtils", () => {
         marshmallows: 0,
       } as FormData;
       
-      const summary = generatePackageSummary(formData as FormData);
+      const summary = generatePackageSummary(formData as FormData, mockPackageOptions);
       
       expect(summary).toBe("Custom Order (3 dozen)");
     });
@@ -41,7 +49,7 @@ describe("packageSummaryUtils", () => {
         marshmallows: 0,
       } as FormData;
       
-      const summary = generatePackageSummary(formData as FormData);
+      const summary = generatePackageSummary(formData as FormData, mockPackageOptions);
       
       expect(summary).toBe("No treats selected");
     });
@@ -51,7 +59,7 @@ describe("packageSummaryUtils", () => {
         packageType: "invalid-type" as FormData["packageType"],
       } as FormData;
       
-      const summary = generatePackageSummary(formData as FormData);
+      const summary = generatePackageSummary(formData as FormData, mockPackageOptions);
       
       expect(summary).toBe("Package not specified");
     });

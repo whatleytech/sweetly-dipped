@@ -1,19 +1,22 @@
 import styles from "./PackageDetails.module.css";
 import type { FormData } from "@/types/formTypes";
-import { PACKAGE_OPTIONS } from "@/constants/formData";
+import { usePackageOptions, useTreatOptions } from "@/hooks/useConfigQuery";
 
 interface PackageDetailsProps {
   formData: FormData;
 }
 
 export const PackageDetails = ({ formData }: PackageDetailsProps) => {
+  const { data: packageOptions = [] } = usePackageOptions();
+  const { data: treatOptions = [] } = useTreatOptions();
+
   const getPackageLabel = (packageType: string) => {
-    const option = PACKAGE_OPTIONS.find((opt) => opt.id === packageType);
+    const option = packageOptions.find((opt) => opt.id === packageType);
     return option?.label || packageType;
   };
 
   const getPackagePrice = (packageType: string) => {
-    const option = PACKAGE_OPTIONS.find((opt) => opt.id === packageType);
+    const option = packageOptions.find((opt) => opt.id === packageType);
     return option?.price || 0;
   };
 
@@ -29,10 +32,15 @@ export const PackageDetails = ({ formData }: PackageDetailsProps) => {
   const calculateTotal = () => {
     if (formData.packageType === "by-dozen") {
       // Calculate total for by-dozen orders
-      const riceKrispiesTotal = formData.riceKrispies * 40;
-      const oreosTotal = formData.oreos * 30;
-      const pretzelsTotal = formData.pretzels * 30;
-      const marshmallowsTotal = formData.marshmallows * 40;
+      const riceKrispiesPrice = treatOptions.find(t => t.key === 'riceKrispies')?.price || 40;
+      const oreosPrice = treatOptions.find(t => t.key === 'oreos')?.price || 30;
+      const pretzelsPrice = treatOptions.find(t => t.key === 'pretzels')?.price || 30;
+      const marshmallowsPrice = treatOptions.find(t => t.key === 'marshmallows')?.price || 40;
+
+      const riceKrispiesTotal = formData.riceKrispies * riceKrispiesPrice;
+      const oreosTotal = formData.oreos * oreosPrice;
+      const pretzelsTotal = formData.pretzels * pretzelsPrice;
+      const marshmallowsTotal = formData.marshmallows * marshmallowsPrice;
       
       return riceKrispiesTotal + oreosTotal + pretzelsTotal + marshmallowsTotal;
     } else {

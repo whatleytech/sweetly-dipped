@@ -1,9 +1,16 @@
  
-import { render, screen, fireEvent } from '@testing-library/react';
+import { screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ByTheDozen } from './ByTheDozen';
 import type { FormData } from '@sweetly-dipped/shared-types';
+import { renderWithQueryClient, setupConfigMocks } from '@/utils/testUtils';
+import { configApi } from '@/api/configApi';
 
+vi.mock('@/api/configApi', () => ({
+  configApi: {
+    getTreatOptions: vi.fn(),
+  },
+}));
 
 const baseData: FormData = {
   firstName: '',
@@ -35,10 +42,11 @@ describe('ByTheDozen', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    setupConfigMocks(configApi);
   });
 
-  it('renders grid headers and rows', () => {
-    render(
+  it('renders grid headers and rows', async () => {
+    renderWithQueryClient(
       <ByTheDozen
         formData={baseData}
         updateFormData={updateFormData}
@@ -50,14 +58,16 @@ describe('ByTheDozen', () => {
       />
     );
 
-    expect(screen.getByText('Treat')).toBeInTheDocument();
+    await screen.findByText('Treat');
     expect(screen.getByText('1 dozen')).toBeInTheDocument();
     expect(screen.getByText('4 dozen')).toBeInTheDocument();
-    expect(screen.getByText(/Chocolate covered Rice Krispies/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Chocolate covered Rice Krispies/)
+    ).toBeInTheDocument();
   });
 
-  it('disables continue when no selections are made', () => {
-    render(
+  it('disables continue when no selections are made', async () => {
+    renderWithQueryClient(
       <ByTheDozen
         formData={baseData}
         updateFormData={updateFormData}
@@ -69,11 +79,12 @@ describe('ByTheDozen', () => {
       />
     );
 
+    await screen.findByText('Treat');
     expect(screen.getByRole('button', { name: /continue/i })).toBeDisabled();
   });
 
-  it('selects a quantity and enables continue', () => {
-    render(
+  it('selects a quantity and enables continue', async () => {
+    renderWithQueryClient(
       <ByTheDozen
         formData={baseData}
         updateFormData={updateFormData}
@@ -85,15 +96,16 @@ describe('ByTheDozen', () => {
       />
     );
 
+    await screen.findByText('Treat');
     const option = screen.getAllByText('1')[0].closest('label');
     fireEvent.click(option!);
 
     expect(updateFormData).toHaveBeenCalled();
   });
 
-  it('calls onNext when continue is clicked after selection', () => {
+  it('calls onNext when continue is clicked after selection', async () => {
     const data = { ...baseData, oreos: 2 };
-    render(
+    renderWithQueryClient(
       <ByTheDozen
         formData={data}
         updateFormData={updateFormData}
@@ -105,15 +117,16 @@ describe('ByTheDozen', () => {
       />
     );
 
+    await screen.findByText('Treat');
     const btn = screen.getByRole('button', { name: /continue/i });
     expect(btn).not.toBeDisabled();
     fireEvent.click(btn);
     expect(onNext).toHaveBeenCalled();
   });
 
-  it("shows correct selected state for oreos", () => {
+  it('shows correct selected state for oreos', async () => {
     const data = { ...baseData, oreos: 2 };
-    render(
+    renderWithQueryClient(
       <ByTheDozen
         formData={data}
         updateFormData={updateFormData}
@@ -125,6 +138,7 @@ describe('ByTheDozen', () => {
       />
     );
 
+    await screen.findByText('Treat');
     // Verify the correct radio is selected
     const oreosInput = screen
       .getAllByDisplayValue('2')
@@ -135,13 +149,13 @@ describe('ByTheDozen', () => {
 
     // Verify continue button is enabled with selection
     expect(
-      screen.getByRole("button", { name: /continue/i })
+      screen.getByRole('button', { name: /continue/i })
     ).not.toBeDisabled();
   });
 
-  it("unselects when clicking on already selected option", () => {
+  it('unselects when clicking on already selected option', async () => {
     const data = { ...baseData, oreos: 2 };
-    render(
+    renderWithQueryClient(
       <ByTheDozen
         formData={data}
         updateFormData={updateFormData}
@@ -153,6 +167,7 @@ describe('ByTheDozen', () => {
       />
     );
 
+    await screen.findByText('Treat');
     // Find the checked oreos radio input and click it
     const oreosInput = screen
       .getAllByDisplayValue('2')
@@ -169,9 +184,9 @@ describe('ByTheDozen', () => {
     expect(updateFormData).toHaveBeenCalledWith({ oreos: 0 });
   });
 
-  it("disables continue when all selections are unselected", () => {
+  it('disables continue when all selections are unselected', async () => {
     const updatedData = { ...baseData, oreos: 0 };
-    render(
+    renderWithQueryClient(
       <ByTheDozen
         formData={updatedData}
         updateFormData={updateFormData}
@@ -183,7 +198,8 @@ describe('ByTheDozen', () => {
       />
     );
 
+    await screen.findByText('Treat');
     // Continue should be disabled when no selections
-    expect(screen.getByRole("button", { name: /continue/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /continue/i })).toBeDisabled();
   });
 });

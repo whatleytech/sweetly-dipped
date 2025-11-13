@@ -1,15 +1,17 @@
-import type { FormData } from '@sweetly-dipped/shared-types';
-import { PACKAGE_OPTIONS } from '@/constants/formData';
+import type { FormData, PackageOptionDto } from '@sweetly-dipped/shared-types';
 
 /**
  * Generates a summary of the selected package
  */
-export const generatePackageSummary = (formData: FormData): string => {
+export const generatePackageSummary = (
+  formData: FormData,
+  packageOptions: PackageOptionDto[]
+): string => {
   if (formData.packageType === "by-dozen") {
     return generateByDozenSummary(formData);
   }
   
-  const packageOption = PACKAGE_OPTIONS.find(pkg => pkg.id === formData.packageType);
+  const packageOption = packageOptions.find(pkg => pkg.id === formData.packageType);
   return packageOption?.label || "Package not specified";
 };
 

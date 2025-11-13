@@ -8,6 +8,7 @@ import {
   generatePickupSummary,
 } from "@/utils/packageSummaryUtils";
 import { useFormData } from "@/hooks/useFormData";
+import { usePackageOptions } from "@/hooks/useConfigQuery";
 
 export const ThankYouPage = () => {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ export const ThankYouPage = () => {
     error,
     clearFormData,
   } = useFormData();
+  const { data: packageOptions = [] } = usePackageOptions();
 
   // Redirect to home if no data or order number exists
   useEffect(() => {
@@ -66,7 +68,7 @@ export const ThankYouPage = () => {
     );
   }
 
-  const packageSummary = generatePackageSummary(formData);
+  const packageSummary = generatePackageSummary(formData, packageOptions);
   const pickupSummary = generatePickupSummary(formData);
   const breakdown =
     formData.packageType === "by-dozen"

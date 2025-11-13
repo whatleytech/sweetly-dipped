@@ -1,7 +1,16 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { PackageDetails } from "./PackageDetails";
 import type { FormData } from '@sweetly-dipped/shared-types';
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { renderWithQueryClient, setupConfigMocks } from '@/utils/testUtils';
+import { configApi } from '@/api/configApi';
+
+vi.mock('@/api/configApi', () => ({
+  configApi: {
+    getPackageOptions: vi.fn(),
+    getTreatOptions: vi.fn(),
+  },
+}));
 
 const mockFormData: FormData = {
   firstName: 'John',
@@ -27,22 +36,31 @@ const mockFormData: FormData = {
 };
 
 describe("PackageDetails", () => {
-  it("renders package type correctly", () => {
-    render(<PackageDetails formData={mockFormData} />);
+  beforeEach(() => {
+    vi.clearAllMocks();
+    setupConfigMocks(configApi);
+  });
+
+  it("renders package type correctly", async () => {
+    renderWithQueryClient(<PackageDetails formData={mockFormData} />);
+    
+    await screen.findByText("Package Details");
     
     expect(screen.getByText("Package Details")).toBeInTheDocument();
     expect(screen.getByText("Package Type:")).toBeInTheDocument();
     expect(screen.getByText("Medium (5 dozen – 60 treats)")).toBeInTheDocument();
   });
 
-  it("displays correct total for pre-defined package", () => {
-    render(<PackageDetails formData={mockFormData} />);
+  it("displays correct total for pre-defined package", async () => {
+    renderWithQueryClient(<PackageDetails formData={mockFormData} />);
+    
+    await screen.findByText("Package Details");
     
     expect(screen.getByText("Total:")).toBeInTheDocument();
     expect(screen.getByText("$180")).toBeInTheDocument();
   });
 
-  it("displays by-dozen breakdown when package type is by-dozen", () => {
+  it("displays by-dozen breakdown when package type is by-dozen", async () => {
     const byDozenData = {
       ...mockFormData,
       packageType: "by-dozen" as const,
@@ -52,7 +70,7 @@ describe("PackageDetails", () => {
       marshmallows: 1,
     };
 
-    render(<PackageDetails formData={byDozenData} />);
+    renderWithQueryClient(<PackageDetails formData={byDozenData} />);
     
     expect(screen.getByText("Treats Breakdown:")).toBeInTheDocument();
     expect(screen.getByText("Rice Krispies: 2")).toBeInTheDocument();
@@ -72,7 +90,7 @@ describe("PackageDetails", () => {
       marshmallows: 1, // 1 * $40 = $40
     };
 
-    render(<PackageDetails formData={byDozenData} />);
+    renderWithQueryClient(<PackageDetails formData={byDozenData} />);
 
     expect(
       screen.getByText("Deposit due within 48 hours:")
@@ -86,7 +104,7 @@ describe("PackageDetails", () => {
     expect(screen.getByText("$150")).toBeInTheDocument();
   });
 
-  it("displays correct totals for different package types", () => {
+  it("displays correct totals for different package types", async () => {
     const testCases = [
       { packageType: "small", expectedTotal: "$110" },
       { packageType: "medium", expectedTotal: "$180" },
@@ -94,16 +112,17 @@ describe("PackageDetails", () => {
       { packageType: "xl", expectedTotal: "$420" },
     ];
 
-    testCases.forEach(({ packageType, expectedTotal }) => {
+    for (const { packageType, expectedTotal } of testCases) {
       const testData = {
         ...mockFormData,
         packageType: packageType as FormData["packageType"],
       };
 
-      const { unmount } = render(<PackageDetails formData={testData} />);
+      const { unmount } = renderWithQueryClient(<PackageDetails formData={testData} />);
+      await screen.findByText("Package Details");
       expect(screen.getByText(expectedTotal)).toBeInTheDocument();
       unmount();
-    });
+    }
   });
 
   it("handles empty package type gracefully", () => {
@@ -112,7 +131,7 @@ describe("PackageDetails", () => {
       packageType: "" as const,
     };
 
-    render(<PackageDetails formData={emptyData} />);
+    renderWithQueryClient(<PackageDetails formData={emptyData} />);
 
     expect(screen.getByText("Package Type:")).toBeInTheDocument();
     expect(screen.getAllByText("$0")).toHaveLength(3);
@@ -128,7 +147,7 @@ describe("PackageDetails", () => {
       marshmallows: 2, // 2 * $40 = $80
     };
 
-    render(<PackageDetails formData={complexOrder} />);
+    renderWithQueryClient(<PackageDetails formData={complexOrder} />);
     
     // Total: $120 + $60 + $30 + $80 = $290
     expect(screen.getByText("$290")).toBeInTheDocument();

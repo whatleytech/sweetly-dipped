@@ -1,8 +1,16 @@
  
-import { render, screen, fireEvent } from '@testing-library/react';
+import { screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { PackageSelection } from './PackageSelection';
 import type { FormData } from '@sweetly-dipped/shared-types';
+import { renderWithQueryClient, setupConfigMocks } from '@/utils/testUtils';
+import { configApi } from '@/api/configApi';
+
+vi.mock('@/api/configApi', () => ({
+  configApi: {
+    getPackageOptions: vi.fn(),
+  },
+}));
 
 
 const baseData: FormData = {
@@ -35,10 +43,11 @@ describe('PackageSelection', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    setupConfigMocks(configApi);
   });
 
-  it('renders package options', () => {
-    render(
+  it('renders package options', async () => {
+    renderWithQueryClient(
       <PackageSelection
         formData={baseData}
         updateFormData={updateFormData}
@@ -50,7 +59,7 @@ describe('PackageSelection', () => {
       />
     );
 
-    expect(screen.getByText('Which package would you like to order?')).toBeInTheDocument();
+    await screen.findByText('Which package would you like to order?');
     expect(screen.getByText(/Small \(3 dozen/)).toBeInTheDocument();
     expect(screen.getByText(/Medium \(5 dozen/)).toBeInTheDocument();
     expect(screen.getByText(/Large \(8 dozen/)).toBeInTheDocument();
@@ -58,8 +67,8 @@ describe('PackageSelection', () => {
     expect(screen.getByText(/No package — order by the dozen/)).toBeInTheDocument();
   });
 
-  it('disables continue when nothing selected', () => {
-    render(
+  it('disables continue when nothing selected', async () => {
+    renderWithQueryClient(
       <PackageSelection
         formData={baseData}
         updateFormData={updateFormData}
@@ -70,12 +79,13 @@ describe('PackageSelection', () => {
         isLastStep={false}
       />
     );
+    await screen.findByText('Which package would you like to order?');
     expect(screen.getByRole('button', { name: /continue/i })).toBeDisabled();
   });
 
-  it('enables continue when a package is selected and calls onNext', () => {
+  it('enables continue when a package is selected and calls onNext', async () => {
     const data = { ...baseData, packageType: 'medium' as const };
-    render(
+    renderWithQueryClient(
       <PackageSelection
         formData={data}
         updateFormData={updateFormData}
@@ -87,14 +97,15 @@ describe('PackageSelection', () => {
       />
     );
 
+    await screen.findByText('Which package would you like to order?');
     const btn = screen.getByRole('button', { name: /continue/i });
     expect(btn).not.toBeDisabled();
     fireEvent.click(btn);
     expect(onNext).toHaveBeenCalled();
   });
 
-  it('updates form data when a radio is clicked', () => {
-    render(
+  it('updates form data when a radio is clicked', async () => {
+    renderWithQueryClient(
       <PackageSelection
         formData={baseData}
         updateFormData={updateFormData}
@@ -106,6 +117,7 @@ describe('PackageSelection', () => {
       />
     );
 
+    await screen.findByText('Which package would you like to order?');
     const medium = screen.getByText(/Medium \(5 dozen/).closest('div');
     fireEvent.click(medium!);
     expect(updateFormData).toHaveBeenCalledWith({ packageType: 'medium' });

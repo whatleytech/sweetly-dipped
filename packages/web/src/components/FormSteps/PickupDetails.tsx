@@ -2,7 +2,7 @@ import type { ChangeEvent } from "react";
 import styles from "./FormSteps.module.css";
 import type { FormStepProps, DayOfWeek } from "@/types/formTypes";
 import { FormButtons, FormStepContainer } from "@/components/shared";
-import { TIME_SLOTS, UNAVAILABLE_PERIODS } from "@/constants/formData";
+import { useTimeSlots, useUnavailablePeriods } from "@/hooks/useConfigQuery";
 import {
   generateTimeIntervals,
   timeSlotToWindow,
@@ -33,6 +33,9 @@ export const PickupDetails = ({
   isFirstStep,
   isLastStep,
 }: FormStepProps) => {
+  const { data: timeSlots, isLoading: isLoadingTimeSlots, isError: isErrorTimeSlots, error: timeSlotsError, refetch: refetchTimeSlots } = useTimeSlots();
+  const { data: unavailablePeriods = [], isLoading: isLoadingPeriods, isError: isErrorPeriods, error: periodsError, refetch: refetchPeriods } = useUnavailablePeriods();
+
   const handleDateChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newDate = e.target.value;
     const isRush = isRushOrder(newDate);
@@ -49,7 +52,7 @@ export const PickupDetails = ({
   };
 
   const dayOfWeek = getDayOfWeek(formData.pickupDate);
-  const availableTimeSlots = dayOfWeek ? TIME_SLOTS[dayOfWeek] : [];
+  const availableTimeSlots = dayOfWeek && timeSlots ? (timeSlots[dayOfWeek] || []) : [];
 
   // Check if the selected date is today or in the past
   const isPastOrTodayDate =
@@ -59,7 +62,7 @@ export const PickupDetails = ({
   // Check if the selected date falls within an unavailable period
   const unavailablePeriod = getUnavailablePeriod(
     formData.pickupDate,
-    UNAVAILABLE_PERIODS
+    unavailablePeriods
   );
 
   // Check if the selected date is a rush order (within 2 weeks)
@@ -77,6 +80,33 @@ export const PickupDetails = ({
     Boolean(formData.pickupTime) &&
     !isPastOrTodayDate &&
     !unavailablePeriod;
+
+  if (isLoadingTimeSlots || isLoadingPeriods) {
+    return (
+      <FormStepContainer
+        title="Pickup date and time"
+        description="Loading pickup options..."
+      >
+        <div>Loading...</div>
+      </FormStepContainer>
+    );
+  }
+
+  if (isErrorTimeSlots || isErrorPeriods) {
+    return (
+      <FormStepContainer
+        title="Pickup date and time"
+        description="Error loading pickup options"
+      >
+        <div>
+          <p>Failed to load pickup options: {timeSlotsError?.message || periodsError?.message}</p>
+          <button type="button" onClick={() => { refetchTimeSlots(); refetchPeriods(); }}>
+            Retry
+          </button>
+        </div>
+      </FormStepContainer>
+    );
+  }
 
   return (
     <FormStepContainer

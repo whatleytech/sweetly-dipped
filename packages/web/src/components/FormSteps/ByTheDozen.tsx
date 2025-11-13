@@ -1,7 +1,8 @@
 import styles from "./FormSteps.module.css";
 import type { FormStepProps } from "@/types/formTypes";
 import { FormButtons, FormStepContainer } from "@/components/shared";
-import { QUANTITIES, TREAT_OPTIONS } from "@/constants/formData";
+import { QUANTITIES } from '@/constants/formData';
+import { useTreatOptions } from '@/hooks/useConfigQuery';
 
 export const ByTheDozen = ({
   formData,
@@ -12,6 +13,13 @@ export const ByTheDozen = ({
   isLastStep,
   onSubmit,
 }: FormStepProps) => {
+  const {
+    data: treatOptions = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useTreatOptions();
   const handleSelect = (
     key: 'riceKrispies' | 'oreos' | 'pretzels' | 'marshmallows',
     value: number
@@ -29,10 +37,37 @@ export const ByTheDozen = ({
       (formData.marshmallows ?? 0) >
     0;
 
+  if (isLoading) {
+    return (
+      <FormStepContainer
+        title="Which treat(s) would you like to order by the dozen?"
+        description="Loading treat options..."
+      >
+        <div>Loading...</div>
+      </FormStepContainer>
+    );
+  }
+
+  if (isError) {
+    return (
+      <FormStepContainer
+        title="Which treat(s) would you like to order by the dozen?"
+        description="Error loading treat options"
+      >
+        <div>
+          <p>Failed to load treat options: {error?.message}</p>
+          <button type="button" onClick={() => refetch()}>
+            Retry
+          </button>
+        </div>
+      </FormStepContainer>
+    );
+  }
+
   return (
     <FormStepContainer
       title="Which treat(s) would you like to order by the dozen?"
-      description="$30/dozen for Oreos or pretzels. $40/dozen for Rice Krispies or marshmallow pops."
+      description="Select the quantity for each treat you'd like to order. Prices are shown per dozen."
     >
       <div className={styles.gridHeader}>
         <div className={styles.gridHeaderCell}>Treat</div>
@@ -43,7 +78,7 @@ export const ByTheDozen = ({
         ))}
       </div>
 
-      {TREAT_OPTIONS.map((row) => (
+      {treatOptions.map((row) => (
         <div key={row.key} className={styles.gridRow}>
           <div className={styles.gridRowLabel}>
             {row.label} — ${row.price}/dozen
@@ -54,7 +89,7 @@ export const ByTheDozen = ({
               <label
                 key={q}
                 className={`${styles.gridRadioOption} ${
-                  selected ? styles.selected : ""
+                  selected ? styles.selected : ''
                 }`}
               >
                 <input

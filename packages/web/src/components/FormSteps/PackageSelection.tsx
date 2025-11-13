@@ -1,7 +1,7 @@
 import styles from './FormSteps.module.css';
 import type { FormStepProps, FormData } from '@/types/formTypes';
 import { FormButtons, FormStepContainer } from '@/components/shared';
-import { PACKAGE_OPTIONS } from '@/constants/formData';
+import { usePackageOptions } from '@/hooks/useConfigQuery';
 
 export const PackageSelection = ({
   formData,
@@ -12,11 +12,40 @@ export const PackageSelection = ({
   isLastStep,
   onSubmit,
 }: FormStepProps) => {
+  const { data: packageOptions = [], isLoading, isError, error, refetch } = usePackageOptions();
+
   const handleSelect = (id: FormData['packageType']) => {
     updateFormData({ packageType: id });
   };
 
   const isValid = formData.packageType !== '';
+
+  if (isLoading) {
+    return (
+      <FormStepContainer
+        title="Which package would you like to order?"
+        description="Loading package options..."
+      >
+        <div>Loading...</div>
+      </FormStepContainer>
+    );
+  }
+
+  if (isError) {
+    return (
+      <FormStepContainer
+        title="Which package would you like to order?"
+        description="Error loading package options"
+      >
+        <div>
+          <p>Failed to load package options: {error?.message}</p>
+          <button type="button" onClick={() => refetch()}>
+            Retry
+          </button>
+        </div>
+      </FormStepContainer>
+    );
+  }
 
   return (
     <FormStepContainer
@@ -25,7 +54,7 @@ export const PackageSelection = ({
     >
       <div className={styles.formFields}>
         <div className={styles.radioGroup}>
-          {PACKAGE_OPTIONS.map((opt) => {
+          {packageOptions.map((opt) => {
             const selected = formData.packageType === opt.id;
             return (
               <div
