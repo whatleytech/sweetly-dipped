@@ -1,6 +1,6 @@
 import type { ChangeEvent } from "react";
 import styles from "./FormSteps.module.css";
-import type { FormStepProps } from "@/types/formTypes";
+import type { FormStepProps, FormData } from "@/types/formTypes";
 import { FormButtons, FormStepContainer } from "@/components/shared";
 
 export const ColorScheme = ({
@@ -11,7 +11,7 @@ export const ColorScheme = ({
   isFirstStep,
   isLastStep,
   onSubmit,
-}: FormStepProps) => {
+}: FormStepProps & { updateFormData: (updates: Partial<FormData>) => void }) => {
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     updateFormData({ colorScheme: e.target.value });
   };

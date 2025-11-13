@@ -76,7 +76,7 @@ export const LeadQuestions = ({
   formData,
   updateFormData,
   onNext,
-}: FormStepProps) => {
+}: FormStepProps & { updateFormData: (updates: Partial<FormData>) => void }) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 

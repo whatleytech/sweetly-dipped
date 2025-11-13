@@ -38,7 +38,6 @@ export interface FormData {
 
 export interface FormStepProps {
   formData: FormData;
-  updateFormData: (updates: Partial<FormData>) => void;
   onNext: () => void;
   onPrev: () => void;
   onSubmit: () => void;

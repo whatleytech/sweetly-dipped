@@ -128,39 +128,6 @@ export const useFormData = () => {
     [formId, queryClient, updateMutation]
   );
 
-  // Update form data (deprecated: prefer persistFormProgress)
-  const updateFormData = useCallback(
-    async (updates: Partial<FormData>) => {
-      if (!formId) {
-        throw new Error('Form not initialized');
-      }
-
-      const currentData = queryClient.getQueryData<StoredFormData>([
-        'formData',
-        formId,
-      ]);
-      if (!currentData) {
-        throw new Error('Form data not found');
-      }
-
-      const updatedFormData = {
-        ...currentData.formData,
-        ...updates,
-      };
-
-      await persistFormProgress({ formData: updatedFormData });
-    },
-    [formId, persistFormProgress, queryClient]
-  );
-
-  // Update current step (deprecated: prefer persistFormProgress)
-  const updateCurrentStep = useCallback(
-    async (step: number) => {
-      await persistFormProgress({ currentStep: step });
-    },
-    [persistFormProgress]
-  );
-
   // Update order number
   const updateOrderNumber = useCallback(
     async (orderNumber: string) => {
@@ -205,8 +172,6 @@ export const useFormData = () => {
     // Actions
     initializeForm,
     persistFormProgress,
-    updateFormData,
-    updateCurrentStep,
     updateOrderNumber,
     clearFormData,
     refetch,

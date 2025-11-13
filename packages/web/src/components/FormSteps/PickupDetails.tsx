@@ -32,7 +32,7 @@ export const PickupDetails = ({
   onSubmit,
   isFirstStep,
   isLastStep,
-}: FormStepProps) => {
+}: FormStepProps & { updateFormData: (updates: Partial<FormData>) => void }) => {
   const { data: timeSlots, isLoading: isLoadingTimeSlots, isError: isErrorTimeSlots, error: timeSlotsError, refetch: refetchTimeSlots } = useTimeSlots();
   const { data: unavailablePeriods = [], isLoading: isLoadingPeriods, isError: isErrorPeriods, error: periodsError, refetch: refetchPeriods } = useUnavailablePeriods();
 

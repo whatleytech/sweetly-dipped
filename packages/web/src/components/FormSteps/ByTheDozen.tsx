@@ -1,5 +1,5 @@
 import styles from "./FormSteps.module.css";
-import type { FormStepProps } from "@/types/formTypes";
+import type { FormStepProps, FormData } from '@/types/formTypes';
 import { FormButtons, FormStepContainer } from "@/components/shared";
 import { QUANTITIES } from '@/constants/formData';
 import { useTreatOptions } from '@/hooks/useConfigQuery';
@@ -12,7 +12,9 @@ export const ByTheDozen = ({
   isFirstStep,
   isLastStep,
   onSubmit,
-}: FormStepProps) => {
+}: FormStepProps & {
+  updateFormData: (updates: Partial<FormData>) => void;
+}) => {
   const {
     data: treatOptions = [],
     isLoading,

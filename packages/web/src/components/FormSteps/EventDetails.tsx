@@ -41,7 +41,7 @@ export const EventDetails = ({
   isFirstStep,
   isLastStep,
   onSubmit,
-}: FormStepProps) => {
+}: FormStepProps & { updateFormData: (updates: Partial<FormData>) => void }) => {
   const handleChange =
     (field: keyof FormData) => (e: ChangeEvent<HTMLInputElement>) => {
       updateFormData({ [field]: e.target.value } as Partial<FormData>);

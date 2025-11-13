@@ -253,66 +253,6 @@ describe("useFormData", () => {
   });
 
   describe("legacy helpers", () => {
-    it("updateFormData delegates to persistFormProgress", async () => {
-      localStorageMock.getItem.mockReturnValue("form-123");
-
-      const { queryClient, wrapper } = createTestEnvironment();
-      const storedForm = createMockStoredFormData();
-      queryClient.setQueryData(["formData", "form-123"], storedForm);
-
-      const updatedFormData = createMockFormData({ firstName: "Alex" });
-
-      vi.mocked(formDataApi.update).mockResolvedValue({
-        ...storedForm,
-        formData: updatedFormData,
-      });
-
-      const { result } = renderHook(() => useFormData(), { wrapper });
-
-      await waitFor(() => {
-        expect(result.current.formId).toBe("form-123");
-      });
-
-      await result.current.updateFormData({ firstName: "Alex" });
-
-      expect(formDataApi.update).toHaveBeenCalledWith(
-        "form-123",
-        expect.objectContaining({
-          formData: updatedFormData,
-          currentStep: storedForm.currentStep,
-        }),
-      );
-    });
-
-    it("updateCurrentStep delegates to persistFormProgress", async () => {
-      localStorageMock.getItem.mockReturnValue("form-123");
-
-      const { queryClient, wrapper } = createTestEnvironment();
-      const storedForm = createMockStoredFormData();
-      queryClient.setQueryData(["formData", "form-123"], storedForm);
-
-      vi.mocked(formDataApi.update).mockResolvedValue({
-        ...storedForm,
-        currentStep: 4,
-      });
-
-      const { result } = renderHook(() => useFormData(), { wrapper });
-
-      await waitFor(() => {
-        expect(result.current.formId).toBe("form-123");
-      });
-
-      await result.current.updateCurrentStep(4);
-
-      expect(formDataApi.update).toHaveBeenCalledWith(
-        "form-123",
-        expect.objectContaining({
-          formData: storedForm.formData,
-          currentStep: 4,
-        }),
-      );
-    });
-
     it("updateOrderNumber delegates to persistFormProgress", async () => {
       localStorageMock.getItem.mockReturnValue("form-123");
 

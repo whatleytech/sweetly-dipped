@@ -1,5 +1,5 @@
 import styles from "./FormSteps.module.css";
-import type { FormStepProps } from "@/types/formTypes";
+import type { FormStepProps, FormData } from "@/types/formTypes";
 import { FormButtons, FormStepContainer } from "@/components/shared";
 
 interface CommunicationPreferenceRadioOptionProps {
@@ -49,7 +49,7 @@ export const CommunicationPreference = ({
   isFirstStep,
   isLastStep,
   onSubmit,
-}: FormStepProps) => {
+}: FormStepProps & { updateFormData: (updates: Partial<FormData>) => void }) => {
   const handleRadioChange = (value: 'email' | 'text') => {
     updateFormData({ communicationMethod: value });
   };

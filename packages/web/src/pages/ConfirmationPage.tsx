@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./ConfirmationPage.module.css";
 
@@ -12,6 +12,7 @@ import { TermsAndConditions } from "@/components/TermsAndConditions/TermsAndCond
 import { PaymentNotice } from "@/components/PaymentNotice/PaymentNotice";
 import { RushOrderNotice } from "@/components/RushOrderNotice/RushOrderNotice";
 import { useFormData } from "@/hooks/useFormData";
+import type { FormData } from "@/types/formTypes";
 
 export const ConfirmationPage = () => {
   const navigate = useNavigate();
@@ -20,9 +21,25 @@ export const ConfirmationPage = () => {
     isLoading,
     isLoadingFormId,
     error,
-    updateFormData,
+    persistFormProgress,
     updateOrderNumber,
   } = useFormData();
+
+  const handleUpdate = useCallback(
+    async (updates: Partial<FormData>) => {
+      if (!formData) {
+        return;
+      }
+
+      const mergedData: FormData = {
+        ...formData,
+        ...updates,
+      };
+
+      await persistFormProgress({ formData: mergedData });
+    },
+    [formData, persistFormProgress]
+  );
 
   // Redirect to form if no data exists
   useEffect(() => {
@@ -87,13 +104,13 @@ export const ConfirmationPage = () => {
       <div className={styles.content}>
         <div className={styles.orderDetails}>
           <h2>Order Details</h2>
-          <ContactInformation formData={formData} onUpdate={updateFormData} />
+          <ContactInformation formData={formData} onUpdate={handleUpdate} />
           <PackageDetails formData={formData} />
           <DesignDetails formData={formData} />
           <PickupDetails formData={formData} />
-          <ReferralSource formData={formData} onUpdate={updateFormData} />
+          <ReferralSource formData={formData} onUpdate={handleUpdate} />
         </div>
-        <TermsAndConditions formData={formData} onUpdate={updateFormData} />
+        <TermsAndConditions formData={formData} onUpdate={handleUpdate} />
         <div className={styles.submitSection}>
           <button
             id="submit-order"

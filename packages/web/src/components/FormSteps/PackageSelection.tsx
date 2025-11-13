@@ -11,7 +11,7 @@ export const PackageSelection = ({
   isFirstStep,
   isLastStep,
   onSubmit,
-}: FormStepProps) => {
+}: FormStepProps & { updateFormData: (updates: Partial<FormData>) => void }) => {
   const { data: packageOptions = [], isLoading, isError, error, refetch } = usePackageOptions();
 
   const handleSelect = (id: FormData['packageType']) => {
