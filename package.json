@@ -32,7 +32,21 @@
     "coverage:full": "yarn coverage:global && yarn coverage:html",
     "type-check": "turbo run type-check",
     "format": "turbo run format",
-    "clean": "turbo run clean && rm -rf node_modules"
+    "clean": "turbo run clean && rm -rf node_modules",
+    "deploy:init": "yarn workspace @sweetly-dipped/deploy bootstrap",
+    "deploy:setup": "yarn workspace @sweetly-dipped/deploy setup:services",
+    "deploy:vars": "yarn workspace @sweetly-dipped/deploy vars:set",
+    "deploy:api": "yarn workspace @sweetly-dipped/deploy deploy:api",
+    "deploy:web": "yarn workspace @sweetly-dipped/deploy deploy:web",
+    "deploy:all": "yarn workspace @sweetly-dipped/deploy deploy:all",
+    "deploy:verify": "yarn workspace @sweetly-dipped/deploy verify",
+    "logs:api": "yarn workspace @sweetly-dipped/deploy logs:api",
+    "logs:web": "yarn workspace @sweetly-dipped/deploy logs:web",
+    "logs:api:follow": "yarn workspace @sweetly-dipped/deploy logs:api:follow",
+    "logs:web:follow": "yarn workspace @sweetly-dipped/deploy logs:web:follow",
+    "railway:status": "yarn workspace @sweetly-dipped/deploy status",
+    "db:migrate:prod": "yarn workspace @sweetly-dipped/deploy db:migrate",
+    "db:seed:prod": "yarn workspace @sweetly-dipped/deploy db:seed"
   },
   "devDependencies": {
     "turbo": "^2.5.8"

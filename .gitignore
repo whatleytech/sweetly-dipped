@@ -29,6 +29,10 @@ coverage/
 
 # Local files
 local/
+packages/deploy/.env.railway
+packages/deploy/.env.railway.local
+packages/deploy/.env.*.local
+.railway
 
 # Prisma generated client
 packages/api/generated/

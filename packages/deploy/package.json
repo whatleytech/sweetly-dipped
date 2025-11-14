@@ -1,0 +1,28 @@
+{
+  "name": "@sweetly-dipped/deploy",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Railway deployment scripts and configuration",
+  "scripts": {
+    "bootstrap": "./scripts/init-project.sh",
+    "setup:services": "./scripts/setup-services.sh",
+    "setup:db": "railway add --database postgresql",
+    "vars:set": "./scripts/set-vars.sh",
+    "deploy:api": "./scripts/deploy-api.sh",
+    "deploy:web": "./scripts/deploy-web.sh",
+    "deploy:all": "yarn deploy:api && yarn deploy:web",
+    "verify": "./scripts/verify-deployment.sh",
+    "logs:api": "railway logs --service sweetly-dipped-api",
+    "logs:web": "railway logs --service sweetly-dipped-web",
+    "logs:api:follow": "railway logs --service sweetly-dipped-api --follow",
+    "logs:web:follow": "railway logs --service sweetly-dipped-web --follow",
+    "status": "railway status",
+    "db:migrate": "railway run --service sweetly-dipped-api yarn db:migrate:docker",
+    "db:generate": "railway run --service sweetly-dipped-api yarn db:generate:docker",
+    "db:seed": "railway run --service sweetly-dipped-api yarn db:seed:docker"
+  },
+  "devDependencies": {
+    "@railway/cli": "^4.11.1"
+  }
+}

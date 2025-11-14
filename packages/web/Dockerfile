@@ -63,5 +63,5 @@ USER nodejs
 EXPOSE 3000
 
 # Start the static file server
-CMD ["serve", "-s", "dist", "-l", "3000", "--no-clipboard"]
+CMD ["sh", "-c", "serve -s dist -l ${PORT:-3000} --no-clipboard"]
 

@@ -1,0 +1,7 @@
+# Environment files with actual secrets/URLs
+.env.railway
+.env.railway.local
+.env.*.local
+
+# Railway CLI state (if it generates any)
+.railway
