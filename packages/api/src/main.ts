@@ -8,7 +8,10 @@ export async function bootstrap(): Promise<void> {
     bufferLogs: true,
   });
 
-  app.enableCors();
+  app.enableCors({
+    origin: process.env.ALLOWED_ORIGINS?.split(',') || true,
+    credentials: true,
+  });
   app.setGlobalPrefix('api');
 
   const port = Number(process.env.PORT) || 3001;

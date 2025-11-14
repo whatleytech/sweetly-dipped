@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
+
+# Build artifacts
+dist/
+coverage/
+.turbo/
+*.tsbuildinfo
+
+# Development files
+.git/
+.gitignore
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment files (keep .env.example)
+.env
+.env.local
+.env.*.local
+
+# Test results and logs
+test-results/
+playwright-report/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Cursor files
+.cursor/
+
+# Documentation and plans
+*.plan.md
+.cursor/plans/
+
+# Local files
+local/
+
