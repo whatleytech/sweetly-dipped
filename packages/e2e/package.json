@@ -5,7 +5,6 @@
   "type": "module",
   "scripts": {
     "test": "playwright test",
-    "test:api": "playwright test --config=playwright.api-only.config.ts",
     "test:ui": "playwright test --ui",
     "test:headed": "playwright test --headed",
     "test:debug": "playwright test --debug",

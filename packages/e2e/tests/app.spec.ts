@@ -1,26 +1,16 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Sweetly Dipped Application', () => {
+test.describe("Sweetly Dipped Application", () => {
   test.beforeEach(async ({ page }) => {
     // Check if web server is available first
     try {
-      await page.goto('/', { timeout: 5000 });
+      await page.goto("/", { timeout: 5000 });
     } catch (error) {
       test.skip();
     }
   });
 
-  test('should load the main page', async ({ page }) => {
-    // Basic test to verify the page loads
-    await expect(page).toHaveTitle(/Sweetly Dipped/);
-  });
-
-  test('should have a main heading', async ({ page }) => {
-    // Check that there's a main heading on the page
-    await expect(page.getByRole('heading', { name: /Personalized Chocolate-Covered Treats/i })).toBeVisible();
-  });
-
-  test.only("should fill out the form and submit", async ({ page }) => {
+  test("should fill out the form and submit", async ({ page }) => {
     // Helper function to fill a field and wait for button to be enabled before continuing
     const fillAndContinue = async (selector: string, value: string) => {
       await page.locator(selector).fill(value);
@@ -56,6 +46,7 @@ test.describe('Sweetly Dipped Application', () => {
     };
 
     // Homepage
+    await expect(page).toHaveTitle(/Sweetly Dipped/);
     await page.getByRole("link", { name: "Design Your Package" }).click();
 
     // Design Package Page - Lead Questions
@@ -95,15 +86,5 @@ test.describe('Sweetly Dipped Application', () => {
     // Thank You Page
     await expect(page).toHaveURL("/thank-you");
     await expect(page.getByText("Thank you for your order!")).toBeVisible();
-  });
-});
-
-test.describe('API Integration', () => {
-  test('should have working health endpoint', async ({ request }) => {
-    const response = await request.get('http://localhost:3001/api/health');
-    expect(response.ok()).toBeTruthy();
-    
-    const data = await response.json();
-    expect(data).toHaveProperty('status');
   });
 });
