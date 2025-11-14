@@ -18,10 +18,12 @@ This is a **Turborepo monorepo** with the following structure:
 /
 ├── packages/
 │   ├── web/          # React + Vite frontend
-│   ├── api/          # NestJS backend
+│   ├── api/          # NestJS backend with Prisma ORM
+│   ├── deploy/       # Railway deployment scripts and configs
 │   ├── shared-types/ # Shared TypeScript types
 │   ├── config-eslint/ # Shared ESLint configuration
-│   └── config-ts/    # Shared TypeScript configuration
+│   ├── config-ts/    # Shared TypeScript configuration
+│   └── e2e/          # Playwright end-to-end tests
 ├── scripts/          # Build and utility scripts
 ├── coverage/         # Test coverage reports
 └── .cursor/rules/    # Cursor rule files
@@ -89,6 +91,8 @@ src/
 - **Providers**: Injected dependencies (services, repositories, pipes, guards)
 - **Bootstrap**: Configure global middleware, filters, and prefixes in `main.ts`
 - **Scaffolding**: Prefer the Nest CLI (`nest generate ...`) for creating new modules, controllers, and services to ensure consistent file structure and metadata ([docs.nestjs.com](https://docs.nestjs.com/cli/usages#nest-generate))
+- **Database**: Prisma ORM for type-safe database access with PostgreSQL
+- **Migrations**: Use `yarn db:migrate` for local, `yarn db:migrate:prod` for production
 
 ### TypeScript Configuration
 
@@ -532,8 +536,144 @@ test('displays error message when validation fails', async () => {
 - **Remove obsolete**: Delete outdated or unused rules
 - **Use current dates**: Always use `date` command to get actual datetime when updating timestamps, never hardcode dates
 
+## Deployment Architecture (packages/deploy)
+
+### Railway Deployment Package
+
+The `packages/deploy` workspace centralizes all Railway deployment automation, configurations, and documentation.
+
+#### Structure
+```
+packages/deploy/
+├── configs/
+│   ├── railway.json          # Project-level Railway config
+│   ├── api.railway.toml      # API service configuration
+│   └── web.railway.toml      # Web service configuration
+├── scripts/
+│   ├── init-project.sh       # Initialize Railway project
+│   ├── setup-services.sh     # Create services and database
+│   ├── set-vars.sh           # Sync environment variables
+│   ├── deploy-api.sh         # Deploy API + migrations
+│   ├── deploy-web.sh         # Deploy web service
+│   └── verify-deployment.sh  # Health check both services
+├── .env.railway.example      # Template (safe placeholders)
+├── .env.railway              # Actual URLs (gitignored)
+├── .gitignore                # Protect secrets
+├── package.json              # Scripts + Railway CLI
+└── README.md                 # Deployment documentation
+```
+
+#### Deployment Workflow
+
+**One-time setup**:
+```bash
+yarn deploy:init              # Railway login + project creation
+yarn deploy:setup             # Create API, web, Postgres services
+cp packages/deploy/.env.railway.example packages/deploy/.env.railway
+```
+
+**Deploy services**:
+```bash
+yarn deploy:vars              # Sync environment variables
+yarn deploy:api               # Build + deploy API + migrations
+# Update .env.railway with API URL
+yarn deploy:vars              # Update web with API URL
+yarn deploy:web               # Build + deploy web
+# Update .env.railway with web URL
+yarn deploy:vars              # Update API CORS with web URL
+yarn deploy:verify            # Test both services
+```
+
+**Monitor**:
+```bash
+yarn logs:api:follow          # Watch API logs
+yarn logs:web:follow          # Watch web logs
+yarn railway:status           # Check service status
+```
+
+#### Security Principles
+
+- **Never commit secrets**: `.env.railway` is gitignored
+- **Template only**: `.env.railway.example` contains safe placeholders
+- **Database credentials**: Managed by Railway via `${{Postgres.DATABASE_URL}}` reference
+- **Service URLs**: Stored only in `.env.railway` (gitignored)
+- **Railway variables**: Use `--skip-deploys` flag when setting variables to avoid unnecessary redeployments
+
+#### Key Environment Variables
+
+**API Service**:
+- `RAILWAY_DOCKERFILE_PATH`: `packages/api/Dockerfile`
+- `DATABASE_URL`: PostgreSQL connection string (public proxy for migrations)
+- `NODE_ENV`: `production`
+- `PORT`: `3001`
+- `ALLOWED_ORIGINS`: Web service URL for CORS
+
+**Web Service**:
+- `RAILWAY_DOCKERFILE_PATH`: `packages/web/Dockerfile`
+- `VITE_API_URL`: API URL with `/api` suffix (auto-added by script)
+- `NODE_ENV`: `production`
+- `PORT`: Injected by Railway (dynamic)
+
+#### Docker Configuration
+
+**API Dockerfile** (`packages/api/Dockerfile`):
+- Multi-stage build (builder + production)
+- Prisma client generated during build
+- Migrations run post-deployment via `railway run`
+- Listens on `0.0.0.0:${PORT}` for Railway's proxy
+
+**Web Dockerfile** (`packages/web/Dockerfile`):
+- Multi-stage build (builder + production)
+- Vite build with `VITE_API_URL` build arg
+- Serves static files via `serve` package
+- Listens on `0.0.0.0:${PORT:-3000}` for Railway's dynamic port
+
+#### Database Management
+
+**Migrations**:
+```bash
+yarn db:migrate:prod          # Run Prisma migrations in production
+```
+
+**Seeding**:
+```bash
+yarn db:seed:prod             # Seed production database
+```
+
+**Connection**:
+- Internal hostname: `postgres.railway.internal:5432` (service-to-service)
+- Public proxy: `nozomi.proxy.rlwy.net:11794` (for migrations from CLI)
+- Database name: `sweetly_dipped` (created manually via psql)
+
+#### Deployment Best Practices
+
+1. **Test locally first**: Always test Docker builds locally before deploying
+2. **Deploy order**: API before web (web needs API URL)
+3. **Update variables**: Run `yarn deploy:vars` after each URL change
+4. **Verify deployments**: Always run `yarn deploy:verify` after deployments
+5. **Monitor logs**: Use `yarn logs:api:follow` to watch for errors
+6. **Database migrations**: Run automatically during API deployment
+7. **Rollback strategy**: Redeploy previous commit if issues arise
+
+#### Common Issues
+
+**502 Bad Gateway**:
+- Ensure service listens on `0.0.0.0:${PORT}`
+- Check Dockerfile CMD uses `${PORT:-3000}` syntax
+- Verify `RAILWAY_DOCKERFILE_PATH` is set correctly
+
+**Database connection errors**:
+- Use public proxy URL for CLI migrations (`nozomi.proxy.rlwy.net`)
+- Verify `DATABASE_URL` points to `sweetly_dipped` database
+- Check database service is running in Railway dashboard
+
+**CORS errors**:
+- Ensure `ALLOWED_ORIGINS` matches web URL exactly
+- Re-run `yarn deploy:vars` after updating web URL
+- Check API logs for CORS-related errors
+
 ---
 
-**Last Updated**: August 2025  
+**Last Updated**: November 2025  
 **Maintainer**: Development Team  
 **Review Cycle**: Quarterly

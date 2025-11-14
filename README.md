@@ -28,6 +28,8 @@ Sweetly Dipped is a multi-page web application that allows customers to:
 - **Node.js** - JavaScript runtime
 - **NestJS** - Opinionated framework atop Express/Fastify
 - **TypeScript** - Type-safe server code
+- **Prisma** - Type-safe ORM for PostgreSQL
+- **PostgreSQL** - Production database
 - **CORS** - Cross-origin resource sharing
 - **Vitest** - API testing
 
@@ -37,6 +39,13 @@ Sweetly Dipped is a multi-page web application that allows customers to:
 - **Prettier** - Code formatting
 - **Yarn** - Package manager with workspaces
 - **Playwright** - End-to-end testing framework
+- **Docker** - Containerization for deployment
+
+### Deployment (Deploy Package)
+- **Railway** - Production hosting platform
+- **Railway CLI** - Deployment automation
+- **PostgreSQL** - Managed database service
+- **Bash Scripts** - Automated deployment workflows
 
 ## Package Structure
 
@@ -61,7 +70,13 @@ packages/
 │   │   ├── forms/         # Feature module for order form APIs
 │   │   ├── orders/        # Feature module for order numbers
 │   │   └── health/        # Feature module for health checks
+│   ├── prisma/            # Prisma schema and migrations
 │   └── package.json
+├── deploy/                 # Railway deployment scripts
+│   ├── configs/           # Railway service configurations
+│   ├── scripts/           # Deployment automation scripts
+│   ├── .env.railway.example  # Environment template (gitignored actual)
+│   └── README.md          # Deployment documentation
 ├── shared-types/           # Shared TypeScript types
 │   ├── formTypes.ts       # Form data interfaces
 │   └── index.ts
@@ -245,6 +260,47 @@ The Sweetly Dipped design system uses a carefully crafted color palette defined 
 - **Bundle size** monitoring
 - **Image optimization** for web assets
 - **Code splitting** for optimal loading
+
+## Deployment
+
+### Production Deployment to Railway
+
+The project is deployed to Railway using automated scripts in the `packages/deploy` package.
+
+**Quick deployment workflow**:
+
+```bash
+# One-time setup (already completed)
+yarn deploy:init                  # Initialize Railway project
+yarn deploy:setup                 # Create services and database
+
+# Deploy services
+yarn deploy:api                   # Deploy API + run migrations
+yarn deploy:web                   # Deploy web application
+yarn deploy:verify                # Verify both services are running
+
+# Monitor deployments
+yarn logs:api:follow              # Watch API logs
+yarn logs:web:follow              # Watch web logs
+yarn railway:status               # Check service status
+```
+
+**Production URLs**:
+- API: `https://sweetly-dipped-api-production.up.railway.app`
+- Web: `https://sweetly-dipped-web-production.up.railway.app`
+- Railway Dashboard: `https://railway.com/dashboard`
+
+For detailed deployment documentation, see `packages/deploy/README.md`.
+
+### Database Operations
+
+```bash
+# Run migrations in production
+yarn db:migrate:prod
+
+# Seed production database
+yarn db:seed:prod
+```
 
 ## Contributing
 
