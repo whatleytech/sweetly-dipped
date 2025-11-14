@@ -32,6 +32,23 @@ export const ByTheDozen = ({
     updateFormData({ [key]: newValue });
   };
 
+  const handleDropdownChange = (
+    key: 'riceKrispies' | 'oreos' | 'pretzels' | 'marshmallows',
+    value: number
+  ) => {
+    updateFormData({ [key]: value });
+  };
+
+  const getQuantityLabel = (quantity: number) => {
+    if (quantity === 0) {
+      return 'None';
+    }
+    if (quantity === 1) {
+      return '1 dozen';
+    }
+    return `${quantity} dozen`;
+  };
+
   const hasAnySelection =
     (formData.riceKrispies ?? 0) +
       (formData.oreos ?? 0) +
@@ -71,44 +88,76 @@ export const ByTheDozen = ({
       title="Which treat(s) would you like to order by the dozen?"
       description="Select the quantity for each treat you'd like to order. Prices are shown per dozen."
     >
-      <div className={styles.gridHeader}>
-        <div className={styles.gridHeaderCell}>Treat</div>
-        {QUANTITIES.slice(1).map((q) => (
-          <div key={q} className={styles.gridHeaderCell}>
-            {q} dozen
+      <div className={styles.desktopGrid}>
+        <div className={styles.gridHeader}>
+          <div className={styles.gridHeaderCell}>Treat</div>
+          {QUANTITIES.slice(1).map((q) => (
+            <div key={q} className={styles.gridHeaderCell}>
+              {q} dozen
+            </div>
+          ))}
+        </div>
+
+        {treatOptions.map((row) => (
+          <div key={row.key} className={styles.gridRow}>
+            <div className={styles.gridRowLabel}>
+              {row.label} — ${row.price}/dozen
+            </div>
+            {QUANTITIES.slice(1).map((q) => {
+              const selected = (formData[row.key] ?? 0) === q;
+              return (
+                <label
+                  key={q}
+                  className={`${styles.gridRadioOption} ${
+                    selected ? styles.selected : ''
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    className={styles.gridRadioInput}
+                    name={row.key}
+                    value={q}
+                    checked={selected}
+                    onChange={() => handleSelect(row.key, q)}
+                    onClick={() => handleSelect(row.key, q)}
+                  />
+                  <span className={styles.gridRadioLabel}>{q}</span>
+                </label>
+              );
+            })}
           </div>
         ))}
       </div>
 
-      {treatOptions.map((row) => (
-        <div key={row.key} className={styles.gridRow}>
-          <div className={styles.gridRowLabel}>
-            {row.label} — ${row.price}/dozen
-          </div>
-          {QUANTITIES.slice(1).map((q) => {
-            const selected = (formData[row.key] ?? 0) === q;
-            return (
-              <label
-                key={q}
-                className={`${styles.gridRadioOption} ${
-                  selected ? styles.selected : ''
-                }`}
-              >
-                <input
-                  type="radio"
-                  className={styles.gridRadioInput}
-                  name={row.key}
-                  value={q}
-                  checked={selected}
-                  onChange={() => handleSelect(row.key, q)}
-                  onClick={() => handleSelect(row.key, q)}
-                />
-                <span className={styles.gridRadioLabel}>{q}</span>
+      <div className={styles.mobileSelectContainer}>
+        {treatOptions.map((row) => {
+          const selectId = `${row.key}-quantity`;
+          const currentValue = formData[row.key] ?? 0;
+
+          return (
+            <div key={row.key} className={styles.mobileTreatGroup}>
+              <label htmlFor={selectId} className={styles.mobileTreatLabel}>
+                {row.label} — ${row.price}/dozen
               </label>
-            );
-          })}
-        </div>
-      ))}
+              <select
+                id={selectId}
+                name={row.key}
+                className={styles.mobileTreatSelect}
+                value={currentValue}
+                onChange={(event) =>
+                  handleDropdownChange(row.key, Number(event.target.value))
+                }
+              >
+                {QUANTITIES.map((quantity) => (
+                  <option key={quantity} value={quantity}>
+                    {getQuantityLabel(quantity)}
+                  </option>
+                ))}
+              </select>
+            </div>
+          );
+        })}
+      </div>
 
       <FormButtons
         onPrev={onPrev}

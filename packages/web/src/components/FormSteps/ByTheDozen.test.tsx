@@ -59,11 +59,11 @@ describe('ByTheDozen', () => {
     );
 
     await screen.findByText('Treat');
-    expect(screen.getByText('1 dozen')).toBeInTheDocument();
-    expect(screen.getByText('4 dozen')).toBeInTheDocument();
+    expect(screen.getAllByText('1 dozen').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('4 dozen').length).toBeGreaterThan(0);
     expect(
-      screen.getByText(/Chocolate covered Rice Krispies/)
-    ).toBeInTheDocument();
+      screen.getAllByText(/Chocolate covered Rice Krispies/).length
+    ).toBeGreaterThan(0);
   });
 
   it('disables continue when no selections are made', async () => {
@@ -101,6 +101,27 @@ describe('ByTheDozen', () => {
     fireEvent.click(option!);
 
     expect(updateFormData).toHaveBeenCalled();
+  });
+
+  it('updates selection via mobile dropdown', async () => {
+    renderWithQueryClient(
+      <ByTheDozen
+        formData={baseData}
+        updateFormData={updateFormData}
+        onNext={onNext}
+        onPrev={onPrev}
+        onSubmit={vi.fn()}
+        isFirstStep={false}
+        isLastStep={false}
+      />
+    );
+
+    const dropdown = await screen.findByLabelText(
+      /Chocolate covered Rice Krispies/
+    );
+    fireEvent.change(dropdown, { target: { value: '3' } });
+
+    expect(updateFormData).toHaveBeenCalledWith({ riceKrispies: 3 });
   });
 
   it('calls onNext when continue is clicked after selection', async () => {

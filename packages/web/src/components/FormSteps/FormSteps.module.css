@@ -198,6 +198,46 @@
   margin-bottom: var(--spacing-lg);
 }
 
+.desktopGrid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.mobileSelectContainer {
+  display: none;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.mobileTreatGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-md);
+  border-radius: 8px;
+  background: var(--sd-pink-light);
+}
+
+.mobileTreatLabel {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--sd-brown-dark);
+}
+
+.mobileTreatSelect {
+  width: 100%;
+  padding: var(--spacing-sm);
+  border: 2px solid var(--sd-brown-light);
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--sd-brown-dark);
+  background: var(--sd-white);
+  cursor: pointer;
+}
+
 .gridHeader {
   display: grid;
   grid-template-columns: 1fr repeat(4, 80px);
@@ -274,6 +314,27 @@
 
 /* Comprehensive mobile responsive - covers all mobile devices */
 @media (max-width: 767px) {
+  .desktopGrid {
+    display: none;
+  }
+
+  .mobileSelectContainer {
+    display: flex;
+  }
+
+  .mobileTreatGroup {
+    padding: var(--spacing-sm);
+  }
+
+  .mobileTreatLabel {
+    font-size: 0.9rem;
+  }
+
+  .mobileTreatSelect {
+    font-size: 0.9rem;
+    padding: var(--spacing-xs);
+  }
+
   .questionTitle {
     font-size: 1.25rem;
   }
@@ -380,6 +441,12 @@
     padding: var(--spacing-xs);
     font-size: 0.8rem;
     min-height: 40px;
+  }
+}
+
+@media (min-width: 768px) {
+  .mobileSelectContainer {
+    display: none;
   }
 }
 
