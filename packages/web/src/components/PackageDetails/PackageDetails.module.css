@@ -15,8 +15,6 @@
   padding-bottom: var(--spacing-xs);
 }
 
-.totalGroup,
-.priceGroup,
 .fieldGroup {
   display: flex;
   justify-content: space-between;
@@ -32,6 +30,24 @@
   color: var(--sd-brown-dark);
   min-width: 120px;
   flex-shrink: 0;
+  margin-right: var(--spacing-sm);
+}
+
+.stackedFieldGroup {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-xs);
+}
+
+.stackedFieldGroup label {
+  min-width: auto;
+  margin-right: 0;
+  width: 100%;
+}
+
+.sectionLabel {
+  display: block;
+  padding: var(--spacing-xs) 0;
 }
 
 .fieldValue {
@@ -40,37 +56,50 @@
   flex: 1;
 }
 
-.treatsBreakdown {
+.table {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs);
-  color: var(--sd-brown-light);
-  text-align: right;
-  flex: 1;
+  width: 100%;
 }
 
-.treatsBreakdown > div {
-  padding: 2px 0;
+.tableRow {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  gap: var(--spacing-sm);
+  align-items: center;
+  padding: 6px 0;
 }
 
-.total {
+.tableLabel {
   font-weight: 600;
   color: var(--sd-brown-dark);
-  border-top: 1px solid var(--sd-pink-light);
-  padding-top: var(--spacing-xs);
-  margin-top: var(--spacing-xs);
 }
 
-.priceGroup {
-  margin-bottom: var(--spacing-xs);
-}
-
-.priceGroup label {
+.tableValue {
   font-weight: 600;
+  color: var(--sd-brown-light);
+  text-align: right;
 }
 
-.totalGroup {
+.tableTotal {
   border-top: 1px solid var(--sd-pink-light);
+  margin-top: var(--spacing-xs);
+  padding-top: var(--spacing-xs);
+}
+
+.treatsBreakdown {
+  margin-top: 0;
+  padding: var(--spacing-sm);
+  border: 1px solid var(--sd-pink-light);
+  border-radius: 6px;
+  background: var(--sd-cream);
+  width: 100%;
+  max-width: 100%;
+  align-self: center;
+  box-sizing: border-box;
+  margin-left: auto;
+  margin-right: auto;
+  overflow: hidden;
 }
 
 .priceBreakdown,
@@ -79,7 +108,6 @@
   color: var(--sd-pink-base);
   font-size: 1.1rem;
   text-align: right;
-  flex: 1;
 }
 
 .priceBreakdown {
@@ -94,11 +122,25 @@
   }
 
   .fieldValue,
-  .treatsBreakdown,
-  .priceGroup,
   .priceBreakdown,
   .totalPrice {
     text-align: left;
     width: 100%;
+  }
+
+  .tableRow {
+    grid-template-columns: 3fr 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .tableRow {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 1fr);
+    gap: var(--spacing-xs);
+  }
+
+  .tableLabel,
+  .tableValue {
+    font-size: 0.95rem;
   }
 }

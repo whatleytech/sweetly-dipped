@@ -6,6 +6,78 @@ interface PackageDetailsProps {
   formData: FormData;
 }
 
+interface PackageTypeFieldProps {
+  value: string;
+}
+
+interface TreatBreakdownRow {
+  label: string;
+  value: number;
+}
+
+interface TreatBreakdownProps {
+  rows: TreatBreakdownRow[];
+  totalDozens: number;
+}
+
+interface PriceSummaryProps {
+  total: number;
+}
+
+const PackageTypeField = ({ value }: PackageTypeFieldProps) => (
+  <div className={styles.fieldGroup}>
+    <label>Package Type:</label>
+    <span className={styles.fieldValue}>{value}</span>
+  </div>
+);
+
+const TreatBreakdown = ({ rows, totalDozens }: TreatBreakdownProps) => (
+  <div className={`${styles.fieldGroup} ${styles.stackedFieldGroup}`}>
+    <label className={styles.sectionLabel}>Treats Breakdown:</label>
+    <div className={`${styles.table} ${styles.treatsBreakdown}`}>
+      {rows.map((item) => (
+        <div className={styles.tableRow} key={item.label}>
+          <span className={styles.tableLabel}>{item.label}</span>{' '}
+          <span className={styles.tableValue}>{item.value}</span>
+        </div>
+      ))}
+      <div className={`${styles.tableRow} ${styles.tableTotal}`}>
+        <span className={styles.tableLabel}>Total:</span>{' '}
+        <span className={styles.tableValue}>{totalDozens} dozen</span>
+      </div>
+    </div>
+  </div>
+);
+
+const PriceSummary = ({ total }: PriceSummaryProps) => {
+  const half = total / 2;
+
+  return (
+    <div className={styles.table}>
+      <div className={styles.tableRow}>
+        <span className={styles.tableLabel}>Deposit due within 48 hours:</span>{' '}
+        <span className={`${styles.tableValue} ${styles.priceBreakdown}`}>
+          ${half}
+        </span>
+      </div>
+      <div className={styles.tableRow}>
+        <span className={styles.tableLabel}>
+          Remainder due 1 week before event:
+        </span>{' '}
+        <span className={`${styles.tableValue} ${styles.priceBreakdown}`}>
+          ${half}
+        </span>
+      </div>
+      <div className={`${styles.tableRow} ${styles.tableTotal}`}>
+        <span className={styles.tableLabel}>Total:</span>{' '}
+        <span className={`${styles.tableValue} ${styles.totalPrice}`}>
+          ${total}
+        </span>
+      </div>
+    </div>
+  );
+};
+
 export const PackageDetails = ({ formData }: PackageDetailsProps) => {
   const { data: packageOptions = [] } = usePackageOptions();
   const { data: treatOptions = [] } = useTreatOptions();
@@ -30,18 +102,22 @@ export const PackageDetails = ({ formData }: PackageDetailsProps) => {
   };
 
   const calculateTotal = () => {
-    if (formData.packageType === "by-dozen") {
+    if (formData.packageType === 'by-dozen') {
       // Calculate total for by-dozen orders
-      const riceKrispiesPrice = treatOptions.find(t => t.key === 'riceKrispies')?.price || 40;
-      const oreosPrice = treatOptions.find(t => t.key === 'oreos')?.price || 30;
-      const pretzelsPrice = treatOptions.find(t => t.key === 'pretzels')?.price || 30;
-      const marshmallowsPrice = treatOptions.find(t => t.key === 'marshmallows')?.price || 40;
+      const riceKrispiesPrice =
+        treatOptions.find((t) => t.key === 'riceKrispies')?.price || 40;
+      const oreosPrice =
+        treatOptions.find((t) => t.key === 'oreos')?.price || 30;
+      const pretzelsPrice =
+        treatOptions.find((t) => t.key === 'pretzels')?.price || 30;
+      const marshmallowsPrice =
+        treatOptions.find((t) => t.key === 'marshmallows')?.price || 40;
 
       const riceKrispiesTotal = formData.riceKrispies * riceKrispiesPrice;
       const oreosTotal = formData.oreos * oreosPrice;
       const pretzelsTotal = formData.pretzels * pretzelsPrice;
       const marshmallowsTotal = formData.marshmallows * marshmallowsPrice;
-      
+
       return riceKrispiesTotal + oreosTotal + pretzelsTotal + marshmallowsTotal;
     } else {
       // Return package price for pre-defined packages
@@ -51,41 +127,23 @@ export const PackageDetails = ({ formData }: PackageDetailsProps) => {
 
   const total = calculateTotal();
 
+  const treatRows: TreatBreakdownRow[] = [
+    { label: 'Rice Krispies:', value: formData.riceKrispies },
+    { label: 'Oreos:', value: formData.oreos },
+    { label: 'Pretzels:', value: formData.pretzels },
+    { label: 'Marshmallows:', value: formData.marshmallows },
+  ];
+
   return (
     <div className={styles.section}>
       <h3>Package Details</h3>
-      <div className={styles.fieldGroup}>
-        <label>Package Type:</label>
-        <span className={styles.fieldValue}>
-          {getPackageLabel(formData.packageType)}
-        </span>
-      </div>
+      <PackageTypeField value={getPackageLabel(formData.packageType)} />
 
-      {formData.packageType === "by-dozen" && (
-        <div className={styles.fieldGroup}>
-          <label>Treats Breakdown:</label>
-          <div className={styles.treatsBreakdown}>
-            <div>Rice Krispies: {formData.riceKrispies}</div>
-            <div>Oreos: {formData.oreos}</div>
-            <div>Pretzels: {formData.pretzels}</div>
-            <div>Marshmallows: {formData.marshmallows}</div>
-            <div className={styles.total}>Total: {getTotalByDozen()} dozen</div>
-          </div>
-        </div>
+      {formData.packageType === 'by-dozen' && (
+        <TreatBreakdown rows={treatRows} totalDozens={getTotalByDozen()} />
       )}
 
-      <div className={styles.priceGroup}>
-        <label>Deposit due within 48 hours:</label>
-        <span className={styles.priceBreakdown}>${total / 2}</span>
-      </div>
-      <div className={styles.priceGroup}>
-        <label>Remainder due 1 week before event:</label>
-        <span className={styles.priceBreakdown}>${total / 2}</span>
-      </div>
-      <div className={styles.totalGroup}>
-        <label>Total:</label>
-        <span className={styles.totalPrice}>${total}</span>
-      </div>
+      <PriceSummary total={total} />
     </div>
   );
 };
