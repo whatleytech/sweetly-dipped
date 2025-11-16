@@ -2,15 +2,15 @@
   "extends": "@sweetly-dipped/config-ts/node.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "./src",
     "target": "ES2023",
     "baseUrl": ".",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    "types": ["jest", "node"],
     "paths": {
       "@/*": ["src/*"]
     }
   },
-  "include": ["src/**/*", "src/generated/**/*"],
+  "include": ["src/**/*", "src/generated/**/*", "test/**/*"],
   "exclude": ["node_modules", "dist", "coverage"]
 }

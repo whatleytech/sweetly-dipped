@@ -417,25 +417,22 @@ export class FormsService {
     const orderNumber = generateOrderNumber();
     const submittedAt = new Date();
 
-    // 5. Create order record
-    await this.prisma.order.create({
-      data: {
-        orderNumber,
-        formId: id,
-        customerId: form.customer.id,
-      },
-    });
-
-    // 6. Update form status to "submitted" with submittedAt timestamp
+    // 5. Update form status to "submitted" with submittedAt timestamp and create order record
     await this.prisma.form.update({
       where: { id },
       data: {
         status: 'submitted',
         submittedAt,
+        order: {
+          create: {
+            orderNumber,
+            customerId: form.customer.id,
+          },
+        },
       },
     });
 
-    // 7. Return order details
+    // 6. Return order details
     return {
       orderNumber,
       submittedAt: submittedAt.toISOString(),
