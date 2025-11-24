@@ -1,12 +1,23 @@
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
-import { Logger } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module.js';
 
 export async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule, {
     bufferLogs: true,
   });
+
+  // Enable global validation
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true, // Automatically transform payloads to DTO instances
+      whitelist: true, // Strip properties not in DTO (unknown properties removed silently)
+      transformOptions: {
+        enableImplicitConversion: true, // Auto-convert types (string to number, etc.)
+      },
+    })
+  );
 
   app.enableCors({
     origin: process.env.ALLOWED_ORIGINS?.split(',') || true,

@@ -10,6 +10,7 @@ import type { CreateFormDto } from './dto/create-form.dto.js';
 import type { UpdateFormDto } from './dto/update-form.dto.js';
 import type { StoredFormDto } from './dto/stored-form.dto.js';
 import type { SubmitFormDto } from './dto/submit-form.dto.js';
+import { FormDataDto } from './dto/form-data.dto.js';
 
 const DEFAULT_VISITED_STEP = 'lead';
 const COMMUNICATION_METHODS: ReadonlyArray<FormData['communicationMethod']> = [
@@ -31,7 +32,7 @@ type FormWithRelations = Prisma.FormGetPayload<{
 }>;
 
 const ensureVisitedStepsSet = (
-  input: FormData['visitedSteps'] | string[] | undefined
+  input: FormData['visitedSteps'] | string[] | null | undefined
 ): Set<string> => {
   if (input instanceof Set) {
     const steps = input.size > 0 ? input : new Set<string>();
@@ -55,8 +56,27 @@ const ensureVisitedStepsSet = (
   return steps;
 };
 
-const normalizeFormDataInput = (data: FormData): FormData => ({
-  ...data,
+const normalizeFormDataInput = (data: FormDataDto): FormData => ({
+  firstName: data.firstName ?? '',
+  lastName: data.lastName ?? '',
+  email: data.email ?? '',
+  phone: data.phone ?? '',
+  communicationMethod: (data.communicationMethod ??
+    '') as FormData['communicationMethod'],
+  packageType: (data.packageType ?? '') as FormData['packageType'],
+  riceKrispies: data.riceKrispies ?? 0,
+  oreos: data.oreos ?? 0,
+  pretzels: data.pretzels ?? 0,
+  marshmallows: data.marshmallows ?? 0,
+  colorScheme: data.colorScheme ?? '',
+  eventType: data.eventType ?? '',
+  theme: data.theme ?? '',
+  additionalDesigns: data.additionalDesigns ?? '',
+  pickupDate: data.pickupDate ?? '',
+  pickupTime: data.pickupTime ?? '',
+  rushOrder: data.rushOrder ?? false,
+  referralSource: data.referralSource ?? '',
+  termsAccepted: data.termsAccepted ?? false,
   visitedSteps: ensureVisitedStepsSet(data.visitedSteps),
 });
 

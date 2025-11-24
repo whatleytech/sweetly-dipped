@@ -1,17 +1,15 @@
-import type { FormData } from '@sweetly-dipped/shared-types';
+import type {
+  IStoredFormDto,
+  FormDataWithVisitedStepsArray,
+} from '@sweetly-dipped/shared-types';
 
-type FormDataWithVisitedStepsArray = Omit<FormData, 'visitedSteps'> & {
-  visitedSteps: string[];
-};
-
-export interface StoredFormDto {
-  id: string;
-  formData: FormDataWithVisitedStepsArray;
-  currentStep: number;
+export class StoredFormDto implements IStoredFormDto {
+  id!: string;
+  formData!: FormDataWithVisitedStepsArray;
+  currentStep!: number;
   orderNumber?: string;
   status?: string;
   submittedAt?: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt!: string;
+  updatedAt!: string;
 }
-

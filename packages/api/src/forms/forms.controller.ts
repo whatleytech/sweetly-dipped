@@ -9,10 +9,10 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import type { CreateFormDto } from './dto/create-form.dto.js';
-import type { UpdateFormDto } from './dto/update-form.dto.js';
-import type { StoredFormDto } from './dto/stored-form.dto.js';
-import type { SubmitFormDto } from './dto/submit-form.dto.js';
+import { CreateFormDto } from './dto/create-form.dto.js';
+import { UpdateFormDto } from './dto/update-form.dto.js';
+import { StoredFormDto } from './dto/stored-form.dto.js';
+import { SubmitFormDto } from './dto/submit-form.dto.js';
 import { FormsService } from './forms.service.js';
 
 @Controller('forms')

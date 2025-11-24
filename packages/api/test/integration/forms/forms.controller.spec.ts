@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import request from 'supertest';
 import { faker } from '@faker-js/faker';
 import { FormsModule } from '../../../src/forms/forms.module.js';
@@ -16,6 +16,16 @@ describe('FormsController (Integration)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    // Enable global validation to match production setup
+    app.useGlobalPipes(
+      new ValidationPipe({
+        transform: true,
+        whitelist: true,
+        transformOptions: {
+          enableImplicitConversion: true,
+        },
+      })
+    );
     await app.init();
     prisma = moduleFixture.get<PrismaService>(PrismaService);
   });
@@ -40,7 +50,7 @@ describe('FormsController (Integration)', () => {
           firstName: faker.person.firstName(),
           lastName: faker.person.lastName(),
           email: faker.internet.email(),
-          phone: faker.phone.number(),
+          phone: '123-456-7890',
           communicationMethod: 'email' as const,
           packageType: 'medium' as const,
           riceKrispies: 0,
@@ -56,7 +66,7 @@ describe('FormsController (Integration)', () => {
           rushOrder: false,
           referralSource: faker.word.noun(),
           termsAccepted: true,
-          visitedSteps: new Set(['lead', 'communication', 'package']),
+          visitedSteps: ['lead', 'communication', 'package'],
         },
         currentStep: 2,
       };
@@ -94,6 +104,127 @@ describe('FormsController (Integration)', () => {
       expect(customerInDb).toBeDefined();
       expect(customerInDb!.email).toBe(createFormDto.formData.email);
     });
+
+    it('should reject invalid email', async () => {
+      const invalidForm = {
+        formData: {
+          firstName: faker.person.firstName(),
+          lastName: faker.person.lastName(),
+          email: 'not-an-email',
+          phone: '123-456-7890',
+          communicationMethod: 'email' as const,
+          packageType: 'medium' as const,
+          riceKrispies: 0,
+          oreos: 0,
+          pretzels: 0,
+          marshmallows: 0,
+          colorScheme: '',
+          eventType: '',
+          theme: '',
+          additionalDesigns: '',
+          pickupDate: '',
+          pickupTime: '',
+          rushOrder: false,
+          referralSource: '',
+          termsAccepted: false,
+          visitedSteps: [],
+        },
+      };
+
+      const response = await request(app.getHttpServer())
+        .post('/forms')
+        .send(invalidForm)
+        .expect(400);
+
+      expect(response.body.message).toBeDefined();
+      expect(Array.isArray(response.body.message)).toBe(true);
+      expect(
+        response.body.message.some((msg: string) =>
+          msg.toLowerCase().includes('email')
+        )
+      ).toBe(true);
+    });
+
+    it('should reject invalid phone format', async () => {
+      const invalidForm = {
+        formData: {
+          firstName: faker.person.firstName(),
+          lastName: faker.person.lastName(),
+          email: faker.internet.email(),
+          phone: '1234567890', // Missing dashes
+          communicationMethod: 'email' as const,
+          packageType: 'medium' as const,
+          riceKrispies: 0,
+          oreos: 0,
+          pretzels: 0,
+          marshmallows: 0,
+          colorScheme: '',
+          eventType: '',
+          theme: '',
+          additionalDesigns: '',
+          pickupDate: '',
+          pickupTime: '',
+          rushOrder: false,
+          referralSource: '',
+          termsAccepted: false,
+          visitedSteps: [],
+        },
+      };
+
+      const response = await request(app.getHttpServer())
+        .post('/forms')
+        .send(invalidForm)
+        .expect(400);
+
+      expect(response.body.message).toBeDefined();
+      expect(Array.isArray(response.body.message)).toBe(true);
+      expect(
+        response.body.message.some(
+          (msg: string) =>
+            msg.toLowerCase().includes('phone') ||
+            msg.toLowerCase().includes('xxx-xxx-xxxx')
+        )
+      ).toBe(true);
+    });
+
+    it('should strip unknown properties without throwing error', async () => {
+      const formWithExtra = {
+        formData: {
+          firstName: faker.person.firstName(),
+          lastName: faker.person.lastName(),
+          email: faker.internet.email(),
+          phone: '123-456-7890',
+          communicationMethod: 'email' as const,
+          packageType: 'medium' as const,
+          riceKrispies: 0,
+          oreos: 0,
+          pretzels: 0,
+          marshmallows: 0,
+          colorScheme: '',
+          eventType: '',
+          theme: '',
+          additionalDesigns: '',
+          pickupDate: '',
+          pickupTime: '',
+          rushOrder: false,
+          referralSource: '',
+          termsAccepted: true,
+          visitedSteps: [],
+        },
+        unknownField: 'should be removed',
+        anotherUnknownField: 'also removed',
+      };
+
+      const response = await request(app.getHttpServer())
+        .post('/forms')
+        .send(formWithExtra)
+        .expect(201);
+
+      // Verify unknownField was stripped - the request succeeds with 201,
+      // and the created form should not contain unknownField in the response
+      expect(response.body).not.toHaveProperty('unknownField');
+      expect(response.body).not.toHaveProperty('anotherUnknownField');
+    });
   });
 
   describe('GET /forms', () => {
@@ -104,7 +235,7 @@ describe('FormsController (Integration)', () => {
           firstName: faker.person.firstName(),
           lastName: faker.person.lastName(),
           email: faker.internet.email(),
-          phone: faker.phone.number(),
+          phone: '123-456-7890',
         },
       });
       const customer2 = await prisma.customer.create({
@@ -112,7 +243,7 @@ describe('FormsController (Integration)', () => {
           firstName: faker.person.firstName(),
           lastName: faker.person.lastName(),
           email: faker.internet.email(),
-          phone: faker.phone.number(),
+          phone: '123-456-7890',
         },
       });
 
@@ -152,7 +283,7 @@ describe('FormsController (Integration)', () => {
           firstName: faker.person.firstName(),
           lastName: faker.person.lastName(),
           email: faker.internet.email(),
-          phone: faker.phone.number(),
+          phone: '123-456-7890',
         },
       });
       const form = await prisma.form.create({
@@ -192,7 +323,7 @@ describe('FormsController (Integration)', () => {
           firstName: faker.person.firstName(),
           lastName: faker.person.lastName(),
           email: faker.internet.email(),
-          phone: faker.phone.number(),
+          phone: '123-456-7890',
         },
       });
       const form = await prisma.form.create({
@@ -208,7 +339,7 @@ describe('FormsController (Integration)', () => {
           firstName: faker.person.firstName(),
           lastName: faker.person.lastName(),
           email: customer.email,
-          phone: faker.phone.number(),
+          phone: '123-456-7890',
           communicationMethod: 'text' as const,
           packageType: 'large' as const,
           riceKrispies: 5,
@@ -224,7 +355,7 @@ describe('FormsController (Integration)', () => {
           rushOrder: true,
           referralSource: faker.word.noun(),
           termsAccepted: true,
-          visitedSteps: new Set(['lead', 'communication', 'package', 'design']),
+          visitedSteps: ['lead', 'communication', 'package', 'design'],
         },
         currentStep: 3,
       };
@@ -258,7 +389,7 @@ describe('FormsController (Integration)', () => {
           firstName: faker.person.firstName(),
           lastName: faker.person.lastName(),
           email: faker.internet.email(),
-          phone: faker.phone.number(),
+          phone: '123-456-7890',
           communicationMethod: 'email' as const,
           packageType: 'medium' as const,
           riceKrispies: 0,
@@ -274,7 +405,7 @@ describe('FormsController (Integration)', () => {
           rushOrder: false,
           referralSource: '',
           termsAccepted: false,
-          visitedSteps: new Set(['lead']),
+          visitedSteps: ['lead'],
         },
       };
 
@@ -294,7 +425,7 @@ describe('FormsController (Integration)', () => {
           firstName: faker.person.firstName(),
           lastName: faker.person.lastName(),
           email: faker.internet.email(),
-          phone: faker.phone.number(),
+          phone: '123-456-7890',
         },
       });
       const form = await prisma.form.create({
@@ -336,7 +467,7 @@ describe('FormsController (Integration)', () => {
           firstName: faker.person.firstName(),
           lastName: faker.person.lastName(),
           email: faker.internet.email(),
-          phone: faker.phone.number(),
+          phone: '123-456-7890',
         },
       });
       const form = await prisma.form.create({
@@ -395,7 +526,7 @@ describe('FormsController (Integration)', () => {
           firstName: faker.person.firstName(),
           lastName: faker.person.lastName(),
           email: faker.internet.email(),
-          phone: faker.phone.number(),
+          phone: '123-456-7890',
         },
       });
       const form = await prisma.form.create({

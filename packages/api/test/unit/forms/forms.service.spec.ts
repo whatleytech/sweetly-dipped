@@ -35,7 +35,7 @@ describe('FormsService', () => {
     rushOrder: false,
     referralSource: faker.word.noun(),
     termsAccepted: true,
-    visitedSteps: new Set(['lead', 'communication', 'package']),
+    visitedSteps: ['lead', 'communication', 'package'],
   });
 
   const createMockForm = (overrides?: Partial<Prisma.FormGetPayload<{ include: { customer: true; order: true } }>>) => {
@@ -66,7 +66,7 @@ describe('FormsService', () => {
         theme: formData.theme,
         additionalDesigns: formData.additionalDesigns,
         termsAccepted: formData.termsAccepted,
-        visitedSteps: Array.from(formData.visitedSteps),
+        visitedSteps: formData.visitedSteps,
         currentStep: 2,
       },
       createdAt,
