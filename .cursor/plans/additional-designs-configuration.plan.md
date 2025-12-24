@@ -7,13 +7,13 @@ todos:
     status: completed
   - id: commit-2-frontend-api
     content: "Commit 2: Add configApi.getAdditionalDesignOptions + useAdditionalDesignOptions hook + tests"
-    status: in_progress
+    status: completed
   - id: commit-3-price-util
     content: "Commit 3: Add priceCalculations.ts utility with calculateAdditionalDesignsTotal + tests"
-    status: pending
+    status: completed
   - id: commit-4-compat-layer
     content: "Commit 4: Add selectedAdditionalDesigns field (keep additionalDesigns), update DTO/service for both"
-    status: pending
+    status: in_progress
   - id: commit-5-component
     content: "Commit 5: Transform AdditionalDesigns component to multi-select checkboxes + tests"
     status: pending

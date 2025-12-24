@@ -21,6 +21,7 @@ const createInitialFormData = () => ({
   eventType: '',
   theme: '',
   additionalDesigns: '',
+  selectedAdditionalDesigns: [],
   pickupDate: '',
   pickupTime: '',
   rushOrder: false,

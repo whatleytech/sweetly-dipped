@@ -72,6 +72,9 @@ const normalizeFormDataInput = (data: FormDataDto): FormData => ({
   eventType: data.eventType ?? '',
   theme: data.theme ?? '',
   additionalDesigns: data.additionalDesigns ?? '',
+  selectedAdditionalDesigns: Array.isArray(data.selectedAdditionalDesigns)
+    ? data.selectedAdditionalDesigns.filter((id): id is string => typeof id === 'string')
+    : [],
   pickupDate: data.pickupDate ?? '',
   pickupTime: data.pickupTime ?? '',
   rushOrder: data.rushOrder ?? false,
@@ -92,7 +95,8 @@ interface FormMetadata {
   colorScheme: string;
   eventType: string;
   theme: string;
-  additionalDesigns: string;
+  additionalDesigns: string; // Keep for now
+  selectedAdditionalDesigns: string[];
   termsAccepted: boolean;
   visitedSteps: string[];
   currentStep: number;
@@ -123,11 +127,19 @@ const getFormMetadata = (form: FormWithRelations): FormMetadata => {
   const toCurrentStep = (value: Prisma.JsonValue | undefined): number =>
     typeof value === 'number' && Number.isFinite(value) ? value : 0;
 
+  const toArrayField = (value: Prisma.JsonValue | undefined): string[] => {
+    if (Array.isArray(value)) {
+      return value.filter((v): v is string => typeof v === 'string');
+    }
+    return [];
+  };
+
   return {
     colorScheme: toStringField(json.colorScheme),
     eventType: toStringField(json.eventType),
     theme: toStringField(json.theme),
     additionalDesigns: toStringField(json.additionalDesigns),
+    selectedAdditionalDesigns: toArrayField(json.selectedAdditionalDesigns),
     termsAccepted: toBooleanField(json.termsAccepted),
     visitedSteps: toVisitedSteps(json.visitedSteps),
     currentStep: toCurrentStep(json.currentStep),
@@ -141,7 +153,8 @@ const buildJsonData = (
   colorScheme: formData.colorScheme,
   eventType: formData.eventType,
   theme: formData.theme,
-  additionalDesigns: formData.additionalDesigns,
+  additionalDesigns: formData.additionalDesigns, // Keep for backward compat
+  selectedAdditionalDesigns: formData.selectedAdditionalDesigns,
   termsAccepted: formData.termsAccepted,
   visitedSteps: Array.from(formData.visitedSteps),
   currentStep,
@@ -194,6 +207,7 @@ const toFormDataFromRecord = (form: FormWithRelations): FormData => {
     eventType: metadata.eventType,
     theme: metadata.theme,
     additionalDesigns: metadata.additionalDesigns,
+    selectedAdditionalDesigns: metadata.selectedAdditionalDesigns,
     pickupDate: form.pickupDate ?? '',
     pickupTime: form.pickupTime ?? '',
     rushOrder: form.rushOrder,

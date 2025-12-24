@@ -49,6 +49,7 @@ vi.mock('../api/formDataApi', () => {
     eventType: 'Birthday',
     theme: 'Princess',
     additionalDesigns: 'Add some sparkles',
+    selectedAdditionalDesigns: [],
     pickupDate: '2024-02-15',
     pickupTime: '8:30 AM',
     rushOrder: false,
@@ -150,6 +151,7 @@ const renderConfirmationPage = (customMockData?: {
     eventType: string;
     theme: string;
     additionalDesigns: string;
+    selectedAdditionalDesigns: string[];
     pickupDate: string;
     pickupTime: string;
     rushOrder: boolean;
@@ -186,6 +188,7 @@ const renderConfirmationPage = (customMockData?: {
       eventType: 'Birthday',
       theme: 'Princess',
       additionalDesigns: 'Add some sparkles',
+      selectedAdditionalDesigns: [],
       pickupDate: '2024-02-15',
       pickupTime: '8:30 AM',
       rushOrder: false,
@@ -294,6 +297,7 @@ describe('ConfirmationPage', () => {
       eventType: 'Birthday',
       theme: 'Princess',
       additionalDesigns: 'Add some sparkles',
+      selectedAdditionalDesigns: [],
       pickupDate: '2024-02-15',
       pickupTime: '8:30 AM',
       rushOrder: true,
@@ -350,6 +354,7 @@ describe('ConfirmationPage', () => {
       eventType: 'Birthday',
       theme: 'Princess',
       additionalDesigns: 'Add some sparkles',
+      selectedAdditionalDesigns: [],
       pickupDate: '2024-02-15',
       pickupTime: '8:30 AM',
       rushOrder: false,

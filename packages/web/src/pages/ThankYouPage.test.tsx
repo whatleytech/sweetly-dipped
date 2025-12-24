@@ -42,6 +42,7 @@ vi.mock("../api/formDataApi", () => {
     eventType: "Birthday",
     theme: "Princess",
     additionalDesigns: "Add some sparkles",
+    selectedAdditionalDesigns: [],
     pickupDate: "2024-02-15",
     pickupTime: "8:30 AM",
     rushOrder: false,

@@ -19,6 +19,7 @@ const baseData: FormData = {
   eventType: '',
   theme: '',
   additionalDesigns: '',
+  selectedAdditionalDesigns: [],
   pickupDate: '',
   pickupTime: '',
   rushOrder: false,

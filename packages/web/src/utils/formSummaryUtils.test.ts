@@ -17,6 +17,7 @@ const mockFormData: FormData = {
   eventType: "Birthday Party",
   theme: "Princess",
   additionalDesigns: "Custom sprinkles",
+  selectedAdditionalDesigns: [],
   pickupDate: "2024-01-15",
   pickupTime: "5:00 PM",
   rushOrder: false,
@@ -170,7 +171,7 @@ describe("formSummaryUtils", () => {
       });
 
       it("returns null when no additional designs are provided", () => {
-        const formData = { ...mockFormData, additionalDesigns: "" };
+        const formData = { ...mockFormData, additionalDesigns: "", selectedAdditionalDesigns: [] };
         expect(getStepSummary("designs", formData)).toBeNull();
       });
     });

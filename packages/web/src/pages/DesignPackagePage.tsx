@@ -89,6 +89,7 @@ export const DesignPackagePage = () => {
         eventType: '',
         theme: '',
         additionalDesigns: '',
+        selectedAdditionalDesigns: [],
         pickupDate: '',
         pickupTime: '',
         rushOrder: false,

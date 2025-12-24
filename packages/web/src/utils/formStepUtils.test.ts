@@ -37,6 +37,7 @@ const mockFormData: FormData = {
   eventType: "Birthday Party",
   theme: "Princess",
   additionalDesigns: "Custom sprinkles",
+  selectedAdditionalDesigns: [],
   pickupDate: "2024-01-15",
   pickupTime: "5:00 PM",
   rushOrder: false,
@@ -112,6 +113,7 @@ describe("formStepUtils", () => {
       const formDataWithVisitedStep = {
         ...mockFormData,
         additionalDesigns: "", // No data
+        selectedAdditionalDesigns: [],
         visitedSteps: new Set(["designs"]), // But visited
       };
       expect(isStepCompleted("designs", formDataWithVisitedStep)).toBe(true);
@@ -121,6 +123,7 @@ describe("formStepUtils", () => {
       const formDataWithoutStep = {
         ...mockFormData,
         additionalDesigns: "", // No data
+        selectedAdditionalDesigns: [],
         visitedSteps: new Set(["lead", "communication"]), // Not visited
       };
       expect(isStepCompleted("designs", formDataWithoutStep)).toBe(false);

@@ -18,6 +18,7 @@ const mockFormData: FormData = {
   eventType: 'Birthday',
   theme: 'Princess',
   additionalDesigns: 'Add some sparkles',
+  selectedAdditionalDesigns: [],
   pickupDate: '2024-02-15',
   pickupTime: '8:30 AM',
   rushOrder: false,
@@ -53,7 +54,7 @@ describe("DesignDetails", () => {
   });
 
   it("does not display additional design notes when empty", () => {
-    const emptyDesignsData = { ...mockFormData, additionalDesigns: "" };
+    const emptyDesignsData = { ...mockFormData, additionalDesigns: "", selectedAdditionalDesigns: [] };
     render(<DesignDetails formData={emptyDesignsData} />);
 
     expect(screen.queryByText("Additional Design Notes:")).not.toBeInTheDocument();
@@ -87,6 +88,7 @@ describe("DesignDetails", () => {
       eventType: "",
       theme: "",
       additionalDesigns: "",
+      selectedAdditionalDesigns: [],
     };
     render(<DesignDetails formData={emptyData} />);
 
@@ -102,6 +104,7 @@ describe("DesignDetails", () => {
       eventType: "A very long event type description that might wrap to multiple lines",
       theme: "A very long theme description that might wrap to multiple lines",
       additionalDesigns: "A very long additional design notes description that might wrap to multiple lines",
+      selectedAdditionalDesigns: [],
     };
     render(<DesignDetails formData={longTextData} />);
 
