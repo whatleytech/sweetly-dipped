@@ -4,6 +4,7 @@ import type {
   TreatOptionDto,
   TimeSlotsDto,
   UnavailablePeriodDto,
+  AdditionalDesignOptionDto,
 } from '@sweetly-dipped/shared-types';
 import { ConfigService } from './config.service.js';
 
@@ -29,6 +30,11 @@ export class ConfigController {
   @Get('unavailable-periods')
   async getUnavailablePeriods(): Promise<UnavailablePeriodDto[]> {
     return this.configService.getUnavailablePeriods();
+  }
+
+  @Get('additional-designs')
+  async getAdditionalDesigns(): Promise<AdditionalDesignOptionDto[]> {
+    return this.configService.getAdditionalDesignOptions();
   }
 }
 

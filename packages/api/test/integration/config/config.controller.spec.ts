@@ -31,6 +31,7 @@ describe('ConfigController (Integration)', () => {
     await prisma.timeSlot.deleteMany();
     await prisma.treatOption.deleteMany();
     await prisma.packageOption.deleteMany();
+    await prisma.additionalDesignOption.deleteMany();
   });
 
   describe('GET /config/packages', () => {
@@ -55,7 +56,9 @@ describe('ConfigController (Integration)', () => {
       // Assert
       expect(Array.isArray(response.body)).toBe(true);
       expect(response.body.length).toBeGreaterThan(0);
-      const found = response.body.find((p: { id: string; label: string }) => p.id === 'medium');
+      const found = response.body.find(
+        (p: { id: string; label: string }) => p.id === 'medium'
+      );
       expect(found).toBeDefined();
       expect(found?.label).toBe(packageOption.label);
     });
@@ -85,7 +88,9 @@ describe('ConfigController (Integration)', () => {
         .expect(200);
 
       // Assert
-      expect(response.body.every((p: { id: string }) => p.id !== 'large')).toBe(true);
+      expect(response.body.every((p: { id: string }) => p.id !== 'large')).toBe(
+        true
+      );
     });
   });
 
@@ -110,7 +115,9 @@ describe('ConfigController (Integration)', () => {
       // Assert
       expect(Array.isArray(response.body)).toBe(true);
       expect(response.body.length).toBeGreaterThan(0);
-      const found = response.body.find((t: { key: string; label: string; price: number }) => t.key === 'oreos');
+      const found = response.body.find(
+        (t: { key: string; label: string; price: number }) => t.key === 'oreos'
+      );
       expect(found).toBeDefined();
       expect(found?.label).toBe(treatOption.label);
       expect(found?.price).toBe(treatOption.price);
@@ -143,7 +150,9 @@ describe('ConfigController (Integration)', () => {
         .expect(200);
 
       // Assert
-      expect(response.body.every((t: { key: string }) => t.key !== 'pretzels')).toBe(true);
+      expect(
+        response.body.every((t: { key: string }) => t.key !== 'pretzels')
+      ).toBe(true);
     });
   });
 
@@ -235,7 +244,8 @@ describe('ConfigController (Integration)', () => {
       expect(Array.isArray(response.body)).toBe(true);
       expect(response.body.length).toBeGreaterThan(0);
       const found = response.body.find(
-        (p: { startDate: string; endDate?: string }) => p.startDate === '2024-12-25'
+        (p: { startDate: string; endDate?: string }) =>
+          p.startDate === '2024-12-25'
       );
       expect(found).toBeDefined();
       expect(found?.endDate).toBe(period.endDate);
@@ -263,8 +273,114 @@ describe('ConfigController (Integration)', () => {
 
       // Assert
       expect(
-        response.body.every((p: { startDate: string }) => p.startDate !== '2025-01-01')
+        response.body.every(
+          (p: { startDate: string }) => p.startDate !== '2025-01-01'
+        )
       ).toBe(true);
+    });
+  });
+
+  describe('GET /config/additional-designs', () => {
+    it('should return additional design options', async () => {
+      // Arrange: Seed test data
+      const designOption = await prisma.additionalDesignOption.create({
+        data: {
+          name: 'Sprinkles',
+          description: 'Custom sprinkles decoration',
+          basePrice: 10,
+          largePriceIncrease: 0,
+          perDozenPrice: null,
+          isActive: true,
+          sortOrder: 1,
+        },
+      });
+
+      // Act
+      const response = await request(app.getHttpServer())
+        .get('/config/additional-designs')
+        .expect(200);
+
+      // Assert
+      expect(Array.isArray(response.body)).toBe(true);
+      expect(response.body.length).toBeGreaterThan(0);
+      const found = response.body.find(
+        (o: { id: string; name: string }) => o.id === designOption.id
+      );
+      expect(found).toBeDefined();
+      expect(found?.name).toBe(designOption.name);
+      expect(found?.description).toBe(designOption.description);
+      expect(found?.basePrice).toBe(designOption.basePrice);
+      expect(found?.largePriceIncrease).toBe(designOption.largePriceIncrease);
+    });
+
+    it('should only return active additional design options', async () => {
+      // Arrange: Create active and inactive options
+      await prisma.additionalDesignOption.create({
+        data: {
+          name: 'Active Option',
+          basePrice: 10,
+          largePriceIncrease: 0,
+          isActive: true,
+          sortOrder: 1,
+        },
+      });
+      await prisma.additionalDesignOption.create({
+        data: {
+          name: 'Inactive Option',
+          basePrice: 20,
+          largePriceIncrease: 0,
+          isActive: false,
+          sortOrder: 2,
+        },
+      });
+
+      // Act
+      const response = await request(app.getHttpServer())
+        .get('/config/additional-designs')
+        .expect(200);
+
+      // Assert
+      expect(
+        response.body.every(
+          (o: { name: string }) => o.name !== 'Inactive Option'
+        )
+      ).toBe(true);
+    });
+
+    it('should return options sorted by sortOrder', async () => {
+      // Arrange
+      await prisma.additionalDesignOption.create({
+        data: {
+          name: 'Second Option',
+          basePrice: 20,
+          largePriceIncrease: 0,
+          isActive: true,
+          sortOrder: 2,
+        },
+      });
+      await prisma.additionalDesignOption.create({
+        data: {
+          name: 'First Option',
+          basePrice: 10,
+          largePriceIncrease: 0,
+          isActive: true,
+          sortOrder: 1,
+        },
+      });
+
+      // Act
+      const response = await request(app.getHttpServer())
+        .get('/config/additional-designs')
+        .expect(200);
+
+      // Assert
+      const firstIndex = response.body.findIndex(
+        (o: { name: string }) => o.name === 'First Option'
+      );
+      const secondIndex = response.body.findIndex(
+        (o: { name: string }) => o.name === 'Second Option'
+      );
+      expect(firstIndex).toBeLessThan(secondIndex);
     });
   });
 });

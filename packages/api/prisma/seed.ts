@@ -235,6 +235,59 @@ async function main() {
     await prisma.unavailablePeriod.create({ data: period });
   }
 
+  // Seed AdditionalDesignOptions
+  const additionalDesignOptions = [
+    {
+      name: 'Sprinkles',
+      description: 'Custom sprinkles decoration',
+      basePrice: 10,
+      largePriceIncrease: 0,
+      perDozenPrice: null,
+      sortOrder: 1,
+    },
+    {
+      name: 'Gold or silver painted',
+      description: 'Gold or silver painted accents',
+      basePrice: 20,
+      largePriceIncrease: 0,
+      perDozenPrice: null,
+      sortOrder: 2,
+    },
+    {
+      name: 'Edible images or logos',
+      description: 'Custom edible images or logos printed on treats',
+      basePrice: 40,
+      largePriceIncrease: 20,
+      perDozenPrice: 15,
+      sortOrder: 3,
+    },
+    {
+      name: 'Individually wrapped treats',
+      description: 'Each treat individually wrapped',
+      basePrice: 40,
+      largePriceIncrease: 20,
+      perDozenPrice: 15,
+      sortOrder: 4,
+    },
+  ];
+
+  for (const option of additionalDesignOptions) {
+    const existing = await prisma.additionalDesignOption.findFirst({
+      where: { name: option.name },
+    });
+
+    if (existing) {
+      await prisma.additionalDesignOption.update({
+        where: { id: existing.id },
+        data: option,
+      });
+    } else {
+      await prisma.additionalDesignOption.create({
+        data: option,
+      });
+    }
+  }
+
   console.log('Seed completed successfully');
 }
 

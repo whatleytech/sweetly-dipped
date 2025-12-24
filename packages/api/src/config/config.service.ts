@@ -4,6 +4,7 @@ import type {
   TreatOptionDto,
   TimeSlotsDto,
   UnavailablePeriodDto,
+  AdditionalDesignOptionDto,
   DayOfWeek,
   PackageId,
   TreatKey,
@@ -98,6 +99,22 @@ export class ConfigService {
       startDate: period.startDate,
       endDate: period.endDate ?? undefined,
       reason: period.reason ?? undefined,
+    }));
+  }
+
+  async getAdditionalDesignOptions(): Promise<AdditionalDesignOptionDto[]> {
+    const options = await this.prisma.additionalDesignOption.findMany({
+      where: { isActive: true },
+      orderBy: { sortOrder: 'asc' },
+    });
+
+    return options.map((option) => ({
+      id: option.id,
+      name: option.name,
+      description: option.description ?? undefined,
+      basePrice: option.basePrice,
+      largePriceIncrease: option.largePriceIncrease,
+      perDozenPrice: option.perDozenPrice ?? undefined,
     }));
   }
 }

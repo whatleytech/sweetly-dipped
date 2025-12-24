@@ -112,6 +112,21 @@ model TreatOption {
   @@map("treat_options")
 }
 
+model AdditionalDesignOption {
+  id                  String   @id @default(uuid())
+  name                String
+  description         String?
+  basePrice           Int      // Base price for S/M packages or flat rate
+  largePriceIncrease  Int      @default(0) @map("large_price_increase")  // Additional for L/XL
+  perDozenPrice       Int?     @map("per_dozen_price")  // Price for by-dozen orders
+  isActive            Boolean  @default(true) @map("is_active")
+  sortOrder           Int      @default(0) @map("sort_order")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+  
+  @@map("additional_design_options")
+}
+
 model TimeSlot {
   id            String @id @default(uuid())
   dayOfWeek     String @map("day_of_week")  // "Monday" | "Tuesday" | etc.

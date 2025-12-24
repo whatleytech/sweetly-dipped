@@ -34,3 +34,12 @@ export interface UnavailablePeriodDto {
   reason?: string; // Optional reason for unavailability
 }
 
+export interface AdditionalDesignOptionDto {
+  id: string;
+  name: string;
+  description?: string;
+  basePrice: number;
+  largePriceIncrease: number;
+  perDozenPrice?: number;
+}
+

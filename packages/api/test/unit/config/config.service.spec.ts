@@ -352,5 +352,126 @@ describe('ConfigService', () => {
       });
     });
   });
+
+  describe('getAdditionalDesignOptions', () => {
+    it('should return additional design options sorted by sortOrder', async () => {
+      // Arrange
+      const mockOptions = [
+        {
+          id: faker.string.uuid(),
+          name: 'Sprinkles',
+          description: 'Custom sprinkles decoration',
+          basePrice: 10,
+          largePriceIncrease: 0,
+          perDozenPrice: null,
+          isActive: true,
+          sortOrder: 2,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          id: faker.string.uuid(),
+          name: 'Gold or silver painted',
+          description: 'Gold or silver painted accents',
+          basePrice: 20,
+          largePriceIncrease: 0,
+          perDozenPrice: null,
+          isActive: true,
+          sortOrder: 1,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          id: faker.string.uuid(),
+          name: 'Edible images or logos',
+          description: 'Custom edible images or logos printed on treats',
+          basePrice: 40,
+          largePriceIncrease: 20,
+          perDozenPrice: 15,
+          isActive: true,
+          sortOrder: 3,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ];
+
+      // Mock returns sorted by sortOrder (as Prisma would)
+      const sortedOptions = [...mockOptions].sort((a, b) => a.sortOrder - b.sortOrder);
+      prisma.additionalDesignOption.findMany.mockResolvedValue(sortedOptions);
+
+      // Act
+      const result = await service.getAdditionalDesignOptions();
+
+      // Assert
+      expect(prisma.additionalDesignOption.findMany).toHaveBeenCalledWith({
+        where: { isActive: true },
+        orderBy: { sortOrder: 'asc' },
+      });
+      expect(result).toHaveLength(3);
+      expect(result[0]).toEqual({
+        id: sortedOptions[0].id,
+        name: 'Gold or silver painted',
+        description: 'Gold or silver painted accents',
+        basePrice: 20,
+        largePriceIncrease: 0,
+        perDozenPrice: undefined,
+      });
+      expect(result[1]).toEqual({
+        id: sortedOptions[1].id,
+        name: 'Sprinkles',
+        description: 'Custom sprinkles decoration',
+        basePrice: 10,
+        largePriceIncrease: 0,
+        perDozenPrice: undefined,
+      });
+      expect(result[2]).toEqual({
+        id: sortedOptions[2].id,
+        name: 'Edible images or logos',
+        description: 'Custom edible images or logos printed on treats',
+        basePrice: 40,
+        largePriceIncrease: 20,
+        perDozenPrice: 15,
+      });
+    });
+
+    it('should only return active additional design options', async () => {
+      // Arrange
+      prisma.additionalDesignOption.findMany.mockResolvedValue([]);
+
+      // Act
+      await service.getAdditionalDesignOptions();
+
+      // Assert
+      expect(prisma.additionalDesignOption.findMany).toHaveBeenCalledWith({
+        where: { isActive: true },
+        orderBy: { sortOrder: 'asc' },
+      });
+    });
+
+    it('should transform null description and perDozenPrice to undefined', async () => {
+      // Arrange
+      const mockOption = {
+        id: faker.string.uuid(),
+        name: 'Test Option',
+        description: null,
+        basePrice: 10,
+        largePriceIncrease: 0,
+        perDozenPrice: null,
+        isActive: true,
+        sortOrder: 1,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      prisma.additionalDesignOption.findMany.mockResolvedValue([mockOption]);
+
+      // Act
+      const result = await service.getAdditionalDesignOptions();
+
+      // Assert
+      expect(result[0].description).toBeUndefined();
+      expect(result[0].perDozenPrice).toBeUndefined();
+    });
+  });
 });
 
