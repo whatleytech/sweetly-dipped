@@ -4,6 +4,7 @@ import type {
   TreatOptionDto,
   TimeSlotsDto,
   UnavailablePeriodDto,
+  AdditionalDesignOptionDto,
 } from '@sweetly-dipped/shared-types';
 import { configApi } from '@/api/configApi';
 
@@ -35,6 +36,14 @@ export function useUnavailablePeriods() {
   return useQuery<UnavailablePeriodDto[]>({
     queryKey: ['config', 'unavailable-periods'],
     queryFn: () => configApi.getUnavailablePeriods(),
+    staleTime: Infinity,
+  });
+}
+
+export function useAdditionalDesignOptions() {
+  return useQuery<AdditionalDesignOptionDto[]>({
+    queryKey: ['config', 'additional-designs'],
+    queryFn: () => configApi.getAdditionalDesignOptions(),
     staleTime: Infinity,
   });
 }

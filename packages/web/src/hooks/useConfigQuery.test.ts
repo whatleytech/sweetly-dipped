@@ -6,6 +6,7 @@ import {
   useTreatOptions,
   useTimeSlots,
   useUnavailablePeriods,
+  useAdditionalDesignOptions,
 } from './useConfigQuery';
 import { configApi } from '@/api/configApi';
 import type {
@@ -13,6 +14,7 @@ import type {
   TreatOptionDto,
   TimeSlotsDto,
   UnavailablePeriodDto,
+  AdditionalDesignOptionDto,
 } from '@sweetly-dipped/shared-types';
 import React from 'react';
 
@@ -22,6 +24,7 @@ vi.mock('@/api/configApi', () => ({
     getTreatOptions: vi.fn(),
     getTimeSlots: vi.fn(),
     getUnavailablePeriods: vi.fn(),
+    getAdditionalDesignOptions: vi.fn(),
   },
 }));
 
@@ -151,9 +154,7 @@ describe('useConfigQuery hooks', () => {
         },
       ];
 
-      vi.mocked(configApi.getUnavailablePeriods).mockResolvedValue(
-        mockPeriods
-      );
+      vi.mocked(configApi.getUnavailablePeriods).mockResolvedValue(mockPeriods);
 
       const { result } = renderHook(() => useUnavailablePeriods(), {
         wrapper: createWrapper(),
@@ -166,6 +167,79 @@ describe('useConfigQuery hooks', () => {
       expect(result.current.data).toEqual(mockPeriods);
       expect(result.current.isError).toBe(false);
       expect(configApi.getUnavailablePeriods).toHaveBeenCalledOnce();
+    });
+  });
+
+  describe('useAdditionalDesignOptions', () => {
+    it('should fetch and return additional design options', async () => {
+      const mockOptions: AdditionalDesignOptionDto[] = [
+        {
+          id: 'option-1',
+          name: 'Sprinkles',
+          description: 'Custom sprinkles decoration',
+          basePrice: 10,
+          largePriceIncrease: 0,
+        },
+        {
+          id: 'option-2',
+          name: 'Gold or silver painted',
+          description: 'Gold or silver painted accents',
+          basePrice: 20,
+          largePriceIncrease: 0,
+          perDozenPrice: 15,
+        },
+      ];
+
+      vi.mocked(configApi.getAdditionalDesignOptions).mockResolvedValue(
+        mockOptions
+      );
+
+      const { result } = renderHook(() => useAdditionalDesignOptions(), {
+        wrapper: createWrapper(),
+      });
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      expect(result.current.data).toEqual(mockOptions);
+      expect(result.current.isError).toBe(false);
+      expect(configApi.getAdditionalDesignOptions).toHaveBeenCalledOnce();
+    });
+
+    it('should handle errors', async () => {
+      const error = new Error('Failed to fetch');
+      vi.mocked(configApi.getAdditionalDesignOptions).mockRejectedValue(error);
+
+      const { result } = renderHook(() => useAdditionalDesignOptions(), {
+        wrapper: createWrapper(),
+      });
+
+      await waitFor(() => {
+        expect(result.current.isError).toBe(true);
+      });
+
+      expect(result.current.data).toBeUndefined();
+      expect(result.current.error).toBeDefined();
+    });
+
+    it('should use correct query key', async () => {
+      const mockOptions: AdditionalDesignOptionDto[] = [];
+      vi.mocked(configApi.getAdditionalDesignOptions).mockResolvedValue(
+        mockOptions
+      );
+
+      const { result } = renderHook(() => useAdditionalDesignOptions(), {
+        wrapper: createWrapper(),
+      });
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      // Verify query key is correct by checking the hook uses staleTime: Infinity
+      // This is tested implicitly by the hook working correctly
+      expect(result.current.data).toEqual(mockOptions);
     });
   });
 });

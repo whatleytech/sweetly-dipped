@@ -3,9 +3,11 @@ import type {
   TreatOptionDto,
   TimeSlotsDto,
   UnavailablePeriodDto,
+  AdditionalDesignOptionDto,
 } from '@sweetly-dipped/shared-types';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
 async function fetchConfig<T>(endpoint: string): Promise<T> {
   const response = await fetch(`${API_BASE_URL}/config/${endpoint}`);
@@ -32,6 +34,10 @@ export const configApi = {
 
   async getUnavailablePeriods(): Promise<UnavailablePeriodDto[]> {
     return fetchConfig<UnavailablePeriodDto[]>('unavailable-periods');
+  },
+
+  async getAdditionalDesignOptions(): Promise<AdditionalDesignOptionDto[]> {
+    return fetchConfig<AdditionalDesignOptionDto[]>('additional-designs');
   },
 };
 
