@@ -70,8 +70,9 @@ test.describe("Sweetly Dipped Application", () => {
     await fill("#theme", "Princess");
     await clickContinue();
 
-    // Additional Designs
-    await fillAndContinue("#additional-designs", "Add some sparkles");
+    // Additional Designs - select an option via checkbox
+    await page.locator("#additional-design-sprinkles").click();
+    await clickContinue();
 
     // Pickup Details
     await fill("#pickup-date", "2030-06-03");

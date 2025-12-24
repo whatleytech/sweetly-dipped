@@ -110,6 +110,27 @@ export const mockTimeSlots: TimeSlotsDto = {
 
 export const mockUnavailablePeriods: UnavailablePeriodDto[] = [];
 
+import type { AdditionalDesignOptionDto } from '@sweetly-dipped/shared-types';
+
+export const mockAdditionalDesignOptions: AdditionalDesignOptionDto[] = [
+  {
+    id: 'design-1',
+    name: 'Sprinkles',
+    description: 'Custom sprinkles decoration',
+    basePrice: 10,
+    largePriceIncrease: 0,
+    perDozenPrice: 8,
+  },
+  {
+    id: 'design-2',
+    name: 'Gold or silver painted',
+    description: 'Elegant metallic paint accents',
+    basePrice: 15,
+    largePriceIncrease: 5,
+    perDozenPrice: 12,
+  },
+];
+
 // Helper to setup config API mocks
 export const setupConfigMocks = (configApi: Record<string, unknown>) => {
   if (configApi.getPackageOptions) {
@@ -131,5 +152,10 @@ export const setupConfigMocks = (configApi: Record<string, unknown>) => {
     vi.mocked(
       configApi.getUnavailablePeriods as ReturnType<typeof vi.fn>
     ).mockResolvedValue(mockUnavailablePeriods);
+  }
+  if (configApi.getAdditionalDesignOptions) {
+    vi.mocked(
+      configApi.getAdditionalDesignOptions as ReturnType<typeof vi.fn>
+    ).mockResolvedValue(mockAdditionalDesignOptions);
   }
 };

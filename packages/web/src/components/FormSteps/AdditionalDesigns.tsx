@@ -1,7 +1,8 @@
-import type { ChangeEvent } from "react";
 import styles from "./FormSteps.module.css";
 import type { FormStepProps, FormData } from "@/types/formTypes";
 import { FormButtons, FormStepContainer } from "@/components/shared";
+import { useAdditionalDesignOptions } from "@/hooks/useConfigQuery";
+import { calculateDesignOptionPrice } from "@/utils/priceCalculations";
 
 export const AdditionalDesigns = ({
   formData,
@@ -12,29 +13,100 @@ export const AdditionalDesigns = ({
   isLastStep,
   onSubmit,
 }: FormStepProps & { updateFormData: (updates: Partial<FormData>) => void }) => {
-  const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    updateFormData({ additionalDesigns: e.target.value });
+  const {
+    data: options = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useAdditionalDesignOptions();
+
+  const handleToggle = (optionId: string) => {
+    const current = formData.selectedAdditionalDesigns ?? [];
+    const updated = current.includes(optionId)
+      ? current.filter((id) => id !== optionId)
+      : [...current, optionId];
+    updateFormData({ selectedAdditionalDesigns: updated });
   };
+
+  if (isLoading) {
+    return (
+      <FormStepContainer
+        title="Additional designs"
+        description="Loading design options..."
+      >
+        <div>Loading...</div>
+      </FormStepContainer>
+    );
+  }
+
+  if (isError) {
+    return (
+      <FormStepContainer
+        title="Additional designs"
+        description="Error loading design options"
+      >
+        <div>
+          <p>Failed to load design options: {error?.message}</p>
+          <button type="button" onClick={() => refetch()}>
+            Retry
+          </button>
+        </div>
+      </FormStepContainer>
+    );
+  }
 
   return (
     <FormStepContainer
       title="Additional designs"
-      description="Base pricing includes your colors, drizzle, themed chocolate molds, and sprinkles. For custom designs, describe your ideas. You can share inspiration photos in our email follow-up."
+      description="Base pricing includes your colors, drizzle, themed chocolate molds, and sprinkles. Select any additional custom design options below. Prices vary by package size."
     >
       <div className={styles.formFields}>
-        <div className={styles.fieldGroup}>
-          <label htmlFor="additional-designs" className={styles.label}>
-            Design notes (optional)
-          </label>
-          <textarea
-            id="additional-designs"
-            value={formData.additionalDesigns}
-            onChange={handleChange}
-            className={styles.input}
-            placeholder="Describe any custom elements or inspiration here..."
-            rows={5}
-          />
-        </div>
+        {options.length > 0 ? (
+          <div className={styles.checkboxGroup}>
+            {options.map((option) => {
+              const isSelected =
+                formData.selectedAdditionalDesigns?.includes(option.id) ?? false;
+              const displayPrice = calculateDesignOptionPrice(
+                option,
+                formData.packageType
+              );
+
+              // Create a slugified ID for E2E testing
+              const checkboxId = `additional-design-${option.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}`;
+
+              return (
+                <label
+                  key={option.id}
+                  className={`${styles.checkboxOption} ${
+                    isSelected ? styles.selected : ""
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    id={checkboxId}
+                    checked={isSelected}
+                    onChange={() => handleToggle(option.id)}
+                    className={styles.checkboxInput}
+                    aria-label={`Select ${option.name}`}
+                  />
+                  <div style={{ flex: 1 }}>
+                    <span className={styles.checkboxLabel}>
+                      {option.name} — ${displayPrice}
+                    </span>
+                    {option.description && (
+                      <span className={styles.checkboxDescription}>
+                        {option.description}
+                      </span>
+                    )}
+                  </div>
+                </label>
+              );
+            })}
+          </div>
+        ) : (
+          <p>No additional design options available at this time.</p>
+        )}
       </div>
 
       <FormButtons

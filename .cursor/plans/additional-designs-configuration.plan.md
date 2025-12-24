@@ -13,10 +13,10 @@ todos:
     status: completed
   - id: commit-4-compat-layer
     content: "Commit 4: Add selectedAdditionalDesigns field (keep additionalDesigns), update DTO/service for both"
-    status: in_progress
+    status: completed
   - id: commit-5-component
     content: "Commit 5: Transform AdditionalDesigns component to multi-select checkboxes + tests"
-    status: pending
+    status: in_progress
   - id: commit-6-utils-sidebar
     content: "Commit 6: Migrate formSummaryUtils, formStepUtils, FormSidebar, StepItem + tests"
     status: pending
