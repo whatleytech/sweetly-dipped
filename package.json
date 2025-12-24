@@ -47,7 +47,7 @@
     "test:e2e:ui": "turbo run test:ui --filter=@sweetly-dipped/e2e",
     "test:e2e": "turbo run test --filter=@sweetly-dipped/e2e",
     "test:web": "turbo run test --filter=@sweetly-dipped/web",
-    "test": "turbo run test",
+    "test": "turbo run test --filter=!@sweetly-dipped/e2e",
     "type-check": "turbo run type-check"
   },
   "devDependencies": {

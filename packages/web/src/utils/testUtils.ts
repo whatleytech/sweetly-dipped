@@ -7,7 +7,7 @@ import type {
 } from '@sweetly-dipped/shared-types';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, type RenderResult } from '@testing-library/react';
 import { vi } from 'vitest';
 
 export const createMockFormData = (
@@ -46,7 +46,9 @@ export const createTestQueryClient = () => {
   });
 };
 
-export const renderWithQueryClient = (ui: React.ReactElement) => {
+export const renderWithQueryClient = (
+  ui: React.ReactElement
+): RenderResult & { queryClient: QueryClient } => {
   const queryClient = createTestQueryClient();
   return {
     queryClient,
