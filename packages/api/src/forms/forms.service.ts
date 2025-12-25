@@ -71,7 +71,6 @@ const normalizeFormDataInput = (data: FormDataDto): FormData => ({
   colorScheme: data.colorScheme ?? '',
   eventType: data.eventType ?? '',
   theme: data.theme ?? '',
-  additionalDesigns: data.additionalDesigns ?? '',
   selectedAdditionalDesigns: Array.isArray(data.selectedAdditionalDesigns)
     ? data.selectedAdditionalDesigns.filter((id): id is string => typeof id === 'string')
     : [],
@@ -95,7 +94,6 @@ interface FormMetadata {
   colorScheme: string;
   eventType: string;
   theme: string;
-  additionalDesigns: string; // Keep for now
   selectedAdditionalDesigns: string[];
   termsAccepted: boolean;
   visitedSteps: string[];
@@ -138,7 +136,6 @@ const getFormMetadata = (form: FormWithRelations): FormMetadata => {
     colorScheme: toStringField(json.colorScheme),
     eventType: toStringField(json.eventType),
     theme: toStringField(json.theme),
-    additionalDesigns: toStringField(json.additionalDesigns),
     selectedAdditionalDesigns: toArrayField(json.selectedAdditionalDesigns),
     termsAccepted: toBooleanField(json.termsAccepted),
     visitedSteps: toVisitedSteps(json.visitedSteps),
@@ -153,7 +150,6 @@ const buildJsonData = (
   colorScheme: formData.colorScheme,
   eventType: formData.eventType,
   theme: formData.theme,
-  additionalDesigns: formData.additionalDesigns, // Keep for backward compat
   selectedAdditionalDesigns: formData.selectedAdditionalDesigns,
   termsAccepted: formData.termsAccepted,
   visitedSteps: Array.from(formData.visitedSteps),
@@ -206,7 +202,6 @@ const toFormDataFromRecord = (form: FormWithRelations): FormData => {
     colorScheme: metadata.colorScheme,
     eventType: metadata.eventType,
     theme: metadata.theme,
-    additionalDesigns: metadata.additionalDesigns,
     selectedAdditionalDesigns: metadata.selectedAdditionalDesigns,
     pickupDate: form.pickupDate ?? '',
     pickupTime: form.pickupTime ?? '',

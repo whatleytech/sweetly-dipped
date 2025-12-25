@@ -21,7 +21,6 @@ export interface FormData {
   colorScheme: string;
   eventType: string;
   theme: string;
-  additionalDesigns: string; // Deprecated: will be removed
   selectedAdditionalDesigns: string[]; // Array of design option IDs
 
   // Pickup Details

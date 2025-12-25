@@ -41,7 +41,6 @@ vi.mock("../api/formDataApi", () => {
     colorScheme: "Pink and Gold",
     eventType: "Birthday",
     theme: "Princess",
-    additionalDesigns: "Add some sparkles",
     selectedAdditionalDesigns: [],
     pickupDate: "2024-02-15",
     pickupTime: "8:30 AM",
@@ -116,7 +115,6 @@ const renderThankYouPage = (customMockData?: {
     colorScheme: string;
     eventType: string;
     theme: string;
-    additionalDesigns: string;
     pickupDate: string;
     pickupTime: string;
     rushOrder: boolean;
@@ -153,7 +151,6 @@ const renderThankYouPage = (customMockData?: {
       colorScheme: "Pink and Gold",
       eventType: "Birthday",
       theme: "Princess",
-      additionalDesigns: "Add some sparkles",
       pickupDate: "2024-02-15",
       pickupTime: "8:30 AM",
       rushOrder: false,
@@ -231,7 +228,6 @@ describe("ThankYouPage", () => {
       colorScheme: "Pink and Gold",
       eventType: "Birthday",
       theme: "Princess",
-      additionalDesigns: "Add some sparkles",
       pickupDate: "2024-02-15",
       pickupTime: "8:30 AM",
       rushOrder: false,

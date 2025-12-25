@@ -84,10 +84,6 @@ export class FormDataDto implements FormDataDtoType {
   theme?: string | null;
 
   @IsOptional()
-  @IsString()
-  additionalDesigns?: string | null; // Deprecated: keep for now
-
-  @IsOptional()
   @IsArray()
   @IsString({ each: true })
   selectedAdditionalDesigns?: string[] | null;

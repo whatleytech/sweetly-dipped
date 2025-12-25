@@ -19,7 +19,6 @@ const mockFormData: FormData = {
   colorScheme: "Pink and Gold",
   eventType: "Birthday Party",
   theme: "Princess",
-  additionalDesigns: "Custom sprinkles",
   selectedAdditionalDesigns: [],
   pickupDate: "2024-01-15",
   pickupTime: "5:00 PM",

@@ -36,7 +36,6 @@ const mockFormData: FormData = {
   colorScheme: "Pink and Gold",
   eventType: "Birthday Party",
   theme: "Princess",
-  additionalDesigns: "Custom sprinkles",
   selectedAdditionalDesigns: [],
   pickupDate: "2024-01-15",
   pickupTime: "5:00 PM",
@@ -132,7 +131,6 @@ describe("formStepUtils", () => {
     it("returns true when step is visited even without data", () => {
       const formDataWithVisitedStep = {
         ...mockFormData,
-        additionalDesigns: "", // No data
         selectedAdditionalDesigns: [],
         visitedSteps: new Set(["designs"]), // But visited
       };
@@ -142,7 +140,6 @@ describe("formStepUtils", () => {
     it("returns false when step has no data and is not visited", () => {
       const formDataWithoutStep = {
         ...mockFormData,
-        additionalDesigns: "", // No data
         selectedAdditionalDesigns: [],
         visitedSteps: new Set(["lead", "communication"]), // Not visited
       };

@@ -21,7 +21,6 @@ const mockFormData: FormData = {
   colorScheme: "Pink and Gold",
   eventType: "Birthday Party",
   theme: "Princess",
-  additionalDesigns: "Custom sprinkles",
   selectedAdditionalDesigns: [],
   pickupDate: "2024-01-15",
   pickupTime: "5:00 PM",
@@ -267,7 +266,6 @@ describe("FormSidebar", () => {
       colorScheme: "",
       eventType: "",
       theme: "",
-      additionalDesigns: "",
       selectedAdditionalDesigns: [],
       pickupDate: "",
       pickupTime: "",
@@ -324,7 +322,6 @@ describe("FormSidebar", () => {
       colorScheme: "", // No color scheme
       eventType: "", // No event type
       theme: "", // No theme
-      additionalDesigns: "", // No additional designs
       pickupDate: "", // No pickup time
       pickupTime: "", // No pickup time
       visitedSteps: new Set(["lead", "communication", "package", "by-dozen"]), // Only first 4 steps visited
@@ -346,7 +343,6 @@ describe("FormSidebar", () => {
   it("counts visited steps as completed even without data", () => {
     const formDataWithVisitedSteps = {
       ...mockFormData,
-      additionalDesigns: "", // No additional designs
       visitedSteps: new Set([
         "lead",
         "communication",
@@ -375,7 +371,6 @@ describe("FormSidebar", () => {
   it("applies hasData class to visited steps even without data", () => {
     const formDataWithVisitedSteps = {
       ...mockFormData,
-      additionalDesigns: "", // No additional designs
       visitedSteps: new Set([
         "lead",
         "communication",

@@ -19,7 +19,6 @@ const baseData: FormData = {
   colorScheme: '',
   eventType: '',
   theme: '',
-  additionalDesigns: '',
   selectedAdditionalDesigns: [],
   pickupDate: '',
   pickupTime: '',

@@ -18,7 +18,6 @@ const mockFormData: FormData = {
   colorScheme: '',
   eventType: '',
   theme: '',
-  additionalDesigns: '',
   selectedAdditionalDesigns: [],
   pickupDate: '',
   pickupTime: '',
