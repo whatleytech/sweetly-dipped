@@ -91,8 +91,28 @@ describe("formStepUtils", () => {
       expect(hasStepData("event", mockFormData)).toBe(true);
     });
 
-    it("returns true for designs step with data", () => {
-      expect(hasStepData("designs", mockFormData)).toBe(true);
+    it('returns true for designs step with data', () => {
+      const formDataWithDesigns = {
+        ...mockFormData,
+        selectedAdditionalDesigns: ['design-1', 'design-2'],
+      };
+      expect(hasStepData('designs', formDataWithDesigns)).toBe(true);
+    });
+
+    it('returns false for designs step with empty array', () => {
+      const formDataWithoutDesigns = {
+        ...mockFormData,
+        selectedAdditionalDesigns: [],
+      };
+      expect(hasStepData('designs', formDataWithoutDesigns)).toBe(false);
+    });
+
+    it('returns false for designs step with undefined array', () => {
+      const formDataWithoutDesigns = {
+        ...mockFormData,
+        selectedAdditionalDesigns: [] as string[] | undefined,
+      } as FormData;
+      expect(hasStepData('designs', formDataWithoutDesigns)).toBe(false);
     });
 
     it("returns true for pickup step with data", () => {
@@ -179,12 +199,14 @@ describe("formStepUtils", () => {
     it("counts only steps with data or visited", () => {
       const partialFormData = {
         ...mockFormData,
-        colorScheme: "", // No data
-        eventType: "", // No data
-        theme: "", // No data
-        visitedSteps: new Set(["lead", "communication", "package", "by-dozen"]), // Only first 4 visited
+        colorScheme: '', // No data
+        eventType: '', // No data
+        theme: '', // No data
+        selectedAdditionalDesigns: [], // No designs selected
+        visitedSteps: new Set(['lead', 'communication', 'package', 'by-dozen']), // Only first 4 visited
       };
-      expect(getCompletedStepsCount(mockFormSteps, partialFormData)).toBe(6);
+      // lead, communication, package, by-dozen (visited) + pickup (has data) = 5 completed steps
+      expect(getCompletedStepsCount(mockFormSteps, partialFormData)).toBe(5);
     });
   });
 

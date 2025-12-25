@@ -2,15 +2,17 @@ import styles from "./StepItem.module.css";
 import type { FormStep } from "@/utils/formStepUtils";
 import { getStepSummary } from "@/utils/formSummaryUtils";
 import type { FormData } from "@/types/formTypes";
+import type { AdditionalDesignOptionDto } from '@sweetly-dipped/shared-types';
 
 interface StepItemProps {
   step: FormStep;
   index: number;
-  status: "completed" | "current" | "pending";
+  status: 'completed' | 'current' | 'pending';
   isClickable: boolean;
   isCompleted: boolean;
   formData: FormData;
   onStepClick: (stepIndex: number) => void;
+  additionalDesignOptions?: AdditionalDesignOptionDto[];
 }
 
 export const StepItem = ({
@@ -21,16 +23,17 @@ export const StepItem = ({
   isCompleted,
   formData,
   onStepClick,
+  additionalDesignOptions,
 }: StepItemProps) => {
-  const summary = getStepSummary(step.id, formData);
+  const summary = getStepSummary(step.id, formData, additionalDesignOptions);
 
   return (
     <div
       className={`${styles.stepItem} ${styles[status]} ${
-        isClickable ? styles.clickable : ""
-      } ${isCompleted ? styles.hasData : ""}`}
+        isClickable ? styles.clickable : ''
+      } ${isCompleted ? styles.hasData : ''}`}
       onClick={() => onStepClick(index)}
-      role={isClickable ? "button" : undefined}
+      role={isClickable ? 'button' : undefined}
       tabIndex={isClickable ? 0 : undefined}
     >
       <div className={styles.stepHeader}>

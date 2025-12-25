@@ -1,7 +1,11 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { FormSidebar } from "./FormSidebar";
-import type { FormData } from '@sweetly-dipped/shared-types';
+import type {
+  FormData,
+  AdditionalDesignOptionDto,
+} from '@sweetly-dipped/shared-types';
+import * as useConfigQuery from '@/hooks/useConfigQuery';
 
 const mockFormData: FormData = {
   firstName: "John",
@@ -53,9 +57,27 @@ const mockFormSteps = [
 
 describe("FormSidebar", () => {
   const mockOnNavigateToStep = vi.fn();
+  const mockDesignOptions: AdditionalDesignOptionDto[] = [
+    { id: 'design-1', name: 'Sprinkles', basePrice: 10, largePriceIncrease: 0 },
+    {
+      id: 'design-2',
+      name: 'Gold or silver painted',
+      basePrice: 15,
+      largePriceIncrease: 5,
+    },
+  ];
 
   beforeEach(() => {
     mockOnNavigateToStep.mockClear();
+    vi.spyOn(useConfigQuery, 'useAdditionalDesignOptions').mockReturnValue({
+      data: mockDesignOptions,
+      isLoading: false,
+      isError: false,
+      error: null,
+      refetch: vi.fn(),
+    } as unknown as ReturnType<
+      typeof useConfigQuery.useAdditionalDesignOptions
+    >);
   });
 
   it("renders the sidebar title", () => {
@@ -142,18 +164,66 @@ describe("FormSidebar", () => {
     expect(screen.getByText("Pink and Gold")).toBeInTheDocument();
   });
 
-  it("shows event details summary", () => {
-    render(
-      <FormSidebar
-        formData={mockFormData}
-        formSteps={mockFormSteps}
-        currentVisibleIndex={6}
-        onNavigateToStep={mockOnNavigateToStep}
-      />
-    );
+    it('shows event details summary', () => {
+      render(
+        <FormSidebar
+          formData={mockFormData}
+          formSteps={mockFormSteps}
+          currentVisibleIndex={6}
+          onNavigateToStep={mockOnNavigateToStep}
+        />
+      );
 
-    expect(screen.getByText("Birthday Party, Princess")).toBeInTheDocument();
-  });
+      expect(screen.getByText('Birthday Party, Princess')).toBeInTheDocument();
+    });
+
+    it('shows additional designs summary when designs are selected', () => {
+      const formDataWithDesigns = {
+        ...mockFormData,
+        selectedAdditionalDesigns: ['design-1', 'design-2'],
+      };
+
+      render(
+        <FormSidebar
+          formData={formDataWithDesigns}
+          formSteps={mockFormSteps}
+          currentVisibleIndex={6}
+          onNavigateToStep={mockOnNavigateToStep}
+        />
+      );
+
+      expect(
+        screen.getByText('Sprinkles, Gold or silver painted')
+      ).toBeInTheDocument();
+    });
+
+    it('shows count when designs are selected but options are not loaded', () => {
+      vi.spyOn(useConfigQuery, 'useAdditionalDesignOptions').mockReturnValue({
+        data: undefined,
+        isLoading: true,
+        isError: false,
+        error: null,
+        refetch: vi.fn(),
+      } as unknown as ReturnType<
+        typeof useConfigQuery.useAdditionalDesignOptions
+      >);
+
+      const formDataWithDesigns = {
+        ...mockFormData,
+        selectedAdditionalDesigns: ['design-1', 'design-2'],
+      };
+
+      render(
+        <FormSidebar
+          formData={formDataWithDesigns}
+          formSteps={mockFormSteps}
+          currentVisibleIndex={6}
+          onNavigateToStep={mockOnNavigateToStep}
+        />
+      );
+
+      expect(screen.getByText('2 selected')).toBeInTheDocument();
+    });
 
   it("shows pickup details summary", () => {
     render(

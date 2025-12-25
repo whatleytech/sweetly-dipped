@@ -1,12 +1,19 @@
-import type { FormData } from '@sweetly-dipped/shared-types';
-import { formatDateForDisplay } from "@/utils/timeUtils";
+import type {
+  FormData,
+  AdditionalDesignOptionDto,
+} from '@sweetly-dipped/shared-types';
+import { formatDateForDisplay } from '@/utils/timeUtils';
 
 /**
  * Generates a summary for a specific form step based on the form data
  */
-export const getStepSummary = (stepId: string, formData: FormData): string | null => {
+export const getStepSummary = (
+  stepId: string,
+  formData: FormData,
+  additionalDesignOptions?: AdditionalDesignOptionDto[]
+): string | null => {
   switch (stepId) {
-    case "lead":
+    case 'lead':
       if (
         formData.firstName ||
         formData.lastName ||
@@ -16,58 +23,70 @@ export const getStepSummary = (stepId: string, formData: FormData): string | nul
         return (
           `${formData.firstName} ${formData.lastName}`.trim() ||
           formData.email ||
-          "Contact info provided"
+          'Contact info provided'
         );
       }
       return null;
 
-    case "communication":
+    case 'communication':
       if (formData.communicationMethod) {
-        return formData.communicationMethod === "email" ? "Email" : "Text";
+        return formData.communicationMethod === 'email' ? 'Email' : 'Text';
       }
       return null;
 
-    case "package":
+    case 'package':
       if (formData.packageType) {
         const packageNames = {
-          small: "Small Package (3 dozen)",
-          medium: "Medium Package (5 dozen)",
-          large: "Large Package (8 dozen)",
-          xl: "XL Package (12 dozen)",
-          "by-dozen": "By The Dozen",
+          small: 'Small Package (3 dozen)',
+          medium: 'Medium Package (5 dozen)',
+          large: 'Large Package (8 dozen)',
+          xl: 'XL Package (12 dozen)',
+          'by-dozen': 'By The Dozen',
         };
         return packageNames[formData.packageType] || null;
       }
       return null;
 
-    case "by-dozen":
-      if (formData.packageType === "by-dozen") {
+    case 'by-dozen':
+      if (formData.packageType === 'by-dozen') {
         const items = [];
         if (formData.riceKrispies > 0)
           items.push(`${formData.riceKrispies} Rice Krispies`);
         if (formData.oreos > 0) items.push(`${formData.oreos} Oreos`);
-        if (formData.pretzels > 0)
-          items.push(`${formData.pretzels} Pretzels`);
+        if (formData.pretzels > 0) items.push(`${formData.pretzels} Pretzels`);
         if (formData.marshmallows > 0)
           items.push(`${formData.marshmallows} Marshmallows`);
-        return items.length > 0 ? items.join(", ") : null;
+        return items.length > 0 ? items.join(', ') : null;
       }
       return null;
 
-    case "color":
+    case 'color':
       return formData.colorScheme || null;
 
-    case "event": {
+    case 'event': {
       const eventDetails: string[] = [];
       if (formData.eventType) eventDetails.push(formData.eventType);
       if (formData.theme) eventDetails.push(formData.theme);
-      return eventDetails.length > 0 ? eventDetails.join(", ") : null;
+      return eventDetails.length > 0 ? eventDetails.join(', ') : null;
     }
 
-    case "designs":
-      return formData.additionalDesigns || null;
+    case 'designs': {
+      const selected = formData.selectedAdditionalDesigns;
+      if (!selected?.length) return null;
 
-    case "pickup":
+      if (!additionalDesignOptions?.length) {
+        return `${selected.length} selected`;
+      }
+
+      const names = selected.map((id) => {
+        const match = additionalDesignOptions.find((opt) => opt.id === id);
+        return match ? match.name : 'Unknown';
+      });
+
+      return names.join(', ');
+    }
+
+    case 'pickup':
       if (formData.pickupDate && formData.pickupTime) {
         return `${formatDateForDisplay(formData.pickupDate, {
           includeYear: true,

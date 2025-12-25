@@ -10,32 +10,33 @@ export interface FormStep {
  */
 export const hasStepData = (stepId: string, formData: FormData): boolean => {
   switch (stepId) {
-    case "lead":
+    case 'lead':
       return !!(
         formData.firstName ||
         formData.lastName ||
         formData.email ||
         formData.phone
       );
-    case "communication":
+    case 'communication':
       return !!formData.communicationMethod;
-    case "package":
+    case 'package':
       return !!formData.packageType;
-    case "by-dozen":
+    case 'by-dozen':
       return (
-        formData.packageType === "by-dozen" &&
+        formData.packageType === 'by-dozen' &&
         (formData.riceKrispies > 0 ||
           formData.oreos > 0 ||
           formData.pretzels > 0 ||
           formData.marshmallows > 0)
       );
-    case "color":
+    case 'color':
       return !!formData.colorScheme;
-    case "event":
+    case 'event':
       return !!(formData.eventType || formData.theme);
-    case "designs":
-      return !!formData.additionalDesigns;
-    case "pickup":
+    case 'designs':
+      // Changed from string check to array length check
+      return (formData.selectedAdditionalDesigns?.length ?? 0) > 0;
+    case 'pickup':
       return !!(formData.pickupDate && formData.pickupTime);
     default:
       return false;

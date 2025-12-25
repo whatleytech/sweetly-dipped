@@ -10,6 +10,7 @@ import {
 } from "@/utils/formStepUtils";
 import { StepItem } from "./StepItem";
 import { ProgressSection } from "./ProgressSection";
+import { useAdditionalDesignOptions } from '@/hooks/useConfigQuery';
 
 interface FormSidebarProps {
   formData: FormData;
@@ -24,6 +25,8 @@ export const FormSidebar = ({
   currentVisibleIndex,
   onNavigateToStep,
 }: FormSidebarProps) => {
+  const { data: additionalDesignOptions } = useAdditionalDesignOptions();
+
   const handleStepClick = (stepIndex: number) => {
     if (
       isStepAccessible(stepIndex, formSteps, currentVisibleIndex!, formData)
@@ -61,6 +64,7 @@ export const FormSidebar = ({
               isCompleted={isCompleted}
               formData={formData}
               onStepClick={handleStepClick}
+              additionalDesignOptions={additionalDesignOptions}
             />
           );
         })}
