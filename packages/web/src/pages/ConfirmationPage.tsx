@@ -40,6 +40,11 @@ export const ConfirmationPage = () => {
     [formData, persistFormProgress]
   );
 
+  // Scroll to top when page loads
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
   // Redirect to form if no data exists
   useEffect(() => {
     // Only redirect if we're not loading formId AND not loading data AND we have no form data AND no error
