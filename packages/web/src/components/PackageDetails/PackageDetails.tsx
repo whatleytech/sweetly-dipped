@@ -1,6 +1,11 @@
 import styles from "./PackageDetails.module.css";
 import type { FormData } from "@/types/formTypes";
-import { usePackageOptions, useTreatOptions } from "@/hooks/useConfigQuery";
+import {
+  usePackageOptions,
+  useTreatOptions,
+  useAdditionalDesignOptions,
+} from '@/hooks/useConfigQuery';
+import { calculateAdditionalDesignsTotal } from '@/utils/priceCalculations';
 
 interface PackageDetailsProps {
   formData: FormData;
@@ -81,6 +86,7 @@ const PriceSummary = ({ total }: PriceSummaryProps) => {
 export const PackageDetails = ({ formData }: PackageDetailsProps) => {
   const { data: packageOptions = [] } = usePackageOptions();
   const { data: treatOptions = [] } = useTreatOptions();
+  const { data: designOptions = [] } = useAdditionalDesignOptions();
 
   const getPackageLabel = (packageType: string) => {
     const option = packageOptions.find((opt) => opt.id === packageType);
@@ -102,6 +108,8 @@ export const PackageDetails = ({ formData }: PackageDetailsProps) => {
   };
 
   const calculateTotal = () => {
+    let baseTotal = 0;
+
     if (formData.packageType === 'by-dozen') {
       // Calculate total for by-dozen orders
       const riceKrispiesPrice =
@@ -118,14 +126,29 @@ export const PackageDetails = ({ formData }: PackageDetailsProps) => {
       const pretzelsTotal = formData.pretzels * pretzelsPrice;
       const marshmallowsTotal = formData.marshmallows * marshmallowsPrice;
 
-      return riceKrispiesTotal + oreosTotal + pretzelsTotal + marshmallowsTotal;
+      baseTotal =
+        riceKrispiesTotal + oreosTotal + pretzelsTotal + marshmallowsTotal;
     } else {
       // Return package price for pre-defined packages
-      return getPackagePrice(formData.packageType);
+      baseTotal = getPackagePrice(formData.packageType);
     }
+
+    // Add additional designs total
+    const additionalDesignsTotal = calculateAdditionalDesignsTotal(
+      formData.selectedAdditionalDesigns ?? [],
+      designOptions,
+      formData.packageType
+    );
+
+    return baseTotal + additionalDesignsTotal;
   };
 
   const total = calculateTotal();
+  const additionalDesignsTotal = calculateAdditionalDesignsTotal(
+    formData.selectedAdditionalDesigns ?? [],
+    designOptions,
+    formData.packageType
+  );
 
   const treatRows: TreatBreakdownRow[] = [
     { label: 'Rice Krispies:', value: formData.riceKrispies },
@@ -141,6 +164,19 @@ export const PackageDetails = ({ formData }: PackageDetailsProps) => {
 
       {formData.packageType === 'by-dozen' && (
         <TreatBreakdown rows={treatRows} totalDozens={getTotalByDozen()} />
+      )}
+
+      {additionalDesignsTotal > 0 && (
+        <div className={styles.fieldGroup}>
+          <div className={styles.table}>
+            <div className={styles.tableRow}>
+              <span className={styles.tableLabel}>Additional Designs:</span>
+              <span className={styles.tableValue}>
+                ${additionalDesignsTotal}
+              </span>
+            </div>
+          </div>
+        </div>
       )}
 
       <PriceSummary total={total} />

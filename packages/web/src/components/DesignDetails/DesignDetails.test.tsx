@@ -1,7 +1,8 @@
 import { render, screen } from "@testing-library/react";
 import { DesignDetails } from "./DesignDetails";
-import type { FormData } from '@sweetly-dipped/shared-types';
-import { describe, it, expect } from "vitest";
+import type { FormData, AdditionalDesignOptionDto } from '@sweetly-dipped/shared-types';
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import * as useConfigQuery from "@/hooks/useConfigQuery";
 
 const mockFormData: FormData = {
   firstName: 'John',
@@ -27,7 +28,22 @@ const mockFormData: FormData = {
   visitedSteps: new Set(),
 };
 
+const mockDesignOptions: AdditionalDesignOptionDto[] = [
+  { id: 'design-1', name: 'Sprinkles', basePrice: 10, largePriceIncrease: 0 },
+  { id: 'design-2', name: 'Gold or silver painted', basePrice: 15, largePriceIncrease: 5 },
+  { id: 'design-3', name: 'Edible images or logos', basePrice: 20, largePriceIncrease: 10 },
+];
+
 describe("DesignDetails", () => {
+  beforeEach(() => {
+    vi.spyOn(useConfigQuery, 'useAdditionalDesignOptions').mockReturnValue({
+      data: mockDesignOptions,
+      isLoading: false,
+      isError: false,
+      error: null,
+      refetch: vi.fn(),
+    } as unknown as ReturnType<typeof useConfigQuery.useAdditionalDesignOptions>);
+  });
   it("renders design details section correctly", () => {
     render(<DesignDetails formData={mockFormData} />);
 
@@ -43,21 +59,35 @@ describe("DesignDetails", () => {
     expect(screen.getByText("Pink and Gold")).toBeInTheDocument();
     expect(screen.getByText("Birthday")).toBeInTheDocument();
     expect(screen.getByText("Princess")).toBeInTheDocument();
-    expect(screen.getByText("Add some sparkles")).toBeInTheDocument();
   });
 
-  it("displays additional design notes when present", () => {
-    render(<DesignDetails formData={mockFormData} />);
+  it("displays selected additional designs when present", () => {
+    const formDataWithDesigns = {
+      ...mockFormData,
+      selectedAdditionalDesigns: ['design-1', 'design-2'],
+    };
+    render(<DesignDetails formData={formDataWithDesigns} />);
 
-    expect(screen.getByText("Additional Design Notes:")).toBeInTheDocument();
-    expect(screen.getByText("Add some sparkles")).toBeInTheDocument();
+    expect(screen.getByText("Additional Designs:")).toBeInTheDocument();
+    expect(screen.getByText("Sprinkles, Gold or silver painted")).toBeInTheDocument();
   });
 
-  it("does not display additional design notes when empty", () => {
-    const emptyDesignsData = { ...mockFormData, additionalDesigns: "", selectedAdditionalDesigns: [] };
+  it("does not display additional designs when empty", () => {
+    const emptyDesignsData = { ...mockFormData, selectedAdditionalDesigns: [] };
     render(<DesignDetails formData={emptyDesignsData} />);
 
-    expect(screen.queryByText("Additional Design Notes:")).not.toBeInTheDocument();
+    expect(screen.queryByText("Additional Designs:")).not.toBeInTheDocument();
+  });
+
+  it("maps selected design IDs to names correctly", () => {
+    const formDataWithDesigns = {
+      ...mockFormData,
+      selectedAdditionalDesigns: ['design-3'],
+    };
+    render(<DesignDetails formData={formDataWithDesigns} />);
+
+    expect(screen.getByText("Additional Designs:")).toBeInTheDocument();
+    expect(screen.getByText("Edible images or logos")).toBeInTheDocument();
   });
 
   it("displays not specified for empty color scheme", () => {
@@ -87,30 +117,12 @@ describe("DesignDetails", () => {
       colorScheme: "",
       eventType: "",
       theme: "",
-      additionalDesigns: "",
       selectedAdditionalDesigns: [],
     };
     render(<DesignDetails formData={emptyData} />);
 
     const notSpecifiedElements = screen.getAllByText("Not specified");
     expect(notSpecifiedElements).toHaveLength(3);
-    expect(screen.queryByText("Additional Design Notes:")).not.toBeInTheDocument();
-  });
-
-  it("handles long design text values", () => {
-    const longTextData = {
-      ...mockFormData,
-      colorScheme: "A very long color scheme description that might wrap to multiple lines",
-      eventType: "A very long event type description that might wrap to multiple lines",
-      theme: "A very long theme description that might wrap to multiple lines",
-      additionalDesigns: "A very long additional design notes description that might wrap to multiple lines",
-      selectedAdditionalDesigns: [],
-    };
-    render(<DesignDetails formData={longTextData} />);
-
-    expect(screen.getByText("A very long color scheme description that might wrap to multiple lines")).toBeInTheDocument();
-    expect(screen.getByText("A very long event type description that might wrap to multiple lines")).toBeInTheDocument();
-    expect(screen.getByText("A very long theme description that might wrap to multiple lines")).toBeInTheDocument();
-    expect(screen.getByText("A very long additional design notes description that might wrap to multiple lines")).toBeInTheDocument();
+    expect(screen.queryByText("Additional Designs:")).not.toBeInTheDocument();
   });
 });
