@@ -1,9 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { getStepSummary } from "./formSummaryUtils";
-import type {
-  FormData,
-  AdditionalDesignOptionDto,
-} from '@sweetly-dipped/shared-types';
+import type { FormData } from '@sweetly-dipped/shared-types';
 
 const mockFormData: FormData = {
   firstName: "John",
@@ -168,78 +165,30 @@ describe("formSummaryUtils", () => {
     });
 
     describe("designs step", () => {
-      const mockDesignOptions: AdditionalDesignOptionDto[] = [
-        {
-          id: 'design-1',
-          name: 'Sprinkles',
-          basePrice: 10,
-          largePriceIncrease: 0,
-        },
-        {
-          id: 'design-2',
-          name: 'Gold or silver painted',
-          basePrice: 15,
-          largePriceIncrease: 5,
-        },
-        {
-          id: 'design-3',
-          name: 'Edible images or logos',
-          basePrice: 20,
-          largePriceIncrease: 10,
-        },
-      ];
-
-      it('returns comma-separated names when designs are selected and options provided', () => {
+      it('returns comma-separated names when designs are selected', () => {
         const formData = {
           ...mockFormData,
-          selectedAdditionalDesigns: ['design-1', 'design-2'],
+          selectedAdditionalDesigns: [
+            { id: 'design-1', name: 'Sprinkles' },
+            { id: 'design-2', name: 'Gold or silver painted' },
+          ],
         };
-        expect(getStepSummary('designs', formData, mockDesignOptions)).toBe(
+        expect(getStepSummary('designs', formData)).toBe(
           'Sprinkles, Gold or silver painted'
         );
       });
 
-      it('returns count when designs are selected but no options provided', () => {
-        const formData = {
-          ...mockFormData,
-          selectedAdditionalDesigns: ['design-1', 'design-2'],
-        };
-        expect(getStepSummary('designs', formData)).toBe('2 selected');
-      });
-
       it('returns null when no designs are selected', () => {
         const formData = { ...mockFormData, selectedAdditionalDesigns: [] };
-        expect(
-          getStepSummary('designs', formData, mockDesignOptions)
-        ).toBeNull();
-      });
-
-      it('returns null when selectedAdditionalDesigns is undefined', () => {
-        const formData = {
-          ...mockFormData,
-          selectedAdditionalDesigns: [] as string[] | undefined,
-        } as FormData;
-        expect(
-          getStepSummary('designs', formData, mockDesignOptions)
-        ).toBeNull();
-      });
-
-      it('handles unknown design IDs gracefully', () => {
-        const formData = {
-          ...mockFormData,
-          selectedAdditionalDesigns: ['unknown-id', 'design-1'],
-        };
-        expect(getStepSummary('designs', formData, mockDesignOptions)).toBe(
-          'Unknown, Sprinkles'
-        );
+        expect(getStepSummary('designs', formData)).toBeNull();
       });
 
       it('returns single design name correctly', () => {
         const formData = {
           ...mockFormData,
-          selectedAdditionalDesigns: ['design-3'],
+          selectedAdditionalDesigns: [{ id: 'design-3', name: 'Edible images or logos' }],
         };
-        expect(getStepSummary('designs', formData, mockDesignOptions)).toBe(
+        expect(getStepSummary('designs', formData)).toBe(
           'Edible images or logos'
         );
       });

@@ -200,7 +200,7 @@ describe('PackageDetails', () => {
     const formDataWithDesigns = {
       ...mockFormData,
       packageType: 'small' as const,
-      selectedAdditionalDesigns: ['design-1', 'design-2'], // $10 + $15 = $25
+      selectedAdditionalDesigns: [{ id: 'design-1', name: 'Sprinkles' }, { id: 'design-2', name: 'Gold or silver painted' }], // $10 + $15 = $25
     };
 
     renderWithQueryClient(<PackageDetails formData={formDataWithDesigns} />);
@@ -215,7 +215,7 @@ describe('PackageDetails', () => {
     const formDataWithDesigns = {
       ...mockFormData,
       packageType: 'large' as const,
-      selectedAdditionalDesigns: ['design-2'], // $15 base + $5 large increase = $20
+      selectedAdditionalDesigns: [{ id: 'design-2', name: 'Gold or silver painted' }], // $15 base + $5 large increase = $20
     };
 
     renderWithQueryClient(<PackageDetails formData={formDataWithDesigns} />);
@@ -231,7 +231,7 @@ describe('PackageDetails', () => {
       ...mockFormData,
       packageType: 'by-dozen' as const,
       riceKrispies: 2, // 2 * $40 = $80
-      selectedAdditionalDesigns: ['design-3'], // $15 per dozen price
+      selectedAdditionalDesigns: [{ id: 'design-3', name: 'Edible images or logos' }], // $15 per dozen price
     };
 
     renderWithQueryClient(<PackageDetails formData={formDataWithDesigns} />);

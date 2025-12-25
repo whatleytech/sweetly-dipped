@@ -26,7 +26,7 @@ export const createMockFormData = (
   colorScheme: '',
   eventType: '',
   theme: '',
-  selectedAdditionalDesigns: [],
+  selectedAdditionalDesigns: [], // Array<{ id: string; name: string }>
   pickupDate: '',
   pickupTime: '',
   rushOrder: false,

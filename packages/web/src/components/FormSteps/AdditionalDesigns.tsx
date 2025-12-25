@@ -21,11 +21,12 @@ export const AdditionalDesigns = ({
     refetch,
   } = useAdditionalDesignOptions();
 
-  const handleToggle = (optionId: string) => {
+  const handleToggle = (optionId: string, optionName: string) => {
     const current = formData.selectedAdditionalDesigns ?? [];
-    const updated = current.includes(optionId)
-      ? current.filter((id) => id !== optionId)
-      : [...current, optionId];
+    const isSelected = current.some((d) => d.id === optionId);
+    const updated = isSelected
+      ? current.filter((d) => d.id !== optionId)
+      : [...current, { id: optionId, name: optionName }];
     updateFormData({ selectedAdditionalDesigns: updated });
   };
 
@@ -66,7 +67,7 @@ export const AdditionalDesigns = ({
           <div className={styles.checkboxGroup}>
             {options.map((option) => {
               const isSelected =
-                formData.selectedAdditionalDesigns?.includes(option.id) ?? false;
+                formData.selectedAdditionalDesigns?.some((d) => d.id === option.id) ?? false;
               const displayPrice = calculateDesignOptionPrice(
                 option,
                 formData.packageType
@@ -86,7 +87,7 @@ export const AdditionalDesigns = ({
                     type="checkbox"
                     id={checkboxId}
                     checked={isSelected}
-                    onChange={() => handleToggle(option.id)}
+                    onChange={() => handleToggle(option.id, option.name)}
                     className={styles.checkboxInput}
                     aria-label={`Select ${option.name}`}
                   />

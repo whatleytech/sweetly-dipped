@@ -122,14 +122,14 @@ describe('AdditionalDesigns', () => {
     fireEvent.click(checkbox);
 
     expect(updateFormData).toHaveBeenCalledWith({
-      selectedAdditionalDesigns: ['design-1'],
+      selectedAdditionalDesigns: [{ id: 'design-1', name: 'Sprinkles' }],
     });
   });
 
   it('removes option from selection when toggling off', () => {
     const formDataWithSelection = {
       ...baseData,
-      selectedAdditionalDesigns: ['design-1', 'design-2'],
+      selectedAdditionalDesigns: [{ id: 'design-1', name: 'Sprinkles' }, { id: 'design-2', name: 'Gold or silver painted' }],
     };
 
     render(
@@ -150,7 +150,7 @@ describe('AdditionalDesigns', () => {
     fireEvent.click(checkbox);
 
     expect(updateFormData).toHaveBeenCalledWith({
-      selectedAdditionalDesigns: ['design-2'],
+      selectedAdditionalDesigns: [{ id: 'design-2', name: 'Gold or silver painted' }],
     });
   });
 
@@ -314,7 +314,7 @@ describe('AdditionalDesigns', () => {
   it('shows selected state for checked options', () => {
     const formDataWithSelection = {
       ...baseData,
-      selectedAdditionalDesigns: ['design-1'],
+      selectedAdditionalDesigns: [{ id: 'design-1', name: 'Sprinkles' }],
     };
 
     render(

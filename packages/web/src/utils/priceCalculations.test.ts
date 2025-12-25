@@ -147,44 +147,72 @@ describe('priceCalculations', () => {
 
     it('should calculate total for small package', () => {
       expect(
-        calculateAdditionalDesignsTotal(['1', '2'], designOptions, 'small')
+        calculateAdditionalDesignsTotal(
+          [{ id: '1', name: 'Option 1' }, { id: '2', name: 'Option 2' }],
+          designOptions,
+          'small'
+        )
       ).toBe(30); // 10 + 20
     });
 
     it('should calculate total for medium package', () => {
       expect(
-        calculateAdditionalDesignsTotal(['1', '2'], designOptions, 'medium')
+        calculateAdditionalDesignsTotal(
+          [{ id: '1', name: 'Option 1' }, { id: '2', name: 'Option 2' }],
+          designOptions,
+          'medium'
+        )
       ).toBe(30); // 10 + 20
     });
 
     it('should calculate total for large package with price increases', () => {
       expect(
-        calculateAdditionalDesignsTotal(['1', '2'], designOptions, 'large')
+        calculateAdditionalDesignsTotal(
+          [{ id: '1', name: 'Option 1' }, { id: '2', name: 'Option 2' }],
+          designOptions,
+          'large'
+        )
       ).toBe(35); // (10 + 5) + 20
     });
 
     it('should calculate total for xl package with price increases', () => {
       expect(
-        calculateAdditionalDesignsTotal(['1', '3'], designOptions, 'xl')
+        calculateAdditionalDesignsTotal(
+          [{ id: '1', name: 'Option 1' }, { id: '3', name: 'Option 3' }],
+          designOptions,
+          'xl'
+        )
       ).toBe(55); // (10 + 5) + (30 + 10)
     });
 
     it('should calculate total for by-dozen package using perDozenPrice when available', () => {
       expect(
-        calculateAdditionalDesignsTotal(['1', '2'], designOptions, 'by-dozen')
+        calculateAdditionalDesignsTotal(
+          [{ id: '1', name: 'Option 1' }, { id: '2', name: 'Option 2' }],
+          designOptions,
+          'by-dozen'
+        )
       ).toBe(23); // 8 + 15
     });
 
     it('should fallback to basePrice for by-dozen when perDozenPrice not set', () => {
       expect(
-        calculateAdditionalDesignsTotal(['3'], designOptions, 'by-dozen')
+        calculateAdditionalDesignsTotal(
+          [{ id: '3', name: 'Option 3' }],
+          designOptions,
+          'by-dozen'
+        )
       ).toBe(30); // basePrice since perDozenPrice is undefined
     });
 
     it('should ignore invalid IDs', () => {
       expect(
         calculateAdditionalDesignsTotal(
-          ['1', 'invalid-id', '2'],
+          [
+            { id: '1', name: 'Option 1' },
+            { id: 'invalid-id', name: 'Invalid' },
+            { id: '2', name: 'Option 2' },
+          ],
           designOptions,
           'small'
         )
@@ -193,7 +221,11 @@ describe('priceCalculations', () => {
 
     it('should handle empty package type', () => {
       expect(
-        calculateAdditionalDesignsTotal(['1', '2'], designOptions, '')
+        calculateAdditionalDesignsTotal(
+          [{ id: '1', name: 'Option 1' }, { id: '2', name: 'Option 2' }],
+          designOptions,
+          ''
+        )
       ).toBe(30); // basePrice for both
     });
   });

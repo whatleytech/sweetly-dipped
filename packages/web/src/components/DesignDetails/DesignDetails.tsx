@@ -1,18 +1,14 @@
 import styles from "./DesignDetails.module.css";
-import type { FormData } from "@/types/formTypes";
-import { useAdditionalDesignOptions } from '@/hooks/useConfigQuery';
+import type { FormData } from '@/types/formTypes';
 
 interface DesignDetailsProps {
   formData: FormData;
 }
 
 export const DesignDetails = ({ formData }: DesignDetailsProps) => {
-  const { data: designOptions } = useAdditionalDesignOptions();
-
-  // Display selected designs by name:
+  // Direct access to names:
   const selectedNames = formData.selectedAdditionalDesigns
-    ?.map((id) => designOptions?.find((opt) => opt.id === id)?.name)
-    .filter(Boolean)
+    ?.map((d) => d.name)
     .join(', ');
 
   return (

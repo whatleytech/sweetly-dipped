@@ -16,16 +16,19 @@ todos:
     status: completed
   - id: commit-5-component
     content: "Commit 5: Transform AdditionalDesigns component to multi-select checkboxes + tests"
-    status: in_progress
+    status: completed
   - id: commit-6-utils-sidebar
     content: "Commit 6: Migrate formSummaryUtils, formStepUtils, FormSidebar, StepItem + tests"
-    status: pending
+    status: completed
   - id: commit-7-display
     content: "Commit 7: Migrate DesignDetails, PackageDetails display components + tests"
-    status: pending
+    status: completed
   - id: commit-8-e2e-cleanup
     content: "Commit 8: Update E2E tests, remove deprecated additionalDesigns field"
-    status: pending
+    status: completed
+  - id: commit-9-enrich-type
+    content: "Commit 9: Refactor selectedAdditionalDesigns from string[] to {id, name}[] with API enrichment"
+    status: completed
 ---
 
 # Additional Designs Configuration
@@ -1001,9 +1004,253 @@ BREAKING CHANGE: additionalDesigns field replaced by selectedAdditionalDesigns
 
 ---
 
-## Summary: 8 Atomic Commits
+## Commit 9: Enrich selectedAdditionalDesigns Type
 
-| # | Scope | Type | Breaking? ||---|-------|------|-----------|| 1 | DB + API endpoint + shared types | feat | No || 2 | Frontend API client + hook | feat | No || 3 | Price calculation utility | feat | No || 4 | Add new field (compatibility) | feat | No || 5 | Transform component UI | feat | No || 6 | Migrate utilities + sidebar | refactor | No || 7 | Migrate display components | feat | No || 8 | E2E + cleanup deprecated field | chore | Yes |**Key Principles:**
+**Scope:** Refactor `selectedAdditionalDesigns` from `string[]` to `Array<{ id: string; name: string }>` for richer data representation.
+
+### 9a. Add SelectedDesignOption Type
+
+**File**: `packages/shared-types/formTypes.ts`
+Add new interface and update FormData:
+
+```typescript
+export interface SelectedDesignOption {
+  id: string;
+  name: string;
+}
+
+export interface FormData {
+  // ... other fields ...
+  selectedAdditionalDesigns: SelectedDesignOption[];
+  // ...
+}
+```
+
+### 9b. Update FormDataDto Validation
+
+**File**: `packages/api/src/forms/dto/form-data.dto.ts`
+Update validation for object array:
+
+```typescript
+@IsOptional()
+@IsArray()
+@ValidateNested({ each: true })
+@Type(() => SelectedDesignOptionDto)
+selectedAdditionalDesigns?: Array<{ id: string; name: string }> | null;
+```
+
+Create SelectedDesignOptionDto class if needed for validation.
+
+### 9c. Update FormsService - Normalize Input
+
+**File**: `packages/api/src/forms/forms.service.ts`
+
+Update `normalizeFormDataInput()` to handle both formats during migration:
+
+```typescript
+const normalizeSelectedDesigns = (
+  input: unknown
+): Array<{ id: string; name: string }> => {
+  if (!Array.isArray(input)) return [];
+  return input.map(item => {
+    if (typeof item === 'string') {
+      return { id: item, name: '' }; // Legacy format
+    }
+    if (typeof item === 'object' && item?.id) {
+      return { id: item.id, name: item.name ?? '' };
+    }
+    return null;
+  }).filter((x): x is { id: string; name: string } => x !== null);
+};
+```
+
+### 9d. Update FormsService - Enrich on Read
+
+**File**: `packages/api/src/forms/forms.service.ts`
+
+Update `toFormDataFromRecord()` to resolve names from database:
+
+```typescript
+const toFormDataFromRecord = async (
+  form: FormWithRelations,
+  prisma: PrismaService
+): Promise<FormData> => {
+  const metadata = getFormMetadata(form);
+  
+  // Look up design option names from stored IDs
+  const storedIds = (metadata.selectedAdditionalDesigns ?? [])
+    .map(item => typeof item === 'string' ? item : item?.id)
+    .filter((id): id is string => typeof id === 'string');
+  
+  let selectedAdditionalDesigns: Array<{ id: string; name: string }> = [];
+  
+  if (storedIds.length > 0) {
+    const options = await this.prisma.additionalDesignOption.findMany({
+      where: { id: { in: storedIds } },
+      select: { id: true, name: true },
+    });
+    const idToName = new Map(options.map(o => [o.id, o.name]));
+    selectedAdditionalDesigns = storedIds
+      .filter(id => idToName.has(id))
+      .map(id => ({ id, name: idToName.get(id)! }));
+  }
+  
+  return {
+    // ... other fields ...
+    selectedAdditionalDesigns,
+    // ...
+  };
+};
+```
+
+### 9e. Update Frontend Components
+
+**File**: `packages/web/src/components/FormSteps/AdditionalDesigns.tsx`
+
+Update toggle handler to include name:
+
+```typescript
+const handleToggle = (optionId: string, optionName: string) => {
+  const current = formData.selectedAdditionalDesigns ?? [];
+  const isSelected = current.some(d => d.id === optionId);
+  
+  const updated = isSelected
+    ? current.filter(d => d.id !== optionId)
+    : [...current, { id: optionId, name: optionName }];
+  
+  updateFormData({ selectedAdditionalDesigns: updated });
+};
+
+// Update checked state:
+const isSelected = formData.selectedAdditionalDesigns?.some(d => d.id === option.id) ?? false;
+
+// Update onChange:
+onChange={() => handleToggle(option.id, option.name)}
+```
+
+### 9f. Update Utility Functions
+
+**File**: `packages/web/src/utils/formStepUtils.ts`
+No change needed (still checks array length).
+
+**File**: `packages/web/src/utils/formSummaryUtils.ts`
+Simplify to use `.name` directly:
+
+```typescript
+case 'designs': {
+  const selected = formData.selectedAdditionalDesigns;
+  if (!selected?.length) return null;
+  return selected.map(d => d.name).join(', ');
+}
+```
+
+**File**: `packages/web/src/utils/priceCalculations.ts`
+Update to accept object array:
+
+```typescript
+export const calculateAdditionalDesignsTotal = (
+  selectedDesigns: Array<{ id: string; name: string }>,
+  allOptions: AdditionalDesignOptionDto[],
+  packageType: FormData['packageType']
+): number => {
+  return selectedDesigns.reduce((total, selected) => {
+    const option = allOptions.find((opt) => opt.id === selected.id);
+    if (option) {
+      return total + calculateDesignOptionPrice(option, packageType);
+    }
+    return total;
+  }, 0);
+};
+```
+
+### 9g. Simplify Display Components
+
+**File**: `packages/web/src/components/DesignDetails/DesignDetails.tsx`
+No longer needs to fetch options for display:
+
+```typescript
+// Direct access to names:
+const selectedNames = formData.selectedAdditionalDesigns
+  ?.map(d => d.name)
+  .join(', ');
+```
+
+**File**: `packages/web/src/components/FormSidebar/FormSidebar.tsx`
+Can remove `useAdditionalDesignOptions` if only used for name lookup.
+
+**File**: `packages/web/src/components/FormSidebar/StepItem.tsx`
+Remove `additionalDesignOptions` prop if no longer needed.
+
+### 9h. Update All Tests
+
+Update all test files to use the new object format:
+
+```typescript
+// Old format:
+selectedAdditionalDesigns: ['design-1', 'design-2']
+
+// New format:
+selectedAdditionalDesigns: [
+  { id: 'design-1', name: 'Sprinkles' },
+  { id: 'design-2', name: 'Gold or silver painted' },
+]
+```
+
+Files to update:
+- `packages/web/src/utils/testUtils.ts`
+- All component tests using mock FormData
+- All page tests
+- API service tests
+- API integration tests
+
+### 9i. Update E2E Tests
+
+**File**: `packages/e2e/tests/app.spec.ts`
+No change needed (interacts via UI, not data structure).
+
+### Quality Gate Check
+
+```bash
+yarn precommit  # Must pass
+```
+
+### Human Manual Validation
+
+Provide a short description of what was done and brief manual testing instructions. Wait for a human to confirm functionality before proceeding to make a commit
+
+### Commit Message
+
+```javascript
+refactor(forms): enrich selectedAdditionalDesigns to include name
+
+- Change type from string[] to Array<{ id: string; name: string }>
+- Add SelectedDesignOption interface to shared-types
+- Update FormsService to resolve names from DB when returning form data
+- Update frontend components to include name when toggling selections
+- Simplify display components (no longer need to fetch options for names)
+- Update priceCalculations utility for new type
+- Update all tests to use new object format
+
+BREAKING CHANGE: selectedAdditionalDesigns now contains objects with id and name
+```
+
+---
+
+## Summary: 9 Atomic Commits
+
+| # | Scope | Type | Breaking? |
+|---|-------|------|-----------|
+| 1 | DB + API endpoint + shared types | feat | No |
+| 2 | Frontend API client + hook | feat | No |
+| 3 | Price calculation utility | feat | No |
+| 4 | Add new field (compatibility) | feat | No |
+| 5 | Transform component UI | feat | No |
+| 6 | Migrate utilities + sidebar | refactor | No |
+| 7 | Migrate display components | feat | No |
+| 8 | E2E + cleanup deprecated field | chore | Yes |
+| 9 | Enrich selectedAdditionalDesigns type | refactor | Yes |
+
+**Key Principles:**
 
 1. Each commit passes `yarn precommit` (lint, type-check, test, test:e2e)
 2. A human validates each commit

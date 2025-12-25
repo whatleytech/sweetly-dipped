@@ -25,12 +25,12 @@ export const calculateDesignOptionPrice = (
  * based on the package type.
  */
 export const calculateAdditionalDesignsTotal = (
-  selectedDesignIds: string[],
+  selectedDesigns: Array<{ id: string; name: string }>,
   designOptions: AdditionalDesignOptionDto[],
   packageType: FormData['packageType']
 ): number => {
-  return selectedDesignIds.reduce((total, id) => {
-    const option = designOptions.find((opt) => opt.id === id);
+  return selectedDesigns.reduce((total, selected) => {
+    const option = designOptions.find((opt) => opt.id === selected.id);
     if (!option) return total;
     return total + calculateDesignOptionPrice(option, packageType);
   }, 0);

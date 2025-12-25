@@ -2,7 +2,6 @@ import styles from "./StepItem.module.css";
 import type { FormStep } from "@/utils/formStepUtils";
 import { getStepSummary } from "@/utils/formSummaryUtils";
 import type { FormData } from "@/types/formTypes";
-import type { AdditionalDesignOptionDto } from '@sweetly-dipped/shared-types';
 
 interface StepItemProps {
   step: FormStep;
@@ -12,7 +11,6 @@ interface StepItemProps {
   isCompleted: boolean;
   formData: FormData;
   onStepClick: (stepIndex: number) => void;
-  additionalDesignOptions?: AdditionalDesignOptionDto[];
 }
 
 export const StepItem = ({
@@ -23,9 +21,8 @@ export const StepItem = ({
   isCompleted,
   formData,
   onStepClick,
-  additionalDesignOptions,
 }: StepItemProps) => {
-  const summary = getStepSummary(step.id, formData, additionalDesignOptions);
+  const summary = getStepSummary(step.id, formData);
 
   return (
     <div

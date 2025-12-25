@@ -85,8 +85,7 @@ export class FormDataDto implements FormDataDtoType {
 
   @IsOptional()
   @IsArray()
-  @IsString({ each: true })
-  selectedAdditionalDesigns?: string[] | null;
+  selectedAdditionalDesigns?: Array<{ id: string; name: string }> | null;
 
   // Pickup Details
   @ValidateIf(

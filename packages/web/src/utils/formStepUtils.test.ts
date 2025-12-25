@@ -93,7 +93,10 @@ describe("formStepUtils", () => {
     it('returns true for designs step with data', () => {
       const formDataWithDesigns = {
         ...mockFormData,
-        selectedAdditionalDesigns: ['design-1', 'design-2'],
+        selectedAdditionalDesigns: [
+          { id: 'design-1', name: 'Design 1' },
+          { id: 'design-2', name: 'Design 2' },
+        ],
       };
       expect(hasStepData('designs', formDataWithDesigns)).toBe(true);
     });
@@ -106,11 +109,11 @@ describe("formStepUtils", () => {
       expect(hasStepData('designs', formDataWithoutDesigns)).toBe(false);
     });
 
-    it('returns false for designs step with undefined array', () => {
+    it('returns false for designs step with empty array', () => {
       const formDataWithoutDesigns = {
         ...mockFormData,
-        selectedAdditionalDesigns: [] as string[] | undefined,
-      } as FormData;
+        selectedAdditionalDesigns: [] as Array<{ id: string; name: string }>,
+      };
       expect(hasStepData('designs', formDataWithoutDesigns)).toBe(false);
     });
 

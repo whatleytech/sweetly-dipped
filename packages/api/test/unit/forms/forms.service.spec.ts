@@ -439,11 +439,14 @@ describe('FormsService', () => {
   });
 
   describe('selectedAdditionalDesigns field handling', () => {
-    it('should normalize selectedAdditionalDesigns array from DTO', async () => {
+    it('should normalize selectedAdditionalDesigns objects from DTO and store IDs', async () => {
       // Arrange
       const formData = {
         ...createMockFormData(),
-        selectedAdditionalDesigns: ['design-id-1', 'design-id-2'],
+        selectedAdditionalDesigns: [
+          { id: 'design-id-1', name: 'Design 1' },
+          { id: 'design-id-2', name: 'Design 2' },
+        ],
       };
       const createDto = { formData, currentStep: 0 };
       const mockCustomer = {
@@ -457,20 +460,20 @@ describe('FormsService', () => {
       };
 
       prisma.customer.upsert.mockResolvedValue(mockCustomer);
-      prisma.form.create.mockResolvedValue(
-        createMockForm({
-          customerId: mockCustomer.id,
-          data: {
-            selectedAdditionalDesigns: ['design-id-1', 'design-id-2'],
-            currentStep: 0,
-          },
-        })
-      );
+      const createdForm = createMockForm({
+        customerId: mockCustomer.id,
+        data: {
+          selectedAdditionalDesigns: ['design-id-1', 'design-id-2'],
+          currentStep: 0,
+        },
+      });
+      prisma.form.create.mockResolvedValue(createdForm);
+      prisma.additionalDesignOption.findMany.mockResolvedValue([]);
 
       // Act
       await service.create(createDto);
 
-      // Assert
+      // Assert - should store only IDs in database
       expect(prisma.form.create).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
@@ -525,53 +528,10 @@ describe('FormsService', () => {
       );
     });
 
-    it('should filter out non-string values from selectedAdditionalDesigns array', async () => {
-      // Arrange
-      const formData = {
-        ...createMockFormData(),
-        selectedAdditionalDesigns: ['valid-id', 123, null, 'another-valid-id', {}] as unknown as string[],
-      };
-      const createDto = { formData, currentStep: 0 };
-      const mockCustomer = {
-        id: faker.string.uuid(),
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-        phone: formData.phone,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-
-      prisma.customer.upsert.mockResolvedValue(mockCustomer);
-      prisma.form.create.mockResolvedValue(
-        createMockForm({
-          customerId: mockCustomer.id,
-          data: {
-            selectedAdditionalDesigns: ['valid-id', 'another-valid-id'],
-            currentStep: 0,
-          },
-        })
-      );
-
-      // Act
-      await service.create(createDto);
-
-      // Assert
-      expect(prisma.form.create).toHaveBeenCalledWith(
-        expect.objectContaining({
-          data: expect.objectContaining({
-            data: expect.objectContaining({
-              selectedAdditionalDesigns: ['valid-id', 'another-valid-id'],
-            }),
-          }),
-        })
-      );
-    });
-
-    it('should extract selectedAdditionalDesigns from stored form data', async () => {
+    it('should normalize selectedAdditionalDesigns from stored IDs and enrich with names', async () => {
       // Arrange
       const formId = faker.string.uuid();
-      const storedDesignIds = ['design-1', 'design-2', 'design-3'];
+      const storedDesignIds = ['design-1', 'design-2'];
       const mockForm = createMockForm({
         id: formId,
         data: {
@@ -580,13 +540,49 @@ describe('FormsService', () => {
         },
       });
 
+      const mockDesignOptions = [
+        {
+          id: 'design-1',
+          name: 'Sprinkles',
+          description: null,
+          basePrice: 10,
+          largePriceIncrease: 0,
+          perDozenPrice: null,
+          isActive: true,
+          sortOrder: 1,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          id: 'design-2',
+          name: 'Gold or silver painted',
+          description: null,
+          basePrice: 15,
+          largePriceIncrease: 5,
+          perDozenPrice: null,
+          isActive: true,
+          sortOrder: 2,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ];
+
       prisma.form.findUnique.mockResolvedValue(mockForm);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      prisma.additionalDesignOption.findMany.mockResolvedValue(mockDesignOptions as any);
 
       // Act
       const result = await service.findOne(formId);
 
-      // Assert
-      expect(result.formData.selectedAdditionalDesigns).toEqual(storedDesignIds);
+      // Assert - should return objects with names
+      expect(result.formData.selectedAdditionalDesigns).toEqual([
+        { id: 'design-1', name: 'Sprinkles' },
+        { id: 'design-2', name: 'Gold or silver painted' },
+      ]);
+      expect(prisma.additionalDesignOption.findMany).toHaveBeenCalledWith({
+        where: { id: { in: storedDesignIds } },
+        select: { id: true, name: true },
+      });
     });
 
     it('should return empty array when selectedAdditionalDesigns is not in stored data', async () => {
@@ -601,6 +597,7 @@ describe('FormsService', () => {
       });
 
       prisma.form.findUnique.mockResolvedValue(mockForm);
+      prisma.additionalDesignOption.findMany.mockResolvedValue([]);
 
       // Act
       const result = await service.findOne(formId);

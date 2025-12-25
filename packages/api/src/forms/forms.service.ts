@@ -56,6 +56,33 @@ const ensureVisitedStepsSet = (
   return steps;
 };
 
+const normalizeSelectedDesigns = (
+  input: unknown
+): Array<{ id: string; name: string }> => {
+  if (!Array.isArray(input)) return [];
+  return input
+    .map((item) => {
+      if (typeof item === 'string') {
+        // Legacy format: just ID, name will be resolved later
+        return { id: item, name: '' };
+      }
+      if (
+        typeof item === 'object' &&
+        item !== null &&
+        'id' in item &&
+        typeof item.id === 'string'
+      ) {
+        return {
+          id: item.id,
+          name:
+            'name' in item && typeof item.name === 'string' ? item.name : '',
+        };
+      }
+      return null;
+    })
+    .filter((x): x is { id: string; name: string } => x !== null);
+};
+
 const normalizeFormDataInput = (data: FormDataDto): FormData => ({
   firstName: data.firstName ?? '',
   lastName: data.lastName ?? '',
@@ -71,9 +98,9 @@ const normalizeFormDataInput = (data: FormDataDto): FormData => ({
   colorScheme: data.colorScheme ?? '',
   eventType: data.eventType ?? '',
   theme: data.theme ?? '',
-  selectedAdditionalDesigns: Array.isArray(data.selectedAdditionalDesigns)
-    ? data.selectedAdditionalDesigns.filter((id): id is string => typeof id === 'string')
-    : [],
+  selectedAdditionalDesigns: normalizeSelectedDesigns(
+    data.selectedAdditionalDesigns
+  ),
   pickupDate: data.pickupDate ?? '',
   pickupTime: data.pickupTime ?? '',
   rushOrder: data.rushOrder ?? false,
@@ -150,7 +177,10 @@ const buildJsonData = (
   colorScheme: formData.colorScheme,
   eventType: formData.eventType,
   theme: formData.theme,
-  selectedAdditionalDesigns: formData.selectedAdditionalDesigns,
+  // Store only IDs in database for consistency
+  selectedAdditionalDesigns: formData.selectedAdditionalDesigns.map(
+    (d) => d.id
+  ),
   termsAccepted: formData.termsAccepted,
   visitedSteps: Array.from(formData.visitedSteps),
   currentStep,
@@ -184,34 +214,6 @@ const mapSharedFormFields = (formData: FormData, currentStep: number) => ({
   data: buildJsonData(formData, currentStep),
 });
 
-const toFormDataFromRecord = (form: FormWithRelations): FormData => {
-  const metadata = getFormMetadata(form);
-  const visitedSteps = ensureVisitedStepsSet(metadata.visitedSteps);
-
-  return {
-    firstName: form.customer?.firstName ?? '',
-    lastName: form.customer?.lastName ?? '',
-    email: form.customer?.email ?? '',
-    phone: form.customer?.phone ?? '',
-    communicationMethod: sanitizeCommunicationMethod(form.communicationMethod),
-    packageType: sanitizePackageType(form.packageType),
-    riceKrispies: form.riceKrispies,
-    oreos: form.oreos,
-    pretzels: form.pretzels,
-    marshmallows: form.marshmallows,
-    colorScheme: metadata.colorScheme,
-    eventType: metadata.eventType,
-    theme: metadata.theme,
-    selectedAdditionalDesigns: metadata.selectedAdditionalDesigns,
-    pickupDate: form.pickupDate ?? '',
-    pickupTime: form.pickupTime ?? '',
-    rushOrder: form.rushOrder,
-    referralSource: form.referralSource ?? '',
-    termsAccepted: metadata.termsAccepted,
-    visitedSteps,
-  };
-};
-
 const generateOrderNumber = (): string => {
   const today = new Date();
   const dateString = today.toISOString().split('T')[0].replace(/-/g, '');
@@ -222,31 +224,80 @@ const generateOrderNumber = (): string => {
   return `${dateString}-${hash}`;
 };
 
-const mapFormToStoredDto = (form: FormWithRelations): StoredFormDto => {
-  const formData = toFormDataFromRecord(form);
-  const metadata = getFormMetadata(form);
-  const { visitedSteps, ...formDataRest } = formData;
-
-  return {
-    id: form.id,
-    formData: {
-      ...formDataRest,
-      visitedSteps: Array.from(visitedSteps),
-    },
-    currentStep: metadata.currentStep,
-    orderNumber: form.order?.orderNumber ?? undefined,
-    status: form.status,
-    submittedAt: form.submittedAt?.toISOString(),
-    createdAt: form.createdAt.toISOString(),
-    updatedAt: form.updatedAt.toISOString(),
-  };
-};
-
 @Injectable()
 export class FormsService {
   private readonly formInclude = { customer: true, order: true } as const;
 
   constructor(private readonly prisma: PrismaService) {}
+
+  private async toFormDataFromRecord(
+    form: FormWithRelations
+  ): Promise<FormData> {
+    const metadata = getFormMetadata(form);
+    const visitedSteps = ensureVisitedStepsSet(metadata.visitedSteps);
+
+    // Look up design option names from stored IDs
+    const storedIds = metadata.selectedAdditionalDesigns;
+    let selectedAdditionalDesigns: Array<{ id: string; name: string }> = [];
+
+    if (storedIds.length > 0) {
+      const options = await this.prisma.additionalDesignOption.findMany({
+        where: { id: { in: storedIds } },
+        select: { id: true, name: true },
+      });
+      const idToName = new Map(options.map((o) => [o.id, o.name]));
+      selectedAdditionalDesigns = storedIds
+        .filter((id) => idToName.has(id))
+        .map((id) => ({ id, name: idToName.get(id)! }));
+    }
+
+    return {
+      firstName: form.customer?.firstName ?? '',
+      lastName: form.customer?.lastName ?? '',
+      email: form.customer?.email ?? '',
+      phone: form.customer?.phone ?? '',
+      communicationMethod: sanitizeCommunicationMethod(
+        form.communicationMethod
+      ),
+      packageType: sanitizePackageType(form.packageType),
+      riceKrispies: form.riceKrispies,
+      oreos: form.oreos,
+      pretzels: form.pretzels,
+      marshmallows: form.marshmallows,
+      colorScheme: metadata.colorScheme,
+      eventType: metadata.eventType,
+      theme: metadata.theme,
+      selectedAdditionalDesigns,
+      pickupDate: form.pickupDate ?? '',
+      pickupTime: form.pickupTime ?? '',
+      rushOrder: form.rushOrder,
+      referralSource: form.referralSource ?? '',
+      termsAccepted: metadata.termsAccepted,
+      visitedSteps,
+    };
+  }
+
+  private async mapFormToStoredDto(
+    form: FormWithRelations
+  ): Promise<StoredFormDto> {
+    const formData = await this.toFormDataFromRecord(form);
+    const metadata = getFormMetadata(form);
+    const { visitedSteps, ...formDataRest } = formData;
+
+    return {
+      id: form.id,
+      formData: {
+        ...formDataRest,
+        visitedSteps: Array.from(visitedSteps),
+      },
+      currentStep: metadata.currentStep,
+      orderNumber: form.order?.orderNumber ?? undefined,
+      status: form.status,
+      submittedAt: form.submittedAt?.toISOString(),
+      createdAt: form.createdAt.toISOString(),
+      updatedAt: form.updatedAt.toISOString(),
+    };
+  }
 
   async create(dto: CreateFormDto): Promise<StoredFormDto> {
     if (!dto.formData) {
@@ -286,7 +337,7 @@ export class FormsService {
       include: this.formInclude,
     });
 
-    return mapFormToStoredDto(form);
+    return this.mapFormToStoredDto(form);
   }
 
   async findAll(): Promise<StoredFormDto[]> {
@@ -295,7 +346,7 @@ export class FormsService {
       orderBy: { createdAt: 'desc' },
     });
 
-    return forms.map(mapFormToStoredDto);
+    return Promise.all(forms.map((form) => this.mapFormToStoredDto(form)));
   }
 
   async findOne(id: string): Promise<StoredFormDto> {
@@ -308,7 +359,7 @@ export class FormsService {
       throw new NotFoundException('Form data not found');
     }
 
-    return mapFormToStoredDto(form);
+    return this.mapFormToStoredDto(form);
   }
 
   async update(id: string, dto: UpdateFormDto): Promise<StoredFormDto> {
@@ -321,7 +372,7 @@ export class FormsService {
       throw new NotFoundException('Form data not found');
     }
 
-    const existingFormData = toFormDataFromRecord(existingForm);
+    const existingFormData = await this.toFormDataFromRecord(existingForm);
     const targetFormData = dto.formData
       ? normalizeFormDataInput(dto.formData)
       : existingFormData;
@@ -398,7 +449,7 @@ export class FormsService {
       throw new NotFoundException('Form data not found');
     }
 
-    return mapFormToStoredDto(updatedForm);
+    return this.mapFormToStoredDto(updatedForm);
   }
 
   async remove(id: string): Promise<void> {

@@ -11,12 +11,8 @@ import { ConfirmationPage } from './ConfirmationPage';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import React from 'react';
 import { configApi } from '../api/configApi';
-import {
-  setupConfigMocks,
-  mockAdditionalDesignOptions,
-} from '../utils/testUtils';
+import { setupConfigMocks } from '../utils/testUtils';
 import { formDataApi } from '../api/formDataApi';
-import * as useConfigQuery from '../hooks/useConfigQuery';
 
 // Mock react-router-dom
 const mockNavigate = vi.fn();
@@ -53,7 +49,7 @@ vi.mock('../api/formDataApi', () => {
     colorScheme: 'Pink and Gold',
     eventType: 'Birthday',
     theme: 'Princess',
-    selectedAdditionalDesigns: ['design-1'], // Mock selected design ID
+    selectedAdditionalDesigns: [{ id: 'design-1', name: 'Sprinkles' }], // Mock selected design ID
     pickupDate: '2024-02-15',
     pickupTime: '8:30 AM',
     rushOrder: false,
@@ -154,7 +150,7 @@ const renderConfirmationPage = (customMockData?: {
     colorScheme: string;
     eventType: string;
     theme: string;
-    selectedAdditionalDesigns: string[];
+    selectedAdditionalDesigns: Array<{ id: string; name: string }>;
     pickupDate: string;
     pickupTime: string;
     rushOrder: boolean;
@@ -240,15 +236,6 @@ describe('ConfirmationPage', () => {
     vi.clearAllMocks();
     localStorageMock.getItem.mockReturnValue('form-123');
     setupConfigMocks(configApi);
-    vi.spyOn(useConfigQuery, 'useAdditionalDesignOptions').mockReturnValue({
-      data: mockAdditionalDesignOptions,
-      isLoading: false,
-      isError: false,
-      error: null,
-      refetch: vi.fn(),
-    } as unknown as ReturnType<
-      typeof useConfigQuery.useAdditionalDesignOptions
-    >);
   });
 
   it('renders loading state initially', () => {
@@ -513,17 +500,47 @@ describe('ConfirmationPage', () => {
     });
   });
 
-  // TODO: Fix this test - needs proper hook mocking for DesignDetails component
-  // The DesignDetails component uses useAdditionalDesignOptions hook which requires
-  // proper React Query setup or hook mocking. This test should verify that selected
-  // additional designs are displayed when present.
-  it.skip('displays additional designs when present', async () => {
-    renderConfirmationPage();
+  it('displays additional designs when present', async () => {
+    const mockFormDataWithDesigns = {
+      firstName: 'John',
+      lastName: 'Doe',
+      email: 'john.doe@example.com',
+      phone: '123-456-7890',
+      communicationMethod: 'email' as const,
+      packageType: 'medium' as const,
+      riceKrispies: 2,
+      oreos: 1,
+      pretzels: 0,
+      marshmallows: 1,
+      colorScheme: 'Pink and Gold',
+      eventType: 'Birthday',
+      theme: 'Princess',
+      selectedAdditionalDesigns: [
+        { id: 'design-1', name: 'Sprinkles' },
+        { id: 'design-2', name: 'Gold or silver painted' },
+      ],
+      pickupDate: '2024-02-15',
+      pickupTime: '8:30 AM',
+      rushOrder: false,
+      referralSource: '',
+      termsAccepted: false,
+      visitedSteps: new Set(['lead', 'contact', 'package', 'design', 'pickup']),
+    };
+    const formWithDesigns = {
+      id: 'form-123',
+      formData: mockFormDataWithDesigns,
+      currentStep: 6,
+      createdAt: '2025-01-15T10:00:00Z',
+      updatedAt: '2025-01-15T10:00:00Z',
+    };
+    renderConfirmationPage(formWithDesigns);
 
-    // Wait for design options to load and render
+    // Wait for design details to render
     await waitFor(() => {
       expect(screen.getByText('Additional Designs:')).toBeInTheDocument();
-      expect(screen.getByText('Sprinkles')).toBeInTheDocument();
+      expect(
+        screen.getByText('Sprinkles, Gold or silver painted')
+      ).toBeInTheDocument();
     });
   });
 

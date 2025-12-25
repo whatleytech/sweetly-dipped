@@ -21,7 +21,7 @@ export interface FormData {
   colorScheme: string;
   eventType: string;
   theme: string;
-  selectedAdditionalDesigns: string[]; // Array of design option IDs
+  selectedAdditionalDesigns: SelectedDesignOption[]; // Array of design options with id and name
 
   // Pickup Details
   pickupDate: string;
@@ -87,3 +87,8 @@ export interface UnavailablePeriod {
 export type TimeSlots = {
   [key in DayOfWeek]: TimeSlot[];
 };
+
+export interface SelectedDesignOption {
+  id: string;
+  name: string;
+}

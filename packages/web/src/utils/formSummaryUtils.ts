@@ -1,6 +1,5 @@
 import type {
   FormData,
-  AdditionalDesignOptionDto,
 } from '@sweetly-dipped/shared-types';
 import { formatDateForDisplay } from '@/utils/timeUtils';
 
@@ -9,8 +8,7 @@ import { formatDateForDisplay } from '@/utils/timeUtils';
  */
 export const getStepSummary = (
   stepId: string,
-  formData: FormData,
-  additionalDesignOptions?: AdditionalDesignOptionDto[]
+  formData: FormData
 ): string | null => {
   switch (stepId) {
     case 'lead':
@@ -73,17 +71,7 @@ export const getStepSummary = (
     case 'designs': {
       const selected = formData.selectedAdditionalDesigns;
       if (!selected?.length) return null;
-
-      if (!additionalDesignOptions?.length) {
-        return `${selected.length} selected`;
-      }
-
-      const names = selected.map((id) => {
-        const match = additionalDesignOptions.find((opt) => opt.id === id);
-        return match ? match.name : 'Unknown';
-      });
-
-      return names.join(', ');
+      return selected.map((d) => d.name).join(', ');
     }
 
     case 'pickup':
