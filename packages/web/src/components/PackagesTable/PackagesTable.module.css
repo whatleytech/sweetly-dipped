@@ -18,8 +18,9 @@
 }
 
 .table {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: var(--spacing-lg);
 }
 
@@ -31,6 +32,10 @@
   position: relative;
   box-shadow: 0 4px 16px rgba(75, 46, 43, 0.1);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 100%;
+  max-width: 280px;
 }
 
 .package:hover {
@@ -67,6 +72,7 @@
   font-weight: 700;
   color: var(--sd-brown-dark);
   margin-bottom: var(--spacing-sm);
+  min-height: 2.5rem;
 }
 
 .quantity {
@@ -74,6 +80,8 @@
   font-size: 1.125rem;
   color: var(--sd-brown-light);
   margin-bottom: var(--spacing-md);
+  min-height: 3rem;
+  flex-grow: 1;
 }
 
 .price {
@@ -81,21 +89,22 @@
   font-size: 2.5rem;
   font-weight: 700;
   color: var(--sd-pink-base);
+  margin-top: auto;
 }
 
 /* Tablet and up */
 @media (min-width: 768px) {
-  .table {
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--spacing-lg);
+  .package {
+    flex: 0 0 calc(50% - var(--spacing-lg));
+    max-width: 280px;
   }
 }
 
 /* Desktop and up */
 @media (min-width: 1024px) {
-  .table {
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--spacing-lg);
+  .package {
+    flex: 0 0 calc(33.333% - var(--spacing-lg));
+    max-width: 280px;
   }
   
   .title {
