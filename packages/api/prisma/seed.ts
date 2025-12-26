@@ -1,91 +1,94 @@
-import { PrismaClient } from '../generated/prisma/index.js';
+import { PackageOption, PrismaClient } from '../generated/prisma/index.js';
 import { PrismaPg } from '@prisma/adapter-pg';
 
 const prisma = new PrismaClient({
   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
 });
 
-async function main() {
-  // Seed PackageOptions
-  const packageOptions = [
+async function seedAdditionalDesignOptions() {
+  const additionalDesignOptions = [
     {
-      packageId: 'small',
-      label: 'Small (3 dozen – 36 treats)',
-      price: 110,
+      name: 'Sprinkles',
+      description: 'Custom sprinkles decoration',
+      basePrice: 10,
+      largePriceIncrease: 0,
+      perDozenPrice: null,
       sortOrder: 1,
     },
     {
-      packageId: 'medium',
-      label: 'Medium (5 dozen – 60 treats)',
-      price: 180,
+      name: 'Gold or silver painted',
+      description: 'Gold or silver painted accents',
+      basePrice: 20,
+      largePriceIncrease: 0,
+      perDozenPrice: null,
       sortOrder: 2,
     },
     {
-      packageId: 'large',
-      label: 'Large (8 dozen – 96 treats)',
-      price: 280,
+      name: 'Edible images or logos',
+      description: 'Custom edible images or logos printed on treats',
+      basePrice: 40,
+      largePriceIncrease: 20,
+      perDozenPrice: 15,
       sortOrder: 3,
     },
     {
-      packageId: 'xl',
-      label: 'XL (12 dozen – 144 treats)',
-      price: 420,
-      description: 'Requires at least one month notice',
-      sortOrder: 4,
-    },
-    {
-      packageId: 'by-dozen',
-      label: 'No package — order by the dozen',
-      price: null,
-      sortOrder: 5,
-    },
-  ];
-
-  for (const option of packageOptions) {
-    await prisma.packageOption.upsert({
-      where: { packageId: option.packageId },
-      update: option,
-      create: option,
-    });
-  }
-
-  // Seed TreatOptions
-  const treatOptions = [
-    {
-      treatKey: 'riceKrispies',
-      label: 'Chocolate covered Rice Krispies',
-      price: 40,
-      sortOrder: 1,
-    },
-    {
-      treatKey: 'oreos',
-      label: 'Chocolate covered Oreos',
-      price: 30,
-      sortOrder: 2,
-    },
-    {
-      treatKey: 'pretzels',
-      label: 'Chocolate dipped pretzels',
-      price: 30,
-      sortOrder: 3,
-    },
-    {
-      treatKey: 'marshmallows',
-      label: 'Chocolate covered marshmallow pops',
-      price: 40,
+      name: 'Individually wrapped treats',
+      description: 'Each treat individually wrapped',
+      basePrice: 40,
+      largePriceIncrease: 20,
+      perDozenPrice: 15,
       sortOrder: 4,
     },
   ];
 
-  for (const option of treatOptions) {
-    await prisma.treatOption.upsert({
-      where: { treatKey: option.treatKey },
-      update: option,
-      create: option,
+  for (const option of additionalDesignOptions) {
+    const existing = await prisma.additionalDesignOption.findFirst({
+      where: { name: option.name },
     });
+
+    if (existing) {
+      await prisma.additionalDesignOption.update({
+        where: { id: existing.id },
+        data: option,
+      });
+    } else {
+      await prisma.additionalDesignOption.create({
+        data: option,
+      });
+    }
   }
 
-  // Seed TimeSlots
+  console.log('Additional design options seeded successfully');
+}
+
+async function seedUnavailablePeriods() {
+  const unavailablePeriods = [
+    {
+      startDate: '2025-08-28',
+      endDate: '2025-09-03',
+      reason: 'Vacation',
+    },
+    {
+      startDate: '2025-10-09',
+      endDate: '2025-10-13',
+      reason: 'Business trip',
+    },
+    {
+      startDate: '2025-11-15',
+      endDate: null,
+      reason: 'Personal appointment',
+    },
+  ];
+
+  await prisma.unavailablePeriod.deleteMany({});
+  for (const period of unavailablePeriods) {
+    await prisma.unavailablePeriod.create({ data: period });
+  }
+
+  console.log('Unavailable periods seeded successfully');
+}
+
+async function seedTimeSlots() {
   const timeSlots = [
     // Monday
     {
@@ -204,89 +207,119 @@ async function main() {
     },
   ];
 
-  // Delete existing time slots and recreate to avoid duplicates
   await prisma.timeSlot.deleteMany({});
   for (const slot of timeSlots) {
     await prisma.timeSlot.create({ data: slot });
   }
 
-  // Seed UnavailablePeriods
-  const unavailablePeriods = [
-    {
-      startDate: '2025-08-28',
-      endDate: '2025-09-03',
-      reason: 'Vacation',
-    },
-    {
-      startDate: '2025-10-09',
-      endDate: '2025-10-13',
-      reason: 'Business trip',
-    },
-    {
-      startDate: '2025-11-15',
-      endDate: null,
-      reason: 'Personal appointment',
-    },
-  ];
+  console.log('Time slots seeded successfully');
+}
 
-  // Delete existing unavailable periods and recreate
-  await prisma.unavailablePeriod.deleteMany({});
-  for (const period of unavailablePeriods) {
-    await prisma.unavailablePeriod.create({ data: period });
-  }
-
-  // Seed AdditionalDesignOptions
-  const additionalDesignOptions = [
+async function seedTreatOptions() {
+  const treatOptions = [
     {
-      name: 'Sprinkles',
-      description: 'Custom sprinkles decoration',
-      basePrice: 10,
-      largePriceIncrease: 0,
-      perDozenPrice: null,
+      treatKey: 'riceKrispies',
+      label: 'Chocolate covered Rice Krispies',
+      price: 40,
       sortOrder: 1,
     },
     {
-      name: 'Gold or silver painted',
-      description: 'Gold or silver painted accents',
-      basePrice: 20,
-      largePriceIncrease: 0,
-      perDozenPrice: null,
+      treatKey: 'oreos',
+      label: 'Chocolate covered Oreos',
+      price: 30,
       sortOrder: 2,
     },
     {
-      name: 'Edible images or logos',
-      description: 'Custom edible images or logos printed on treats',
-      basePrice: 40,
-      largePriceIncrease: 20,
-      perDozenPrice: 15,
+      treatKey: 'pretzels',
+      label: 'Chocolate dipped pretzels',
+      price: 30,
       sortOrder: 3,
     },
     {
-      name: 'Individually wrapped treats',
-      description: 'Each treat individually wrapped',
-      basePrice: 40,
-      largePriceIncrease: 20,
-      perDozenPrice: 15,
+      treatKey: 'marshmallows',
+      label: 'Chocolate covered marshmallow pops',
+      price: 40,
       sortOrder: 4,
     },
   ];
 
-  for (const option of additionalDesignOptions) {
-    const existing = await prisma.additionalDesignOption.findFirst({
-      where: { name: option.name },
+  for (const option of treatOptions) {
+    await prisma.treatOption.upsert({
+      where: { treatKey: option.treatKey },
+      update: option,
+      create: option,
     });
-
-    if (existing) {
-      await prisma.additionalDesignOption.update({
-        where: { id: existing.id },
-        data: option,
-      });
-    } else {
-      await prisma.additionalDesignOption.create({
-        data: option,
-      });
-    }
   }
+
+  console.log('Treat options seeded successfully');
+}
+
+async function seedPackageOptions() {
+  const packageOptions: Omit<
+    PackageOption,
+    'id' | 'createdAt' | 'updatedAt'
+  >[] = [
+    {
+      packageId: 'small',
+      label: 'Small',
+      price: 110,
+      description: '3 dozen – 36 treats',
+      isActive: true,
+      sortOrder: 1,
+    },
+    {
+      packageId: 'medium',
+      label: 'Medium',
+      price: 180,
+      description: '5 dozen – 60 treats',
+      isActive: true,
+      sortOrder: 2,
+    },
+    {
+      packageId: 'large',
+      label: 'Large',
+      price: 280,
+      description: '8 dozen – 96 treats',
+      isActive: true,
+      sortOrder: 3,
+    },
+    {
+      packageId: 'xl',
+      label: 'XL',
+      price: 420,
+      description: '12 dozen – 144 treats (Requires at least one month notice)',
+      isActive: true,
+      sortOrder: 4,
+    },
+    {
+      packageId: 'by-dozen',
+      label: 'By the dozen',
+      price: null,
+      description: 'No package — order by the dozen',
+      isActive: true,
+      sortOrder: 5,
+    },
+  ];
+
+  for (const option of packageOptions) {
+    await prisma.packageOption.upsert({
+      where: { packageId: option.packageId },
+      update: option,
+      create: option,
+    });
+  }
+
+  console.log('Package options seeded successfully');
+}
+
+async function main() {
+  await Promise.all([
+    seedPackageOptions(),
+    seedTreatOptions(),
+    seedTimeSlots(),
+    seedUnavailablePeriods(),
+    seedAdditionalDesignOptions(),
+  ]);
 
   console.log('Seed completed successfully');
 }
@@ -299,5 +332,3 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
-
-
